@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso ao Sistema de Licitações</title>
-    <script src="https://jsdelivr.net"></script>
+    <!-- Link alternativo, muito mais rápido e estável para carregar o Supabase -->
+    <script src="https://unpkg.com"></script>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .login-card { background: white; padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; max-width: 400px; width: 100%; text-align: center; }
@@ -39,11 +40,21 @@
 </div>
 
 <script>
+// Variável de controle movida para o topo para evitar erros de inicialização
+let modoLogin = true; 
+
 const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let _supabase = null;
 
-let modoLogin = true;
+// Garante a inicialização segura do banco de dados apenas se o script carregar
+try {
+    if (typeof supabase !== 'undefined') {
+        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+} catch (e) {
+    console.error("Aviso: Conexão direta pendente com o provedor.", e);
+}
 
 function alternarModo() {
     modoLogin = !modoLogin;
@@ -66,6 +77,11 @@ function alternarModo() {
 }
 
 async function executarAutenticacao() {
+    if (!_supabase) {
+        alert("❌ Erro de Conexão: A biblioteca do Supabase não pôde ser carregada na sua rede atual. Verifique sua conexão.");
+        return;
+    }
+
     const email = document.getElementById("email").value;
     const senha = document.getElementById("senha").value;
 
