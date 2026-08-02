@@ -100,10 +100,8 @@
 </div>
 
 <script>
-    // ===== CONFIGURAÇÃO CORRETA DO SUPABASE =====
     const CONFIG_URL = "https://ltjxofcbogdynbkssqlr.supabase.co";
     const CONFIG_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
-    // ============================================
 
     let modoLogin = true;
 
@@ -162,21 +160,22 @@
             }
 
             if (modoLogin) {
-                // Salva o token de acesso
                 if (resposta.access_token) {
                     localStorage.setItem('supabase_token', resposta.access_token);
                     localStorage.setItem('supabase_user', JSON.stringify(resposta.user));
                 }
                 alert("✅ Login realizado com sucesso!");
-                // Aqui você pode redirecionar para o painel:
-                // window.location.href = "painel.html";
             } else {
                 alert("🎉 Conta criada com sucesso! Agora você pode fazer login.");
-                alternarModo(); // volta para a tela de login
+                alternarModo();
             }
 
         } catch (erro) {
             console.error(erro);
             alert("❌ Falha de rede: Não foi possível alcançar o servidor.");
         }
-   
+    }
+</script>
+
+</body>
+</html>
