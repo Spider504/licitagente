@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro da Empresa - Sistema de Licitações</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f4f6f9; color: #333; }
+        header {
+            background: #1e3a8a; color: white; padding: 15px 30px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        header h1 { font-size: 18px; }
+        .user-info { display: flex; align-items: center; gap: 15px; font-size: 14px; }
+        .btn-sair {
+            background: #ef4444; color: white; border: none;
+            padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 13px;
+        }
+        .container { max-width: 900px; margin: 30px auto; padding: 0 20px; }
+        .card {
+            background: white; padding: 30px; border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        h2 { color: #1e3a8a; margin-bottom: 5px; }
+        .subtitle { color: #666; font-size: 14px; margin-bottom: 25px; }
+        .form-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 18px;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full { grid-column: 1 / -1; }
+        label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #444; }
+        input, select, textarea {
+            padding: 10px; border: 1px solid #ccc; border-radius: 5px;
+            font-size: 14px; width: 100%;
+        }
+        textarea { resize: vertical; min-height: 70px; }
+        .section-title {
+            grid-column: 1 / -1; font-size: 15px; font-weight: bold;
+            color: #1e3a8a; margin-top: 15px; padding-bottom: 6px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .btn-salvar {
+            background: #1e3a8a; color: white; border: none;
+            padding: 12px 30px; border-radius: 6px; font-size: 15px;
+            font-weight: bold; cursor: pointer; margin-top: 25px;
+        }
+        .btn-salvar:hover { background: #152960; }
+        .btn-voltar {
+            background: #6b7280; color: white; border: none;
+            padding: 10px 20px; border-radius: 6px; cursor: pointer;
+            font-size: 14px; margin-right: 10px;
+        }
+        .actions { margin-top: 25px; display: flex; gap: 10px; }
+        .msg {
+            padding: 12px; border-radius: 6px; margin-bottom: 20px;
+            font-size: 14px; display: none;
+        }
+        .msg.sucesso { background: #d1fae5; color: #065f46; display: block; }
+        .msg.erro { background: #fee2e2; color: #991b1b; display: block; }
+        @media (max-width: 700px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>📋 Cadastro da Empresa</h1>
+    <div class="user-info">
+        <span id="emailUsuario">...</span>
+        <button class="btn-sair" onclick="fazerLogout()">Sair</button>
+    </div>
+</header>
+
+<div class="container">
+    <div class="card">
+        <h2>Dados da Empresa</h2>
+        <p class="subtitle">Preencha os dados que serão usados automaticamente nas propostas.</p>
+
+        <div id="mensagem" class="msg"></div>
+
+        <form id="formEmpresa" onsubmit="salvarEmpresa(event)">
+            <div class="form-grid">
+
+                <div class="section-title">Dados da Empresa</div>
+
+                <div class="form-group full">
+                    <label>Razão Social *</label>
+                    <input type="text" id="razao_social" required>
+                </div>
+
+                <div class="form-group">
+                    <label>CNPJ *</label>
+                    <input type="text" id="cnpj" required placeholder="00.000.000/0000-00">
+                </div>
+
+                <div class="form-group">
+                    <label>Inscrição Estadual</label>
+                    <input type="text" id="inscricao_estadual">
+                </div>
+
+                <div class="section-title">Endereço</div>
+
+                <div class="form-group full">
+                    <label>Endereço</label>
+                    <input type="text" id="endereco" placeholder="Rua, número">
+                </div>
+
+                <div class="form-group">
+                    <label>Bairro</label>
+                    <input type="text" id="bairro">
+                </div>
+
+                <div class="form-group">
+                    <label>CEP</label>
+                    <input type="text" id="cep" placeholder="00000-000">
+                </div>
+
+                <div class="form-group">
+                    <label>Cidade</label>
+                    <input type="text" id="cidade">
+                </div>
+
+                <div class="form-group">
+                    <label>Estado</label>
+                    <input type="text" id="estado" value="MA" maxlength="2">
+                </div>
+
+                <div class="section-title">Representante Legal</div>
+
+                <div class="form-group full">
+                    <label>Nome Completo</label>
+                    <input type="text" id="nome_completo">
+                </div>
+
+                <div class="form-group">
+                    <label>RG</label>
+                    <input type="text" id="rg">
+                </div>
+
+                <div class="form-group">
+                    <label>CPF</label>
+                    <input type="text" id="cpf" placeholder="000.000.000-00">
+                </div>
+
+                <div class="form-group">
+                    <label>Cargo</label>
+                    <input type="text" id="cargo" placeholder="Ex: Sócio Administrador">
+                </div>
+
+                <div class="form-group">
+                    <label>Estado Civil</label>
+                    <select id="estado_civil">
+                        <option value="CASADO">Casado(a)</option>
+                        <option value="SOLTEIRO">Solteiro(a)</option>
+                        <option value="DIVORCIADO">Divorciado(a)</option>
+                        <option value="VIUVO">Viúvo(a)</option>
+                    </select>
+                </div>
+
+                <div class="section-title">Contatos e Dados Bancários</div>
+
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="text" id="telefone" placeholder="(00) 00000-0000">
+                </div>
+
+                <div class="form-group">
+                    <label>E-mail</label>
+                    <input type="email" id="email">
+                </div>
+
+                <div class="form-group full">
+                    <label>Dados Bancários</label>
+                    <textarea id="dados_bancarios" placeholder="Banco, Agência, Conta Corrente..."></textarea>
+                </div>
+
+                <div class="form-group full">
+                    <label>Chave PIX</label>
+                    <input type="text" id="chave_pix">
+                </div>
+
+            </div>
+
+            <div class="actions">
+                <button type="button" class="btn-voltar" onclick="window.location.href='painel.html'">← Voltar</button>
+                <button type="submit" class="btn-salvar">Salvar Dados da Empresa</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const CONFIG_URL = "https://ltjxofcbogdynbkssqlr.supabase.co";
+    const CONFIG_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
+
+    // Verifica login
+    const token = localStorage.getItem('supabase_token');
+    const user = localStorage.getItem('supabase_user');
+
+    if (!token) {
+        window.location.href = "index.html";
+    } else {
+        try {
+            const userData = JSON.parse(user);
+            document.getElementById('emailUsuario').innerText = userData.email || "Usuário";
+        } catch (e) {
+            document.getElementById('emailUsuario').innerText = "Usuário";
+        }
+        carregarEmpresa();
+    }
+
+    function fazerLogout() {
+        localStorage.removeItem('supabase_token');
+        localStorage.removeItem('supabase_user');
+        window.location.href = "index.html";
+    }
+
+    function mostrarMensagem(texto, tipo) {
+        const msg = document.getElementById('mensagem');
+        msg.innerText = texto;
+        msg.className = 'msg ' + tipo;
+        setTimeout(() => msg.className = 'msg', 4000);
+    }
+
+    async function carregarEmpresa() {
+        try {
+            const userData = JSON.parse(user);
+            const response = await fetch(`${CONFIG_URL}/rest/v1/empresas?user_id=eq.${userData.id}`, {
+                headers: {
+                    'apikey': CONFIG_KEY,
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await response.json();
+
+            if (data && data.length > 0) {
+                const emp = data[0];
+                document.getElementById('razao_social').value = emp.razao_social || '';
+                document.getElementById('cnpj').value = emp.cnpj || '';
+                document.getElementById('inscricao_estadual').value = emp.inscricao_estadual || '';
+                document.getElementById('endereco').value = emp.endereco || '';
+                document.getElementById('bairro').value = emp.bairro || '';
+                document.getElementById('cep').value = emp.cep || '';
+                document.getElementById('cidade').value = emp.cidade || '';
+                document.getElementById('estado').value = emp.estado || 'MA';
+                document.getElementById('nome_completo').value = emp.nome_completo || '';
+                document.getElementById('rg').value = emp.rg || '';
+                document.getElementById('cpf').value = emp.cpf || '';
+                document.getElementById('cargo').value = emp.cargo || '';
+                document.getElementById('estado_civil').value = emp.estado_civil || 'CASADO';
+                document.getElementById('telefone').value = emp.telefone || '';
+                document.getElementById('email').value = emp.email || '';
+                document.getElementById('dados_bancarios').value = emp.dados_bancarios || '';
+                document.getElementById('chave_pix').value = emp.chave_pix || '';
+            }
+        } catch (erro) {
+            console.error('Erro ao carregar empresa:', erro);
+        }
+    }
+
+    async function salvarEmpresa(event) {
+        event.preventDefault();
+
+        const userData = JSON.parse(user);
+
+        const dados = {
+            user_id: userData.id,
+            razao_social: document.getElementById('razao_social').value.trim(),
+            cnpj: document.getElementById('cnpj').value.trim(),
+            inscricao_estadual: document.getElementById('inscricao_estadual').value.trim(),
+            endereco: document.getElementById('endereco').value.trim(),
+            bairro: document.getElementById('bairro').value.trim(),
+            cep: document.getElementById('cep').value.trim(),
+            cidade: document.getElementById('cidade').value.trim(),
+            estado: document.getElementById('estado').value.trim(),
+            nome_completo: document.getElementById('nome_completo').value.trim(),
+            rg: document.getElementById('rg').value.trim(),
+            cpf: document.getElementById('cpf').value.trim(),
+            cargo: document.getElementById('cargo').value.trim(),
+            estado_civil: document.getElementById('estado_civil').value,
+            telefone: document.getElementById('telefone').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            dados_bancarios: document.getElementById('dados_bancarios').value.trim(),
+            chave_pix: document.getElementById('chave_pix').value.trim(),
+            updated_at: new Date().toISOString()
+        };
+
+        try {
+            // Verifica se já existe empresa
+            const check = await fetch(`${CONFIG_URL}/rest/v1/empresas?user_id=eq.${userData.id}`, {
+                headers: {
+                    'apikey': CONFIG_KEY,
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const existentes = await check.json();
+
+            let response;
+
+            if (existentes && existentes.length > 0) {
+                // Atualiza
+                response = await fetch(`${CONFIG_URL}/rest/v1/empresas?user_id=eq.${userData.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': CONFIG_KEY,
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(dados)
+                });
+            } else {
+                // Insere
+                response = await fetch(`${CONFIG_URL}/rest/v1/empresas`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': CONFIG_KEY,
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(dados)
+                });
+            }
+
+            if (response.ok) {
+                mostrarMensagem('✅ Dados da empresa salvos com sucesso!', 'sucesso');
+            } else {
+                const erro = await response.json();
+                console.error(erro);
+                mostrarMensagem('❌ Erro ao salvar. Verifique o console.', 'erro');
+            }
+
+        } catch (erro) {
+            console.error(erro);
+            mostrarMensagem('❌ Erro de conexão com o servidor.', 'erro');
+        }
+    }
+</script>
+
+</body>
+</html>
