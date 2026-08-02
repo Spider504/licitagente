@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso ao Sistema de Licitações</title>
-    <!-- Inclusão Oficial da Biblioteca do Supabase JS -->
     <script src="https://jsdelivr.net"></script>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
@@ -25,7 +24,6 @@
     <h1 id="tituloTela">🔑 Entrar no Sistema</h1>
     <p id="subtituloTela">Digite suas credenciais para gerenciar as propostas.</p>
 
-    <!-- Formulário Único -->
     <div class="form-group">
         <label>E-mail institucional</label>
         <input type="email" id="email" placeholder="seu-email@empresa.com.br">
@@ -41,12 +39,11 @@
 </div>
 
 <script>
-// CONEXÃO DIRETA COM O SEU PROJETO DO SUPABASE
 const SUPABASE_URL = "https://supabase.co";
 const SUPABASE_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-let modoLogin = true; // Controla se a tela está em modo Login ou Cadastro
+let modoLogin = true;
 
 function alternarModo() {
     modoLogin = !modoLogin;
@@ -78,15 +75,13 @@ async function executarAutenticacao() {
     }
 
     if (modoLogin) {
-        // 🔐 EFETUAR LOGIN
         const { data, error } = await _supabase.auth.signInWithPassword({ email, senha });
         if (error) {
             alert("❌ Erro ao entrar: " + error.message);
         } else {
-            alert("✅ Login realizado com sucesso! Pronto para carregar o seu painel de propostas.");
+            alert("✅ Login realizado com sucesso!");
         }
     } else {
-        // 📝 CRIAR CADASTRO DE USUÁRIO (CONFIRMAÇÃO POR E-MAIL DESATIVADA)
         const { data, error } = await _supabase.auth.signUp({ email, senha });
         if (error) {
             alert("❌ Erro ao cadastrar: " + error.message);
