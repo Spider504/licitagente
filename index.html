@@ -5,16 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso ao Sistema de Licitações</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .login-card { background: white; padding: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-radius: 8px; max-width: 400px; width: 100%; text-align: center; }
-        h1 { color: #1e3a8a; font-size: 24px; margin-bottom: 10px; }
-        p { color: #666; font-size: 14px; margin-bottom: 25px; }
-        .form-group { display: flex; flex-direction: column; text-align: left; margin-bottom: 15px; }
-        label { font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #555; }
-        input { padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; width: 100%; box-sizing: border-box; }
-        .btn { background: #1e3a8a; color: white; border: none; padding: 12px; cursor: pointer; border-radius: 4px; font-weight: bold; width: 100%; font-size: 15px; margin-top: 10px; }
-        .btn:hover { background: #152960; }
-        .toggle-link { margin-top: 15px; font-size: 13px; color: #1e3a8a; cursor: pointer; display: block; text-decoration: underline; }
+        body { 
+            font-family: Arial, sans-serif; 
+            background-color: #f4f6f9; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .login-card { 
+            background: white; 
+            padding: 40px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
+            border-radius: 8px; 
+            max-width: 400px; 
+            width: 100%; 
+            text-align: center; 
+        }
+        h1 { 
+            color: #1e3a8a; 
+            font-size: 24px; 
+            margin-bottom: 10px; 
+        }
+        p { 
+            color: #666; 
+            font-size: 14px; 
+            margin-bottom: 25px; 
+        }
+        .form-group { 
+            display: flex; 
+            flex-direction: column; 
+            text-align: left; 
+            margin-bottom: 15px; 
+        }
+        label { 
+            font-size: 12px; 
+            font-weight: bold; 
+            margin-bottom: 5px; 
+            color: #555; 
+        }
+        input { 
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            font-size: 14px; 
+            width: 100%; 
+            box-sizing: border-box; 
+        }
+        .btn { 
+            background: #1e3a8a; 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            cursor: pointer; 
+            border-radius: 4px; 
+            font-weight: bold; 
+            width: 100%; 
+            font-size: 15px; 
+            margin-top: 10px; 
+        }
+        .btn:hover { 
+            background: #152960; 
+        }
+        .toggle-link { 
+            margin-top: 15px; 
+            font-size: 13px; 
+            color: #1e3a8a; 
+            cursor: pointer; 
+            display: block; 
+            text-decoration: underline; 
+        }
     </style>
 </head>
 <body>
@@ -27,6 +88,7 @@
         <label>E-mail institucional</label>
         <input type="email" id="email" placeholder="seu-email@empresa.com.br">
     </div>
+
     <div class="form-group">
         <label>Senha de acesso</label>
         <input type="password" id="senha" placeholder="••••••••">
@@ -38,70 +100,83 @@
 </div>
 
 <script>
-const CONFIG_URL = "https://supabase.co";
-const CONFIG_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
-let modoLogin = true; 
+    // ===== CONFIGURAÇÃO CORRETA DO SUPABASE =====
+    const CONFIG_URL = "https://ltjxofcbogdynbkssqlr.supabase.co";
+    const CONFIG_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
+    // ============================================
 
-function alternarModo() {
-    modoLogin = !modoLogin;
-    const titulo = document.getElementById("tituloTela");
-    const subtitulo = document.getElementById("subtituloTela");
-    const btnAcao = document.getElementById("btnAcao");
-    const btnAlternar = document.getElementById("btnAlternar");
+    let modoLogin = true;
 
-    if (modoLogin) {
-        titulo.innerText = "🔑 Entrar no Sistema";
-        subtitulo.innerText = "Digite suas credenciais para gerenciar as propostas.";
-        btnAcao.innerText = "Entrar";
-        btnAlternar.innerText = "Não tem uma conta? Cadastre-se aqui";
-    } else {
-        titulo.innerText = "📝 Criar Nova Conta";
-        subtitulo.innerText = "Cadastre um novo e-mail para acessar o painel.";
-        btnAcao.innerText = "Criar Conta";
-        btnAlternar.innerText = "Já possui uma conta? Faça o Login";
-    }
-}
+    function alternarModo() {
+        modoLogin = !modoLogin;
+        const titulo = document.getElementById("tituloTela");
+        const subtitulo = document.getElementById("subtituloTela");
+        const btnAcao = document.getElementById("btnAcao");
+        const btnAlternar = document.getElementById("btnAlternar");
 
-async function executarAutenticacao() {
-    const emailInput = document.getElementById("email").value.trim();
-    const senhaInput = document.getElementById("senha").value.trim();
-
-    if (!emailInput || !senhaInput) {
-        alert("⚠️ Por favor, preencha todos os campos.");
-        return;
-    }
-
-    // Define a rota com base no modo atual (login ou cadastro)
-    const rotaApi = modoLogin ? 'token?grant_type=password' : 'signup';
-    const corpoDados = modoLogin ? { email: emailInput, password: senhaInput } : { email: emailInput, password: senhaInput };
-
-    try {
-        const conexao = await fetch(`${CONFIG_URL}/auth/v1/${rotaApi}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'apikey': CONFIG_KEY,
-                'Authorization': `Bearer ${CONFIG_KEY}`
-            },
-            body: JSON.stringify(corpoDados)
-        });
-
-        const resposta = await conexao.json();
-
-        if (resposta.error || resposta.error_description) {
-            alert("❌ Erro: " + (resposta.error_description || resposta.error.message));
+        if (modoLogin) {
+            titulo.innerText = "🔑 Entrar no Sistema";
+            subtitulo.innerText = "Digite suas credenciais para gerenciar as propostas.";
+            btnAcao.innerText = "Entrar";
+            btnAlternar.innerText = "Não tem uma conta? Cadastre-se aqui";
         } else {
-            if (modoLogin) {
-                alert("✅ Login realizado com sucesso!");
-            } else {
-                alert("🎉 Usuário registrado com sucesso! Você já pode realizar o login.");
-                alternarModo();
-            }
+            titulo.innerText = "📝 Criar Nova Conta";
+            subtitulo.innerText = "Cadastre um novo e-mail para acessar o painel.";
+            btnAcao.innerText = "Criar Conta";
+            btnAlternar.innerText = "Já possui uma conta? Faça o Login";
         }
-    } catch (erro) {
-        alert("❌ Falha de rede: Não foi possível alcançar o servidor.");
     }
-}
-</script>
-</body>
-</html>
+
+    async function executarAutenticacao() {
+        const emailInput = document.getElementById("email").value.trim();
+        const senhaInput = document.getElementById("senha").value.trim();
+
+        if (!emailInput || !senhaInput) {
+            alert("⚠️ Por favor, preencha todos os campos.");
+            return;
+        }
+
+        const rotaApi = modoLogin ? 'token?grant_type=password' : 'signup';
+        const corpoDados = {
+            email: emailInput,
+            password: senhaInput
+        };
+
+        try {
+            const conexao = await fetch(`${CONFIG_URL}/auth/v1/${rotaApi}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': CONFIG_KEY,
+                    'Authorization': `Bearer ${CONFIG_KEY}`
+                },
+                body: JSON.stringify(corpoDados)
+            });
+
+            const resposta = await conexao.json();
+
+            if (!conexao.ok || resposta.error || resposta.error_description) {
+                const mensagem = resposta.error_description || resposta.msg || (resposta.error && resposta.error.message) || "Erro desconhecido";
+                alert("❌ Erro: " + mensagem);
+                return;
+            }
+
+            if (modoLogin) {
+                // Salva o token de acesso
+                if (resposta.access_token) {
+                    localStorage.setItem('supabase_token', resposta.access_token);
+                    localStorage.setItem('supabase_user', JSON.stringify(resposta.user));
+                }
+                alert("✅ Login realizado com sucesso!");
+                // Aqui você pode redirecionar para o painel:
+                // window.location.href = "painel.html";
+            } else {
+                alert("🎉 Conta criada com sucesso! Agora você pode fazer login.");
+                alternarModo(); // volta para a tela de login
+            }
+
+        } catch (erro) {
+            console.error(erro);
+            alert("❌ Falha de rede: Não foi possível alcançar o servidor.");
+        }
+   
