@@ -3,104 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel - Sistema de Licitações</title>
+    <title>Dashboard - Sistema de Licitações</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f6f9;
-            color: #333;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f0f2f5;
+            color: #1f2937;
+            min-height: 100vh;
         }
+
+        /* ===== HEADER ===== */
         header {
             background: #1e3a8a;
             color: white;
-            padding: 15px 30px;
+            padding: 14px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
-        header h1 {
-            font-size: 20px;
-        }
-        .user-info {
+
+        .logo {
+            font-size: 17px;
+            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 15px;
-            font-size: 14px;
+            gap: 8px;
         }
-        .btn-logout {
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+        }
+
+        .user-email {
+            max-width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn-sair {
             background: #ef4444;
             color: white;
             border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
+            padding: 7px 14px;
+            border-radius: 6px;
             cursor: pointer;
             font-size: 13px;
+            font-weight: 600;
         }
-        .btn-logout:hover {
+
+        .btn-sair:hover {
             background: #dc2626;
         }
+
+        /* ===== CONTEÚDO ===== */
         .container {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 25px 16px 40px;
         }
+
+        .welcome {
+            margin-bottom: 25px;
+        }
+
+        .welcome h1 {
+            font-size: 24px;
+            color: #1e3a8a;
+            margin-bottom: 4px;
+        }
+
+        .welcome p {
+            color: #6b7280;
+            font-size: 15px;
+        }
+
+        /* ===== CARDS DE AÇÃO ===== */
+        .cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
         .card {
             background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            text-align: center;
+            border-radius: 12px;
+            padding: 24px 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            border: 1px solid #e5e7eb;
         }
-        .card h2 {
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .card h3 {
+            font-size: 17px;
+            margin-bottom: 6px;
             color: #1e3a8a;
-            margin-bottom: 10px;
         }
+
         .card p {
-            color: #666;
+            font-size: 13px;
+            color: #6b7280;
+            line-height: 1.4;
+        }
+
+        .card.destaque {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            border: none;
+        }
+
+        .card.destaque h3,
+        .card.destaque p {
+            color: white;
+        }
+
+        /* ===== STATUS DA EMPRESA ===== */
+        .status-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            border: 1px solid #e5e7eb;
             margin-bottom: 25px;
+        }
+
+        .status-box h3 {
+            font-size: 15px;
+            color: #1e3a8a;
+            margin-bottom: 12px;
+        }
+
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.ok {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge.pendente {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        /* ===== RESPONSIVO ===== */
+        @media (max-width: 600px) {
+            header {
+                padding: 12px 14px;
+            }
+
+            .logo {
+                font-size: 15px;
+            }
+
+            .user-email {
+                display: none; /* esconde o e-mail no celular para economizar espaço */
+            }
+
+            .welcome h1 {
+                font-size: 20px;
+            }
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 18px 14px 30px;
+            }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>📋 Sistema de Licitações</h1>
-    <div class="user-info">
-        <span id="emailUsuario">Carregando...</span>
-        <button class="btn-logout" onclick="fazerLogout()">Sair</button>
+    <div class="logo">
+        📋 Sistema de Licitações
+    </div>
+    <div class="user-area">
+        <span class="user-email" id="emailUsuario">Carregando...</span>
+        <button class="btn-sair" onclick="fazerLogout()">Sair</button>
     </div>
 </header>
 
 <div class="container">
-    <div class="card">
-        <h2>Bem-vindo ao Painel!</h2>
-        <div style="margin-top: 25px;">
-    <a href="empresa.html" style="background:#1e3a8a; color:white; padding:12px 25px; border-radius:6px; text-decoration:none; font-weight:bold;">
-        📝 Cadastrar / Editar Empresa
-    </a>
-</div>    </div>
+
+    <div class="welcome">
+        <h1>Olá! 👋</h1>
+        <p>Bem-vindo ao seu painel de propostas e licitações.</p>
+    </div>
+
+    <!-- Status da Empresa -->
+    <div class="status-box">
+        <h3>Status do Cadastro da Empresa</h3>
+        <div class="status-info">
+            <span id="statusEmpresa">Verificando...</span>
+        </div>
+    </div>
+
+    <!-- Cards de Ação -->
+    <div class="cards">
+
+        <a href="empresa.html" class="card destaque">
+            <div class="card-icon">🏢</div>
+            <h3>Cadastro da Empresa</h3>
+            <p>Preencha ou edite os dados da sua empresa que serão usados nas propostas.</p>
+        </a>
+
+        <a href="#" class="card" onclick="alertaEmBreve()">
+            <div class="card-icon">📄</div>
+            <h3>Nova Proposta</h3>
+            <p>Gere uma proposta reajustada a partir dos modelos pré-definidos.</p>
+        </a>
+
+        <a href="#" class="card" onclick="alertaEmBreve()">
+            <div class="card-icon">📁</div>
+            <h3>Meus Editais</h3>
+            <p>Cadastre e gerencie os editais e licitações que você está participando.</p>
+        </a>
+
+        <a href="#" class="card" onclick="alertaEmBreve()">
+            <div class="card-icon">📊</div>
+            <h3>Histórico de Propostas</h3>
+            <p>Veja todas as propostas já geradas e baixe novamente quando precisar.</p>
+        </a>
+
+    </div>
+
 </div>
 
 <script>
-    // Verifica se o usuário está logado
+    const CONFIG_URL = "https://ltjxofcbogdynbkssqlr.supabase.co";
+    const CONFIG_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
+
     const token = localStorage.getItem('supabase_token');
     const user = localStorage.getItem('supabase_user');
 
     if (!token) {
-        // Se não estiver logado, volta para a tela de login
         window.location.href = "index.html";
     } else {
-        // Mostra o e-mail do usuário
         try {
             const userData = JSON.parse(user);
-            document.getElementById('emailUsuario').innerText = userData.email || "Usuário logado";
+            document.getElementById('emailUsuario').innerText = userData.email || "Usuário";
+            verificarEmpresa(userData.id);
         } catch (e) {
-            document.getElementById('emailUsuario').innerText = "Usuário logado";
+            document.getElementById('emailUsuario').innerText = "Usuário";
         }
     }
 
@@ -108,6 +294,39 @@
         localStorage.removeItem('supabase_token');
         localStorage.removeItem('supabase_user');
         window.location.href = "index.html";
+    }
+
+    function alertaEmBreve() {
+        alert("🚧 Esta funcionalidade será liberada em breve!");
+    }
+
+    async function verificarEmpresa(userId) {
+        const statusEl = document.getElementById('statusEmpresa');
+
+        try {
+            const response = await fetch(`${CONFIG_URL}/rest/v1/empresas?user_id=eq.${userId}&select=razao_social`, {
+                headers: {
+                    'apikey': CONFIG_KEY,
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (data && data.length > 0 && data[0].razao_social) {
+                statusEl.innerHTML = `
+                    <span class="badge ok">✓ Cadastrada</span>
+                    <span>${data[0].razao_social}</span>
+                `;
+            } else {
+                statusEl.innerHTML = `
+                    <span class="badge pendente">⚠ Pendente</span>
+                    <span>Você ainda não cadastrou os dados da empresa.</span>
+                `;
+            }
+        } catch (erro) {
+            statusEl.innerHTML = `<span class="badge pendente">⚠ Não foi possível verificar</span>`;
+        }
     }
 </script>
 
