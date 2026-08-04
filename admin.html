@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administração - Sistema de Licitações</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1f2937; min-height: 100vh; }
+        
+        header {
+            background: #1e3a8a; color: white; padding: 14px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .logo { font-size: 17px; font-weight: 700; }
+        .user-area { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+        .btn-sair { background: #ef4444; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
+        .btn-sair:hover { background: #dc2626; }
+        .btn-voltar { background: #3b82f6; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; text-decoration: none; }
+        
+        .container { max-width: 1100px; margin: 0 auto; padding: 25px 16px 50px; }
+        h1 { font-size: 22px; color: #1e3a8a; margin-bottom: 6px; }
+        .subtitle { color: #6b7280; font-size: 14px; margin-bottom: 25px; }
+        
+        .tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab {
+            padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer;
+            font-size: 14px; font-weight: 600; background: #e5e7eb; color: #374151;
+        }
+        .tab.active { background: #1e3a8a; color: white; }
+        
+        .card {
+            background: white; border-radius: 12px; padding: 24px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06); border: 1px solid #e5e7eb; margin-bottom: 20px;
+        }
+        .card h2 { font-size: 16px; color: #1e3a8a; margin-bottom: 16px; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 10px 8px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        th { background: #f9fafb; font-weight: 600; color: #374151; }
+        
+        .badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .badge.ativa { background: #d1fae5; color: #065f46; }
+        .badge.expirada { background: #fee2e2; color: #991b1b; }
+        .badge.cancelada { background: #e5e7eb; color: #4b5563; }
+        .badge.admin { background: #dbeafe; color: #1e40af; }
+        .badge.user { background: #f3f4f6; color: #4b5563; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full { grid-column: 1 / -1; }
+        label { font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #374151; }
+        input, select {
+            padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;
+        }
+        input:focus, select:focus { outline: none; border-color: #3b82f6; }
+        
+        .btn {
+            padding: 11px 20px; border-radius: 8px; font-size: 14px; font-weight: 600;
+            cursor: pointer; border: none; margin-top: 10px;
+        }
+        .btn-primary { background: #1e3a8a; color: white; }
+        .btn-primary:hover { background: #152960; }
+        .btn-danger { background: #ef4444; color: white; }
+        
+        .msg { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 14px; display: none; }
+        .msg.sucesso { background: #d1fae5; color: #065f46; display: block; }
+        .msg.erro { background: #fee2e2; color: #991b1b; display: block; }
+        
+        .hidden { display: none; }
+        
+        @media (max-width: 700px) {
+            .form-grid { grid-template-columns: 1fr; }
+            table { font-size: 12px; }
+            th, td { padding: 8px 4px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">⚙️ Painel Administrativo</div>
+    <div class="user-area">
+        <span id="emailUsuario">...</span>
+        <a href="painel.html" class="btn-voltar">Dashboard</a>
+        <button class="btn-sair" onclick="fazerLogout()">Sair</button>
+    </div>
+</header>
+
+<div class="container">
+    <h1>Administração do Sistema</h1>
+    <p class="subtitle">Gerencie usuários, planos e assinaturas</p>
+
+    <div id="mensagem" class="msg"></div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="mostrarAba('usuarios')">Usuários</button>
+        <button class="tab" onclick="mostrarAba('assinaturas')">Assinaturas</button>
+        <button class="tab" onclick="mostrarAba('nova')">Nova Assinatura</button>
+        <button class="tab" onclick="mostrarAba('planos')">Planos</button>
+    </div>
+
+    <!-- ABA USUÁRIOS -->
+    <div id="aba-usuarios" class="card">
+        <h2>Usuários Cadastrados</h2>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>E-mail</th>
+                        <th>Tipo</th>
+                        <th>Cadastro</th>
+                    </tr>
+                </thead>
+                <tbody id="listaUsuarios">
+                    <tr><td colspan="3">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA ASSINATURAS -->
+    <div id="aba-assinaturas" class="card hidden">
+        <h2>Assinaturas</h2>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Plano</th>
+                        <th>Início</th>
+                        <th>Fim</th>
+                        <th>Status</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody id="listaAssinaturas">
+                    <tr><td colspan="6">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ABA NOVA ASSINATURA -->
+    <div id="aba-nova" class="card hidden">
+        <h2>Criar / Renovar Assinatura</h2>
+        <form onsubmit="criarAssinatura(event)">
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Usuário (e-mail)</label>
+                    <select id="user_id" required></select>
+                </div>
+                <div class="form-group">
+                    <label>Plano</label>
+                    <select id="plano_id" onchange="atualizarDias()">
+                        <option value="">Personalizado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Duração (dias)</label>
+                    <input type="number" id="duracao_dias" min="1" value="30" required>
+                </div>
+                <div class="form-group">
+                    <label>Data de Início</label>
+                    <input type="date" id="data_inicio" required>
+                </div>
+                <div class="form-group">
+                    <label>Observação (opcional)</label>
+                    <input type="text" id="observacao" placeholder="Ex: Cliente VIP, cortesia...">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Salvar Assinatura</button>
+        </form>
+    </div>
+
+    <!-- ABA PLANOS -->
+    <div id="aba-planos" class="card hidden">
+        <h2>Planos Disponíveis</h2>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Duração</th>
+                        <th>Preço</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="listaPlanos">
+                    <tr><td colspan="4">Carregando...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const CONFIG_URL = "https://ltjxofcbogdynbkssqlr.supabase.co";
+    const CONFIG_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
+
+    const token = localStorage.getItem('supabase_token');
+    const userStr = localStorage.getItem('supabase_user');
+    let userData = null;
+    let planosCache = [];
+    let usuariosCache = [];
+
+    if (!token || !userStr) {
+        window.location.href = "index.html";
+    } else {
+        userData = JSON.parse(userStr);
+        document.getElementById('emailUsuario').innerText = userData.email;
+        verificarAdmin();
+    }
+
+    // Data de hoje no campo
+    document.getElementById('data_inicio').valueAsDate = new Date();
+
+    function fazerLogout() {
+        localStorage.removeItem('supabase_token');
+        localStorage.removeItem('supabase_user');
+        window.location.href = "index.html";
+    }
+
+    function mostrarMensagem(texto, tipo) {
+        const msg = document.getElementById('mensagem');
+        msg.innerText = texto;
+        msg.className = 'msg ' + tipo;
+        setTimeout(() => msg.className = 'msg', 4000);
+    }
+
+    function mostrarAba(nome) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('[id^="aba-"]').forEach(a => a.classList.add('hidden'));
+        
+        event.target.classList.add('active');
+        document.getElementById('aba-' + nome).classList.remove('hidden');
+    }
+
+    async function verificarAdmin() {
+        try {
+            const res = await fetch(`${CONFIG_URL}/rest/v1/profiles?id=eq.${userData.id}&select=role`, {
+                headers: {
+                    'apikey': CONFIG_KEY,
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await res.json();
+            
+            if (!data || !data[0] || data[0].role !== 'admin') {
+                alert('Acesso restrito a administradores.');
+                window.location.href = "painel.html";
+                return;
+            }
+            
+            carregarTudo();
+        } catch (e) {
+            console.error(e);
+            alert('Erro ao verificar permissão.');
+            window.location.href = "painel.html";
+        }
+    }
+
+    async function carregarTudo() {
+        await Promise.all([
+            carregarUsuarios(),
+            carregarPlanos(),
+            carregarAssinaturas()
+        ]);
+    }
+
+    async function carregarUsuarios() {
+        try {
+            const res = await fetch(`${CONFIG_URL}/rest/v1/profiles?select=id,email,role,created_at&order=created_at.desc`, {
+                headers: {
+                    'apikey': CONFIG_KEY,
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await res.json();
+            usuariosCache = data || [];
+
+            const tbody = document.getElementById('listaUsuarios');
+            const select = document.getElementById('user_id');
+            
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3">Nenhum usuário encontrado</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(u => `
+                <tr>
+                    <td>${u.email || '-'}</td>
+                    <td><span class="badge ${u.role === 'admin' ? 'admin' : 'user'}">${u.role === 'admin' ? 'Admin' : 'Usuário'}</span></td>
+                    <td>${u.created_at ? new Date(u.created_at).toLocaleDateString('pt-BR') : '-'}</td>
+                </tr>
+            `).join('');
+
+            select.innerHTML = '<option value="">Selecione o usuário</option>' + 
+                data.filter(u => u.role !== 'admin').map(u => 
+                    `<option value="${u.id}">${u.email}</option>`
+                ).join('');
+
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function carregarPlanos() {
+        try {
+            const res = await fetch(`${CONFIG_URL}/rest/v1/planos?select=*&order=duracao_dias`, {
+                headers: {
+                    'apikey': CONFIG_KEY,
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await res.json();
+            planosCache = data || [];
+
+            const tbody = document.getElementById('listaPlanos');
+            const select = document.getElementById('plano_id');
+
+            tbody.innerHTML = (data || []).map(p => `
+                <tr>
+                    <td>${p.nome}</td>
+                    <td>${p.duracao_dias} dias</td>
+                    <td>R$ ${Number(p.preco).toFixed(2)}</td>
+                    <td>${p.ativo ? 'Ativo' : 'Inativo'}</td>
+                </tr>
+            `).join('');
+
+            select.innerHTML = '<option value="">Personalizado</option>' + 
+                (data || []).map(p => 
+                    `<option value="${p.id}" data-dias="${p.duracao_dias}">${p.nome} (${p.duracao_dias} dias)</option>`
+                ).join('');
+
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async function carregarAssinaturas() {
+        try {
+            const res = await fetch(`${CONFIG_URL}/rest/v1/assinaturas?select=*,planos(nome),profiles(email)&order=created_at.desc`, {
+                headers: {
+                    'apikey': CONFIG_KEY,
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            const data = await res.json();
+
+            const tbody = document.getElementById('listaAssinaturas');
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">Nenhuma assinatura cadastrada</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map(a => `
+                <tr>
+                    <td>${a.profiles?.email || a.user_id}</td>
+                    <td>${a.planos?.nome || 'Personalizado'}</td>
+                    <td>${a.data_inicio ? new Date(a.data_inicio).toLocaleDateString('pt-BR') : '-'}</td>
+                    <td>${a.data_fim ? new Date(a.data_fim).toLocaleDateString('pt-BR') : '-'}</td>
+                    <td><span class="badge ${a.status}">${a.status}</span></td>
+                    <td>
+                        ${a.status === 'ativa' ? 
+                            `<button class="btn btn-danger" style="padding:5px 10px;font-size:12px;margin:0" onclick="cancelarAssinatura('${a.id}')">Cancelar</button>` 
+                            : '-'}
+                    </td>
+                </tr>
+            `).join('');
+
+        } catch (e) {
+            console.error(e);
+            document.getElementById('listaAssinaturas').innerHTML = '<tr><td colspan="6">Erro ao carregar</td></tr>';
+        }
+    }
+
+    function atualizarDias() {
+        const select = document.getElementById('plano_id');
+        const option = select.options[select.selectedIndex];
+        if (option && option.dataset.dias) {
+            document.getElementById('duracao_dias').value = option.dataset.dias;
+        }
+    }
+
+    async function criarAssinatura(event) {
+        event.preventDefault();
+
+        const userId = document.getElementById('user_id').value;
+        const planoId = document.getElementById('plano_id').value || null;
+        const dias = parseInt(document.getElementById('duracao_dias').value);
+        const dataInicio = document.getElementById('data_inicio').value;
+        const observacao = document.getElementById('observacao').value.trim();
+
+        if (!userId || !dias || !dataInicio) {
+            mostrarMensagem('Preencha todos os campos obrigatórios.', 'erro');
+            return;
+        }
+
+        // Calcula data fim
+        const inicio = new Date(dataInicio);
+        const fim = new Date(inicio);
+        fim.setDate(fim.getDate() + dias);
+
+        const dados = {
+            user_id: userId,
+            plano_id: planoId,
+            data_inicio: dataInicio,
+            data_fim: fim.toISOString().split('T')[0],
+            status: 'ativa',
+            observacao: observacao || null
+        };
+
+        try {
+            const res = await fetch(`${CONFIG_URL}/rest/v1/assinaturas`, {
+                method: 'POST',
+                headers: {
+                    'apikey': CONFIG_KEY,
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(dados)
+            });
+
+            if (res.ok) {
+                mostrarMensagem('✅ Assinatura criada com sucesso!', 'sucesso');
+                document.getElementById('observacao').value = '';
+                carregarAssinaturas();
+            } else {
+                const erro = await res.json();
+                console.error(erro);
+                mostrarMensagem('❌ Erro ao criar assinatura.', 'erro');
+            }
+        } catch (e) {
+            console.error(e);
+            mostrarMensagem('❌ Erro de conexão.', 'erro');
+        }
+    }
+
+    async function cancelarAssinatura(id) {
+        if (!confirm('Deseja realmente cancelar esta assinatura?')) return;
+
+        try {
+            const res = await fetch(`${CONFIG_URL}/rest/v1/assinaturas?id=eq.${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': CONFIG_KEY,
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({ status: 'cancelada', updated_at: new Date().toISOString() })
+            });
+
+            if (res.ok) {
+                mostrarMensagem('Assinatura cancelada.', 'sucesso');
+                carregarAssinaturas();
+            } else {
+                mostrarMensagem('Erro ao cancelar.', 'erro');
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+</script>
+
+</body>
+</html>
