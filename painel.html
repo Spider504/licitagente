@@ -8,470 +8,147 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f1f5f9;
-            color: #1e293b;
-            min-height: 100vh;
-        }
-
-        /* ===== HEADER ===== */
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #1e293b; min-height: 100vh; }
         header {
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 0 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 64px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background: white; border-bottom: 1px solid #e2e8f0; padding: 0 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            height: 64px; position: sticky; top: 0; z-index: 100;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 16px;
-            font-weight: 700;
-            color: #1e3a8a;
-            text-decoration: none;
-        }
-
+        .logo { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; color: #1e3a8a; text-decoration: none; }
         .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: white;
+            width: 36px; height: 36px; background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: white;
         }
-
-        .user-area {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
+        .user-area { display: flex; align-items: center; gap: 14px; }
+        .user-info { display: flex; align-items: center; gap: 10px; }
         .user-avatar {
-            width: 34px;
-            height: 34px;
-            background: #1e3a8a;
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 600;
+            width: 34px; height: 34px; background: #1e3a8a; color: white;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 600;
         }
-
-        .user-email {
-            font-size: 13px;
-            color: #64748b;
-            max-width: 200px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
+        .user-email { font-size: 13px; color: #64748b; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .btn-sair {
-            background: transparent;
-            color: #64748b;
-            border: 1px solid #e2e8f0;
-            padding: 7px 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            font-family: inherit;
-            transition: all 0.2s;
+            background: transparent; color: #64748b; border: 1px solid #e2e8f0;
+            padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px;
+            font-weight: 500; font-family: inherit; transition: all 0.2s;
         }
-
-        .btn-sair:hover {
-            background: #fef2f2;
-            color: #dc2626;
-            border-color: #fecaca;
-        }
-
-        /* ===== ASSINATURA BAR ===== */
-        .assinatura-bar {
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 12px 24px;
-        }
-
+        .btn-sair:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+        .assinatura-bar { background: white; border-bottom: 1px solid #e2e8f0; padding: 12px 24px; }
         .assinatura-inner {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
+            max-width: 1200px; margin: 0 auto; display: flex; align-items: center;
+            justify-content: space-between; flex-wrap: wrap; gap: 12px;
         }
-
-        .assinatura-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-        }
-
-        .assinatura-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .assinatura-badge.ativa {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .assinatura-badge.expirada {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .assinatura-badge.nenhum {
-            background: #fef3c7;
-            color: #92400e;
-        }
-
-        .assinatura-datas {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-
-        /* ===== CONTEÚDO ===== */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 28px 24px 60px;
-        }
-
-        .welcome {
-            margin-bottom: 28px;
-        }
-
-        .welcome h1 {
-            font-size: 26px;
-            color: #0f172a;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .welcome p {
-            color: #64748b;
-            font-size: 15px;
-        }
-
-        /* ===== STATS ===== */
+        .assinatura-info { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+        .assinatura-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .assinatura-badge.ativa { background: #d1fae5; color: #065f46; }
+        .assinatura-badge.expirada { background: #fee2e2; color: #991b1b; }
+        .assinatura-badge.nenhum { background: #fef3c7; color: #92400e; }
+        .assinatura-datas { font-size: 12px; color: #94a3b8; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 28px 24px 60px; }
+        .welcome { margin-bottom: 28px; }
+        .welcome h1 { font-size: 26px; color: #0f172a; font-weight: 700; margin-bottom: 4px; }
+        .welcome p { color: #64748b; font-size: 15px; }
         .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 28px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px; margin-bottom: 28px;
         }
-
         .stat-card {
-            background: white;
-            border-radius: 12px;
-            padding: 18px 20px;
-            border: 1px solid #e2e8f0;
-            display: flex;
-            align-items: center;
-            gap: 14px;
+            background: white; border-radius: 12px; padding: 18px 20px;
+            border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 14px;
         }
-
         .stat-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
+            width: 44px; height: 44px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
         }
-
         .stat-icon.blue { background: #dbeafe; }
         .stat-icon.green { background: #d1fae5; }
         .stat-icon.orange { background: #fef3c7; }
         .stat-icon.purple { background: #ede9fe; }
-
-        .stat-value {
-            font-size: 22px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #64748b;
-        }
-
-        /* ===== CARDS DE AÇÃO ===== */
+        .stat-value { font-size: 22px; font-weight: 700; color: #0f172a; }
+        .stat-label { font-size: 12px; color: #64748b; }
         .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-            gap: 18px;
-            margin-bottom: 30px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+            gap: 18px; margin-bottom: 30px;
         }
-
         .card {
-            background: white;
-            border-radius: 14px;
-            padding: 26px 22px;
-            border: 1px solid #e2e8f0;
-            transition: all 0.25s;
-            cursor: pointer;
-            text-decoration: none;
-            color: inherit;
-            display: block;
+            background: white; border-radius: 14px; padding: 26px 22px;
+            border: 1px solid #e2e8f0; transition: all 0.25s; cursor: pointer;
+            text-decoration: none; color: inherit; display: block;
         }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.08);
-            border-color: #3b82f6;
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-
+        .card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(0,0,0,0.08); border-color: #3b82f6; }
+        .card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
         .card-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
+            width: 44px; height: 44px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
         }
-
         .card-icon.blue { background: #dbeafe; }
         .card-icon.green { background: #d1fae5; }
         .card-icon.orange { background: #fef3c7; }
         .card-icon.purple { background: #ede9fe; }
-
-        .card h3 {
-            font-size: 16px;
-            color: #0f172a;
-            font-weight: 600;
-        }
-
-        .card p {
-            font-size: 13px;
-            color: #64748b;
-            line-height: 1.5;
-        }
-
-        .card.destaque {
-            background: linear-gradient(135deg, #1e3a8a, #2563eb);
-            border: none;
-        }
-
-        .card.destaque h3,
-        .card.destaque p {
-            color: white;
-        }
-
-        .card.destaque .card-icon {
-            background: rgba(255,255,255,0.15);
-        }
-
-        .card.destaque:hover {
-            border-color: transparent;
-        }
-
-        .card-arrow {
-            margin-top: 16px;
-            font-size: 13px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .card.destaque .card-arrow {
-            color: rgba(255,255,255,0.8);
-        }
-
-        .card:not(.destaque) .card-arrow {
-            color: #3b82f6;
-        }
-
-        /* ===== STATUS DA EMPRESA ===== */
+        .card h3 { font-size: 16px; color: #0f172a; font-weight: 600; }
+        .card p { font-size: 13px; color: #64748b; line-height: 1.5; }
+        .card.destaque { background: linear-gradient(135deg, #1e3a8a, #2563eb); border: none; }
+        .card.destaque h3, .card.destaque p { color: white; }
+        .card.destaque .card-icon { background: rgba(255,255,255,0.15); }
+        .card.destaque:hover { border-color: transparent; }
+        .card-arrow { margin-top: 16px; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+        .card.destaque .card-arrow { color: rgba(255,255,255,0.8); }
+        .card:not(.destaque) .card-arrow { color: #3b82f6; }
+        .card.bloqueado { opacity: 0.7; }
+        .card.bloqueado:hover { border-color: #e2e8f0; transform: none; box-shadow: none; }
         .status-box {
-            background: white;
-            border-radius: 14px;
-            padding: 22px 24px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 14px;
+            background: white; border-radius: 14px; padding: 22px 24px;
+            border: 1px solid #e2e8f0; margin-bottom: 28px;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 14px;
         }
-
-        .status-left {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
+        .status-left { display: flex; align-items: center; gap: 14px; }
         .status-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
+            width: 44px; height: 44px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 20px;
         }
-
         .status-icon.ok { background: #d1fae5; }
         .status-icon.pendente { background: #fef3c7; }
-
-        .status-label {
-            font-size: 12px;
-            color: #64748b;
-            margin-bottom: 2px;
-        }
-
-        .status-value {
-            font-size: 15px;
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        .status-badge {
-            padding: 5px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .status-badge.ok { background: #d1fae5; color: #065f46; }
-        .status-badge.pendente { background: #fef3c7; color: #92400e; }
-
+        .status-label { font-size: 12px; color: #64748b; margin-bottom: 2px; }
+        .status-value { font-size: 15px; font-weight: 600; color: #0f172a; }
         .btn-ir-empresa {
-            background: #1e3a8a;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: inherit;
-            text-decoration: none;
-            transition: background 0.2s;
+            background: #1e3a8a; color: white; border: none; padding: 8px 16px;
+            border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+            font-family: inherit; text-decoration: none; transition: background 0.2s;
         }
-
         .btn-ir-empresa:hover { background: #152960; }
-
-        /* ===== ADMIN LINK ===== */
         .admin-link {
-            display: none;
-            background: white;
-            border-radius: 14px;
-            padding: 18px 22px;
-            border: 1px solid #e2e8f0;
-            margin-bottom: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
+            background: white; border-radius: 14px; padding: 18px 22px;
+            border: 1px solid #e2e8f0; margin-bottom: 28px;
+            display: none; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 12px;
         }
-
-        .admin-link .admin-text {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .admin-text { display: flex; align-items: center; gap: 12px; }
+        .admin-icon {
+            width: 40px; height: 40px; background: #ede9fe; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 18px;
         }
-
-        .admin-link .admin-icon {
-            width: 40px;
-            height: 40px;
-            background: #ede9fe;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-
-        .admin-link .admin-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #0f172a;
-        }
-
-        .admin-link .admin-desc {
-            font-size: 12px;
-            color: #64748b;
-        }
-
+        .admin-label { font-size: 14px; font-weight: 600; color: #0f172a; }
+        .admin-desc { font-size: 12px; color: #64748b; }
         .btn-admin {
-            background: #7c3aed;
-            color: white;
-            border: none;
-            padding: 9px 18px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: inherit;
-            text-decoration: none;
-            transition: background 0.2s;
+            background: #7c3aed; color: white; border: none; padding: 9px 18px;
+            border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+            font-family: inherit; text-decoration: none; transition: background 0.2s;
         }
-
         .btn-admin:hover { background: #6d28d9; }
-
-        /* ===== TOAST ===== */
         .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 14px 20px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 500;
-            font-family: inherit;
-            color: white;
-            z-index: 9999;
-            transform: translateX(120%);
-            transition: transform 0.3s ease;
-            max-width: 340px;
+            position: fixed; top: 20px; right: 20px; padding: 14px 20px;
+            border-radius: 10px; font-size: 13px; font-weight: 500; font-family: inherit;
+            color: white; z-index: 9999; transform: translateX(120%);
+            transition: transform 0.3s ease; max-width: 360px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
-
         .toast.show { transform: translateX(0); }
         .toast.success { background: #059669; }
         .toast.error { background: #dc2626; }
-
-        /* ===== RESPONSIVO ===== */
+        .toast.info { background: #2563eb; }
         @media (max-width: 768px) {
             header { padding: 0 16px; }
             .container { padding: 20px 16px 50px; }
@@ -481,10 +158,7 @@
             .user-email { display: none; }
             .assinatura-inner { flex-direction: column; align-items: flex-start; }
         }
-
-        @media (max-width: 480px) {
-            .stats-row { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 480px) { .stats-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
@@ -503,7 +177,6 @@
     </div>
 </header>
 
-<!-- Barra de Assinatura -->
 <div class="assinatura-bar">
     <div class="assinatura-inner">
         <div class="assinatura-info">
@@ -515,13 +188,11 @@
 </div>
 
 <div class="container">
-
     <div class="welcome">
         <h1 id="welcomeMsg">Olá! 👋</h1>
         <p>Bem-vindo ao seu painel de propostas e licitações.</p>
     </div>
 
-    <!-- Stats -->
     <div class="stats-row">
         <div class="stat-card">
             <div class="stat-icon blue">📄</div>
@@ -553,7 +224,6 @@
         </div>
     </div>
 
-    <!-- Status da Empresa -->
     <div class="status-box">
         <div class="status-left">
             <div class="status-icon" id="statusIcon">⏳</div>
@@ -562,11 +232,10 @@
                 <div class="status-value" id="statusEmpresa">Verificando...</div>
             </div>
         </div>
-        <a href="empresa.html" class="btn-ir-empresa" id="btnIrEmpresa" style="display:none;">Ir para Cadastro</a>
+        <a href="#" class="btn-ir-empresa" id="btnIrEmpresa" style="display:none;" onclick="acessarEmpresa(event)">Ir para Cadastro</a>
     </div>
 
-    <!-- Link Admin (visível apenas para admins) -->
-    <div class="admin-link" id="adminLink" style="display:none;">
+    <div class="admin-link" id="adminLink">
         <div class="admin-text">
             <div class="admin-icon">⚙️</div>
             <div>
@@ -577,50 +246,45 @@
         <a href="admin.html" class="btn-admin">Acessar Admin</a>
     </div>
 
-    <!-- Cards de Ação -->
     <div class="cards">
-
-        <a href="empresa.html" class="card destaque">
+        <a href="#" class="card destaque" id="cardEmpresa" onclick="acessarEmpresa(event)">
             <div class="card-header">
                 <div class="card-icon blue" style="background:rgba(255,255,255,0.15);">🏢</div>
                 <h3>Cadastro da Empresa</h3>
             </div>
             <p>Preencha ou edite os dados da sua empresa que serão usados nas propostas.</p>
-            <div class="card-arrow">Acessar →</div>
+            <div class="card-arrow" id="arrowEmpresa">Acessar →</div>
         </a>
 
-        <a href="#" class="card" onclick="alertaEmBreve(event)">
+        <a href="#" class="card" onclick="verificarAcesso(event)">
             <div class="card-header">
                 <div class="card-icon green">📄</div>
                 <h3>Nova Proposta Reajustada</h3>
             </div>
             <p>Gere uma proposta reajustada a partir dos modelos pré-definidos após o pregão.</p>
-            <div class="card-arrow">Em breve →</div>
+            <div class="card-arrow">Acessar →</div>
         </a>
 
-        <a href="#" class="card" onclick="alertaEmBreve(event)">
+        <a href="#" class="card" onclick="verificarAcesso(event)">
             <div class="card-header">
                 <div class="card-icon orange">📁</div>
                 <h3>Meus Editais</h3>
             </div>
             <p>Cadastre e gerencie os editais e licitações que você está participando.</p>
-            <div class="card-arrow">Em breve →</div>
+            <div class="card-arrow">Acessar →</div>
         </a>
 
-        <a href="#" class="card" onclick="alertaEmBreve(event)">
+        <a href="#" class="card" onclick="verificarAcesso(event)">
             <div class="card-header">
                 <div class="card-icon purple">📊</div>
                 <h3>Histórico de Propostas</h3>
             </div>
             <p>Veja todas as propostas já geradas e baixe novamente quando precisar.</p>
-            <div class="card-arrow">Em breve →</div>
+            <div class="card-arrow">Acessar →</div>
         </a>
-
     </div>
-
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -630,19 +294,18 @@
     const token = localStorage.getItem('supabase_token');
     const userStr = localStorage.getItem('supabase_user');
 
-    if (!token) {
+    let assinaturaAtiva = false;
+    let isAdmin = false;
+
+    if (!token || !userStr) {
         window.location.href = "index.html";
     } else {
         try {
             const userData = JSON.parse(userStr);
             const email = userData.email || "Usuário";
             document.getElementById('emailUsuario').textContent = email;
+            document.getElementById('userAvatar').textContent = email.charAt(0).toUpperCase();
 
-            // Avatar com primeira letra do e-mail
-            const initial = email.charAt(0).toUpperCase();
-            document.getElementById('userAvatar').textContent = initial;
-
-            // Saudação personalizada
             const hora = new Date().getHours();
             let saudacao = 'Olá';
             if (hora >= 6 && hora < 12) saudacao = 'Bom dia';
@@ -650,19 +313,24 @@
             else saudacao = 'Boa noite';
             document.getElementById('welcomeMsg').textContent = `${saudacao}! 👋`;
 
-            verificarEmpresa(userData.id);
-            verificarAssinatura(userData.id);
-            verificarAdmin(userData);
+            iniciar(userData);
         } catch (e) {
             document.getElementById('emailUsuario').textContent = "Usuário";
         }
+    }
+
+    async function iniciar(userData) {
+        await verificarAdmin(userData);
+        await verificarAssinatura(userData.id);
+        await verificarEmpresa(userData.id);
+        atualizarInterface();
     }
 
     function showToast(msg, tipo) {
         const toast = document.getElementById('toast');
         toast.textContent = msg;
         toast.className = 'toast ' + tipo + ' show';
-        setTimeout(() => toast.classList.remove('show'), 4000);
+        setTimeout(() => toast.classList.remove('show'), 4500);
     }
 
     function fazerLogout() {
@@ -672,9 +340,34 @@
         window.location.href = "index.html";
     }
 
-    function alertaEmBreve(e) {
-        e.preventDefault();
+    // Admin sempre liberado | Usuário comum precisa de assinatura ativa
+    function podeUsarSistema() {
+        return isAdmin || assinaturaAtiva;
+    }
+
+    function verificarAcesso(event) {
+        event.preventDefault();
+        if (!podeUsarSistema()) {
+            showToast("🔒 Sua assinatura está inativa ou expirada. Entre em contato com o administrador.", "error");
+            return;
+        }
         showToast("🚧 Esta funcionalidade será liberada em breve!", "info");
+    }
+
+    function acessarEmpresa(event) {
+        event.preventDefault();
+        if (!podeUsarSistema()) {
+            showToast("🔒 Sua assinatura está inativa. Não é possível cadastrar a empresa sem assinatura ativa.", "error");
+            return;
+        }
+        window.location.href = "empresa.html";
+    }
+
+    function atualizarInterface() {
+        const cards = document.querySelectorAll('.card');
+        if (!podeUsarSistema()) {
+            cards.forEach(c => c.classList.add('bloqueado'));
+        }
     }
 
     async function verificarAdmin(userData) {
@@ -684,10 +377,11 @@
             });
             const data = await res.json();
             if (data && data.length > 0 && data[0].role === 'admin') {
+                isAdmin = true;
                 document.getElementById('adminLink').style.display = 'flex';
             }
         } catch (e) {
-            console.error('Erro ao verificar admin:', e);
+            console.error(e);
         }
     }
 
@@ -699,17 +393,12 @@
 
         try {
             const response = await fetch(`${CONFIG_URL}/rest/v1/empresas?user_id=eq.${userId}&select=razao_social`, {
-                headers: {
-                    'apikey': CONFIG_KEY,
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
             });
-
             const data = await response.json();
 
             if (data && data.length > 0 && data[0].razao_social) {
-                const nome = data[0].razao_social;
-                statusEl.textContent = nome;
+                statusEl.textContent = data[0].razao_social;
                 statusIcon.textContent = '✅';
                 statusIcon.className = 'status-icon ok';
                 statEmpresa.textContent = 'OK';
@@ -720,7 +409,7 @@
                 btnIr.style.display = 'inline-block';
                 statEmpresa.textContent = '—';
             }
-        } catch (erro) {
+        } catch (e) {
             statusEl.textContent = 'Não foi possível verificar';
             statusIcon.className = 'status-icon pendente';
         }
@@ -731,45 +420,55 @@
         const datas = document.getElementById('assinaturaDatas');
         const statDias = document.getElementById('statDiasAssinatura');
 
+        // Admin não depende de assinatura
+        if (isAdmin) {
+            assinaturaAtiva = true;
+            badge.textContent = 'Admin';
+            badge.className = 'assinatura-badge ativa';
+            datas.textContent = 'Acesso total liberado';
+            statDias.textContent = '∞';
+            return;
+        }
+
         try {
             const response = await fetch(`${CONFIG_URL}/rest/v1/assinaturas?user_id=eq.${userId}&select=data_inicio,data_fim,status&order=created_at.desc&limit=1`, {
-                headers: {
-                    'apikey': CONFIG_KEY,
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
             });
-
             const data = await response.json();
 
             if (data && data.length > 0) {
                 const ass = data[0];
                 const hoje = new Date();
-                const dataFim = new Date(ass.data_fim);
+                hoje.setHours(0, 0, 0, 0);
+                const dataFim = new Date(ass.data_fim + 'T23:59:59');
 
-                if (ass.status === 'ativa' && dataFim > hoje) {
+                if (ass.status === 'ativa' && dataFim >= hoje) {
+                    assinaturaAtiva = true;
                     badge.textContent = 'Ativa';
                     badge.className = 'assinatura-badge ativa';
-                    const diasRestantes = Math.ceil((dataFim - hoje) / (1000 * 60 * 60 * 24));
-                    datas.textContent = `Válida até ${dataFim.toLocaleDateString('pt-BR')} (${diasRestantes} dias)`;
-                    statDias.textContent = diasRestantes;
+                    const dias = Math.ceil((dataFim - hoje) / (1000 * 60 * 60 * 24));
+                    datas.textContent = `Válida até ${dataFim.toLocaleDateString('pt-BR')} (${dias} dias)`;
+                    statDias.textContent = dias;
                 } else {
+                    assinaturaAtiva = false;
                     badge.textContent = 'Expirada';
                     badge.className = 'assinatura-badge expirada';
                     datas.textContent = `Expirou em ${dataFim.toLocaleDateString('pt-BR')}`;
                     statDias.textContent = '0';
                 }
             } else {
+                assinaturaAtiva = false;
                 badge.textContent = 'Sem assinatura';
                 badge.className = 'assinatura-badge nenhum';
                 datas.textContent = 'Entre em contato com o administrador';
                 statDias.textContent = '—';
             }
-        } catch (erro) {
+        } catch (e) {
+            assinaturaAtiva = false;
             badge.textContent = 'Não verificada';
             badge.className = 'assinatura-badge nenhum';
         }
     }
 </script>
-
 </body>
 </html>
