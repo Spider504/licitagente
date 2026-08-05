@@ -622,34 +622,48 @@
     }
 
     async function carregarAssinaturas() {
-        try {
-            const res = await fetch(`${CONFIG_URL}/rest/v1/assinaturas?select=*,planos(nome)&order=created_at.desc`, {
+    try {
+        // Busca assinaturas e perfis em paralelo
+        const [resAss, resPerfis] = await Promise.all([
+            fetch(`${CONFIG_URL}/rest/v1/assinaturas?select=*,planos(nome)&order=created_at.desc`, {
                 headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
-            });
-            const data = await res.json();
-            const tbody = document.getElementById('listaAssinaturas');
+            }),
+            fetch(`${CONFIG_URL}/rest/v1/profiles?select=id,email`, {
+                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+            })
+        ]);
 
-            if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><p>Nenhuma assinatura cadastrada</p></div></td></tr>';
-                return;
-            }
+        const data = await resAss.json();
+        const perfis = await resPerfis.json();
 
-            tbody.innerHTML = data.map(a => `
-                <tr>
-                    <td style="font-weight:500;">${a.user_id || '-'}</td>
-                    <td>${a.planos?.nome || 'Personalizado'}</td>
-                    <td>${a.data_inicio ? new Date(a.data_inicio).toLocaleDateString('pt-BR') : '-'}</td>
-                    <td>${a.data_fim ? new Date(a.data_fim).toLocaleDateString('pt-BR') : '-'}</td>
-                    <td><span class="badge ${a.status}">${a.status || 'desconhecido'}</span></td>
-                    <td>${a.status === 'ativa' ? `<button class="btn btn-danger btn-sm" onclick="confirmarCancelamento('${a.id}')">Cancelar</button>` : '-'}</td>
-                </tr>
-            `).join('');
-        } catch (e) {
-            console.error(e);
-            document.getElementById('listaAssinaturas').innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">❌</div><p>Erro ao carregar assinaturas</p></div></td></tr>';
+        // Mapa id → e-mail
+        const emailMap = {};
+        (perfis || []).forEach(p => {
+            emailMap[p.id] = p.email;
+        });
+
+        const tbody = document.getElementById('listaAssinaturas');
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><p>Nenhuma assinatura cadastrada</p></div></td></tr>';
+            return;
         }
-    }
 
+        tbody.innerHTML = data.map(a => `
+            <tr>
+                <td style="font-weight:500;">${emailMap[a.user_id] || a.user_id || '-'}</td>
+                <td>${a.planos?.nome || 'Personalizado'}</td>
+                <td>${a.data_inicio ? new Date(a.data_inicio).toLocaleDateString('pt-BR') : '-'}</td>
+                <td>${a.data_fim ? new Date(a.data_fim).toLocaleDateString('pt-BR') : '-'}</td>
+                <td><span class="badge ${a.status}">${a.status || 'desconhecido'}</span></td>
+                <td>${a.status === 'ativa' ? `<button class="btn btn-danger btn-sm" onclick="confirmarCancelamento('${a.id}')">Cancelar</button>` : '-'}</td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        console.error(e);
+        document.getElementById('listaAssinaturas').innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">❌</div><p>Erro ao carregar assinaturas</p></div></td></tr>';
+    }
+}
     function atualizarDias() {
         const select = document.getElementById('plano_id');
         const option = select.options[select.selectedIndex];
