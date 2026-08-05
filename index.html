@@ -4,99 +4,330 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acesso ao Sistema de Licitações</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            background-color: #f4f6f9; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .login-card { 
-            background: white; 
-            padding: 40px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            border-radius: 8px; 
-            max-width: 400px; 
-            width: 100%; 
-            text-align: center; 
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #3b82f6 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        h1 { 
-            color: #1e3a8a; 
-            font-size: 24px; 
-            margin-bottom: 10px; 
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 440px;
+            animation: slideUp 0.6s ease-out;
         }
-        p { 
-            color: #666; 
-            font-size: 14px; 
-            margin-bottom: 25px; 
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .form-group { 
-            display: flex; 
-            flex-direction: column; 
-            text-align: left; 
-            margin-bottom: 15px; 
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.97);
+            backdrop-filter: blur(20px);
+            padding: 48px 36px 40px;
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            text-align: center;
         }
-        label { 
-            font-size: 12px; 
-            font-weight: bold; 
-            margin-bottom: 5px; 
-            color: #555; 
+
+        .logo-area {
+            margin-bottom: 32px;
         }
-        input { 
-            padding: 10px; 
-            border: 1px solid #ccc; 
-            border-radius: 4px; 
-            font-size: 14px; 
-            width: 100%; 
-            box-sizing: border-box; 
+
+        .logo-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 24px rgba(30, 58, 138, 0.3);
         }
-        .btn { 
-            background: #1e3a8a; 
-            color: white; 
-            border: none; 
-            padding: 12px; 
-            cursor: pointer; 
-            border-radius: 4px; 
-            font-weight: bold; 
-            width: 100%; 
-            font-size: 15px; 
-            margin-top: 10px; 
+
+        h1 {
+            color: #0f172a;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.3px;
         }
-        .btn:hover { 
-            background: #152960; 
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.5;
         }
-        .toggle-link { 
-            margin-top: 15px; 
-            font-size: 13px; 
-            color: #1e3a8a; 
-            cursor: pointer; 
-            display: block; 
-            text-decoration: underline; 
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper svg {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            color: #9ca3af;
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: #f9fafb;
+            color: #1f2937;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+            background: white;
+        }
+
+        input::placeholder {
+            color: #9ca3af;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 6px;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-login:hover {
+            background: linear-gradient(135deg, #152960, #1d4ed8);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.35);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .toggle-link {
+            display: block;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #3b82f6;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .toggle-link:hover {
+            color: #1e3a8a;
+            text-decoration: underline;
+        }
+
+        .divider {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .footer-text {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            color: white;
+            z-index: 9999;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            max-width: 340px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success { background: #059669; }
+        .toast.error { background: #dc2626; }
+        .toast.info { background: #2563eb; }
+
+        /* Modal de erro */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 360px;
+            width: 100%;
+            text-align: center;
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .modal h3 {
+            font-size: 16px;
+            color: #0f172a;
+            margin-bottom: 8px;
+        }
+
+        .modal p {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 20px;
+        }
+
+        .modal button {
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 36px 24px 32px;
+            }
+
+            h1 { font-size: 20px; }
+
+            .logo-icon {
+                width: 56px;
+                height: 56px;
+                font-size: 24px;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="login-card">
-    <h1 id="tituloTela">🔑 Entrar no Sistema</h1>
-    <p id="subtituloTela">Digite suas credenciais para gerenciar as propostas.</p>
+<div class="login-wrapper">
+    <div class="login-card">
+        <div class="logo-area">
+            <div class="logo-icon">📋</div>
+            <h1 id="tituloTela">Entrar no Sistema</h1>
+            <p class="subtitle" id="subtituloTela">Acesse sua conta para gerenciar propostas e licitações.</p>
+        </div>
 
-    <div class="form-group">
-        <label>E-mail institucional</label>
-        <input type="email" id="email" placeholder="seu-email@empresa.com.br">
+        <form id="formAuth" onsubmit="return false;">
+            <div class="form-group">
+                <label for="email">E-mail institucional</label>
+                <div class="input-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" /></svg>
+                    <input type="email" id="email" placeholder="seu-email@empresa.com.br" autocomplete="email" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="senha">Senha de acesso</label>
+                <div class="input-wrapper">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" /></svg>
+                    <input type="password" id="senha" placeholder="Digite sua senha" autocomplete="current-password" required minlength="6">
+                </div>
+            </div>
+
+            <button class="btn-login" id="btnAcao" onclick="executarAutenticacao()">Entrar</button>
+        </form>
+
+        <a class="toggle-link" id="btnAlternar" onclick="alternarModo()">Não tem uma conta? Cadastre-se aqui</a>
+
+        <div class="divider">
+            <p class="footer-text">Sistema de Licitações &copy; 2026</p>
+        </div>
     </div>
+</div>
 
-    <div class="form-group">
-        <label>Senha de acesso</label>
-        <input type="password" id="senha" placeholder="••••••••">
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal">
+        <div class="modal-icon" id="modalIcon">❌</div>
+        <h3 id="modalTitulo">Erro</h3>
+        <p id="modalMsg"></p>
+        <button onclick="fecharModal()">Entendi</button>
     </div>
-
-    <button class="btn" id="btnAcao" onclick="executarAutenticacao()">Entrar</button>
-    
-    <span class="toggle-link" id="btnAlternar" onclick="alternarModo()">Não tem uma conta? Cadastre-se aqui</span>
 </div>
 
 <script>
@@ -104,6 +335,24 @@
     const CONFIG_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
 
     let modoLogin = true;
+
+    function showToast(msg, tipo) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = 'toast ' + tipo + ' show';
+        setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+
+    function mostrarModal(titulo, msg, icon) {
+        document.getElementById('modalTitulo').textContent = titulo;
+        document.getElementById('modalMsg').textContent = msg;
+        document.getElementById('modalIcon').textContent = icon;
+        document.getElementById('modalOverlay').classList.add('show');
+    }
+
+    function fecharModal() {
+        document.getElementById('modalOverlay').classList.remove('show');
+    }
 
     function alternarModo() {
         modoLogin = !modoLogin;
@@ -113,15 +362,17 @@
         const btnAlternar = document.getElementById("btnAlternar");
 
         if (modoLogin) {
-            titulo.innerText = "🔑 Entrar no Sistema";
-            subtitulo.innerText = "Digite suas credenciais para gerenciar as propostas.";
-            btnAcao.innerText = "Entrar";
-            btnAlternar.innerText = "Não tem uma conta? Cadastre-se aqui";
+            titulo.textContent = "Entrar no Sistema";
+            subtitulo.textContent = "Acesse sua conta para gerenciar propostas e licitações.";
+            btnAcao.textContent = "Entrar";
+            btnAlternar.textContent = "Não tem uma conta? Cadastre-se aqui";
+            document.getElementById('senha').setAttribute('autocomplete', 'current-password');
         } else {
-            titulo.innerText = "📝 Criar Nova Conta";
-            subtitulo.innerText = "Cadastre um novo e-mail para acessar o painel.";
-            btnAcao.innerText = "Criar Conta";
-            btnAlternar.innerText = "Já possui uma conta? Faça o Login";
+            titulo.textContent = "Criar Nova Conta";
+            subtitulo.textContent = "Cadastre-se para acessar o painel de licitações.";
+            btnAcao.textContent = "Criar Conta";
+            btnAlternar.textContent = "Já possui conta? Faça o login";
+            document.getElementById('senha').setAttribute('autocomplete', 'new-password');
         }
     }
 
@@ -129,10 +380,28 @@
         const emailInput = document.getElementById("email").value.trim();
         const senhaInput = document.getElementById("senha").value.trim();
 
+        // Validação
         if (!emailInput || !senhaInput) {
-            alert("⚠️ Por favor, preencha todos os campos.");
+            showToast("Preencha todos os campos.", "error");
             return;
         }
+
+        // Validação de e-mail básico
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailInput)) {
+            showToast("Informe um e-mail válido.", "error");
+            return;
+        }
+
+        // Validação de senha
+        if (senhaInput.length < 6) {
+            showToast("A senha deve ter pelo menos 6 caracteres.", "error");
+            return;
+        }
+
+        const btn = document.getElementById("btnAcao");
+        btn.classList.add("loading");
+        btn.textContent = "Processando...";
 
         const rotaApi = modoLogin ? 'token?grant_type=password' : 'signup';
         const corpoDados = {
@@ -153,30 +422,51 @@
 
             const resposta = await conexao.json();
 
+            btn.classList.remove("loading");
+            btn.textContent = modoLogin ? "Entrar" : "Criar Conta";
+
             if (!conexao.ok || resposta.error || resposta.error_description) {
                 const mensagem = resposta.error_description || resposta.msg || (resposta.error && resposta.error.message) || "Erro desconhecido";
-                alert("❌ Erro: " + mensagem);
+                mostrarModal("Erro", mensagem, "⚠️");
                 return;
             }
 
             if (modoLogin) {
-    if (resposta.access_token) {
-        localStorage.setItem('supabase_token', resposta.access_token);
-        localStorage.setItem('supabase_user', JSON.stringify(resposta.user));
-    }
-    
-    // Redireciona para o painel
-    window.location.href = "painel.html";
-} else {
-    alert("🎉 Conta criada com sucesso! Agora você pode fazer login.");
-    alternarModo();
-}
+                if (resposta.access_token) {
+                    localStorage.setItem('supabase_token', resposta.access_token);
+                    localStorage.setItem('supabase_user', JSON.stringify(resposta.user));
+                    // Armazena timestamp para verificar expiração do token
+                    localStorage.setItem('supabase_token_expires', (Date.now() + resposta.expires_in * 1000).toString());
+                }
+                showToast("Login realizado com sucesso!", "success");
+                setTimeout(() => {
+                    window.location.href = "painel.html";
+                }, 600);
+            } else {
+                showToast("Conta criada com sucesso! Faça o login.", "success");
+                setTimeout(() => alternarModo(), 1500);
+            }
 
         } catch (erro) {
             console.error(erro);
-            alert("❌ Falha de rede: Não foi possível alcançar o servidor.");
+            btn.classList.remove("loading");
+            btn.textContent = modoLogin ? "Entrar" : "Criar Conta";
+            mostrarModal("Erro de Conexão", "Não foi possível alcançar o servidor. Verifique sua conexão com a internet.", "📡");
         }
     }
+
+    // Permitir envio com Enter
+    document.getElementById('formAuth').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            executarAutenticacao();
+        }
+    });
+
+    // Fechar modal ao clicar fora
+    document.getElementById('modalOverlay').addEventListener('click', function(e) {
+        if (e.target === this) fecharModal();
+    });
 </script>
 
 </body>
