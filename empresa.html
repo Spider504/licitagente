@@ -4,103 +4,156 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro da Empresa - Sistema de Licitações</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #f0f2f5;
-            color: #1f2937;
+            font-family: 'Inter', sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
             min-height: 100vh;
         }
 
+        /* ===== HEADER ===== */
         header {
-            background: #1e3a8a;
-            color: white;
-            padding: 14px 20px;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 0 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            height: 64px;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         }
 
         .logo {
-            font-size: 17px;
-            font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e3a8a;
+            text-decoration: none;
         }
 
-        .user-area {
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            border-radius: 10px;
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 13px;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
         }
+
+        .user-area { display: flex; align-items: center; gap: 14px; }
 
         .user-email {
-            max-width: 180px;
+            font-size: 13px;
+            color: #64748b;
+            max-width: 200px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .btn-sair {
-            background: #ef4444;
-            color: white;
-            border: none;
+        .btn-voltar {
+            background: transparent;
+            color: #3b82f6;
+            border: 1px solid #e2e8f0;
             padding: 7px 14px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
+            font-family: inherit;
+            text-decoration: none;
+            transition: all 0.2s;
         }
 
-        .btn-sair:hover {
-            background: #dc2626;
+        .btn-voltar:hover { background: #eff6ff; border-color: #bfdbfe; }
+
+        .btn-sair {
+            background: transparent;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            padding: 7px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all 0.2s;
         }
 
+        .btn-sair:hover { background: #fef2f2; color: #dc2626; border-color: #fecaca; }
+
+        /* ===== CONTEÚDO ===== */
         .container {
             max-width: 900px;
             margin: 0 auto;
-            padding: 25px 16px 50px;
+            padding: 28px 20px 60px;
         }
 
         .page-header {
-            margin-bottom: 22px;
+            margin-bottom: 24px;
         }
 
         .page-header h1 {
-            font-size: 22px;
-            color: #1e3a8a;
+            font-size: 24px;
+            color: #0f172a;
+            font-weight: 700;
             margin-bottom: 4px;
         }
 
         .page-header p {
-            color: #6b7280;
+            color: #64748b;
             font-size: 14px;
         }
 
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            font-family: inherit;
+            color: white;
+            z-index: 9999;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            max-width: 380px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: #059669; }
+        .toast.error { background: #dc2626; }
+        .toast.info { background: #2563eb; }
+
+        /* ===== CARD / FORM ===== */
         .card {
             background: white;
-            border-radius: 12px;
-            padding: 28px 24px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 32px 28px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
         }
 
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 18px;
+            gap: 20px;
         }
 
         .form-group {
@@ -119,128 +172,172 @@
             color: #374151;
         }
 
-        input, select, textarea {
-            padding: 11px 12px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+        label .required {
+            color: #ef4444;
+            margin-left: 2px;
+        }
+
+        input, select {
+            padding: 11px 14px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
             font-size: 14px;
             width: 100%;
-            transition: border-color 0.2s;
+            transition: all 0.2s;
             font-family: inherit;
+            background: #f9fafb;
+            color: #1f2937;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus, select:focus {
             outline: none;
             border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: white;
         }
 
+        input.error {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+        }
+
+        .error-text {
+            font-size: 12px;
+            color: #ef4444;
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-text.show { display: block; }
+
+        /* ===== SECTION TITLES ===== */
         .section-title {
             grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
             font-size: 15px;
             font-weight: 700;
             color: #1e3a8a;
-            margin-top: 18px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid #e5e7eb;
+            margin-top: 8px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f1f5f9;
         }
 
-        .section-title:first-child {
-            margin-top: 0;
+        .section-title:first-child { margin-top: 0; }
+
+        .section-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
         }
 
+        .section-icon.blue { background: #dbeafe; }
+        .section-icon.green { background: #d1fae5; }
+        .section-icon.orange { background: #fef3c7; }
+        .section-icon.purple { background: #ede9fe; }
+
+        /* ===== CEP BUSCA ===== */
+        .cep-wrapper {
+            position: relative;
+        }
+
+        .btn-buscar-cep {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.2s;
+        }
+
+        .btn-buscar-cep:hover { background: #152960; }
+
+        .btn-buscar-cep.loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* ===== ACTIONS ===== */
         .actions {
-            margin-top: 30px;
+            margin-top: 32px;
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
+            padding-top: 24px;
+            border-top: 1px solid #f1f5f9;
         }
 
         .btn {
             padding: 12px 24px;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             border: none;
-            transition: background 0.2s;
+            font-family: inherit;
+            transition: all 0.2s;
         }
 
-        .btn-voltar {
-            background: #e5e7eb;
-            color: #374151;
+        .btn-voltar-form {
+            background: #f1f5f9;
+            color: #475569;
         }
 
-        .btn-voltar:hover {
-            background: #d1d5db;
-        }
+        .btn-voltar-form:hover { background: #e2e8f0; }
 
         .btn-salvar {
-            background: #1e3a8a;
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
             color: white;
+            flex: 1;
+            max-width: 280px;
         }
 
         .btn-salvar:hover {
-            background: #152960;
+            background: linear-gradient(135deg, #152960, #1d4ed8);
+            box-shadow: 0 6px 20px rgba(30, 58, 138, 0.3);
         }
 
-        .msg {
-            padding: 13px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: none;
-            font-weight: 500;
+        .btn-salvar.loading {
+            opacity: 0.7;
+            pointer-events: none;
         }
 
-        .msg.sucesso {
-            background: #d1fae5;
-            color: #065f46;
-            display: block;
-        }
-
-        .msg.erro {
-            background: #fee2e2;
-            color: #991b1b;
-            display: block;
-        }
-
+        /* ===== RESPONSIVO ===== */
         @media (max-width: 700px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .user-email {
-                display: none;
-            }
-
-            .card {
-                padding: 22px 16px;
-            }
-
-            .page-header h1 {
-                font-size: 20px;
-            }
-
-            .actions {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                text-align: center;
-            }
+            .form-grid { grid-template-columns: 1fr; }
+            .user-email { display: none; }
+            .card { padding: 24px 18px; }
+            .page-header h1 { font-size: 20px; }
+            .actions { flex-direction: column; }
+            .btn { width: 100%; text-align: center; max-width: 100%; }
+            header { padding: 0 14px; }
+            .container { padding: 20px 14px 50px; }
         }
     </style>
 </head>
 <body>
 
 <header>
-    <div class="logo">
-        📋 Cadastro da Empresa
-    </div>
+    <a href="painel.html" class="logo">
+        <div class="logo-icon">📋</div>
+        <span>Licitações</span>
+    </a>
     <div class="user-area">
         <span class="user-email" id="emailUsuario">...</span>
+        <a href="painel.html" class="btn-voltar">← Dashboard</a>
         <button class="btn-sair" onclick="fazerLogout()">Sair</button>
     </div>
 </header>
@@ -249,37 +346,47 @@
 
     <div class="page-header">
         <h1>Dados da Empresa</h1>
-        <p>Preencha os dados que serão usados automaticamente nas propostas.</p>
+        <p>Preencha os dados que serão usados automaticamente nas suas propostas reajustadas.</p>
     </div>
 
     <div class="card">
-        <div id="mensagem" class="msg"></div>
-
         <form id="formEmpresa" onsubmit="salvarEmpresa(event)">
             <div class="form-grid">
 
-                <div class="section-title">Dados da Empresa</div>
+                <div class="section-title">
+                    <div class="section-icon blue">🏢</div>
+                    Dados da Empresa
+                </div>
 
                 <div class="form-group full">
-                    <label>Razão Social *</label>
+                    <label>Razão Social <span class="required">*</span></label>
                     <input type="text" id="razao_social" required>
+                    <span class="error-text" id="err-razao">Campo obrigatório</span>
                 </div>
 
                 <div class="form-group">
-                    <label>CNPJ *</label>
-                    <input type="text" id="cnpj" required placeholder="00.000.000/0000-00">
+                    <label>CNPJ <span class="required">*</span></label>
+                    <input type="text" id="cnpj" required placeholder="00.000.000/0000-00" maxlength="18" oninput="mascaraCNPJ(this)">
+                    <span class="error-text" id="err-cnpj">Informe um CNPJ válido</span>
                 </div>
 
                 <div class="form-group">
                     <label>Inscrição Estadual</label>
-                    <input type="text" id="inscricao_estadual">
+                    <input type="text" id="inscricao_estadual" placeholder="Opcional">
                 </div>
 
-                <div class="section-title">Endereço</div>
+                <div class="section-title">
+                    <div class="section-icon green">📍</div>
+                    Endereço
+                </div>
 
-                <div class="form-group full">
-                    <label>Endereço</label>
-                    <input type="text" id="endereco" placeholder="Rua, número">
+                <div class="form-group">
+                    <label>CEP</label>
+                    <div class="cep-wrapper">
+                        <input type="text" id="cep" placeholder="00000-000" maxlength="9" oninput="mascaraCEP(this)">
+                        <button type="button" class="btn-buscar-cep" id="btnCep" onclick="buscarCEP()">Buscar</button>
+                    </div>
+                    <span class="error-text" id="err-cep">CEP não encontrado</span>
                 </div>
 
                 <div class="form-group">
@@ -287,9 +394,9 @@
                     <input type="text" id="bairro">
                 </div>
 
-                <div class="form-group">
-                    <label>CEP</label>
-                    <input type="text" id="cep" placeholder="00000-000">
+                <div class="form-group full">
+                    <label>Endereço</label>
+                    <input type="text" id="endereco" placeholder="Rua, número, complemento">
                 </div>
 
                 <div class="form-group">
@@ -302,21 +409,26 @@
                     <input type="text" id="estado" value="MA" maxlength="2">
                 </div>
 
-                <div class="section-title">Representante Legal</div>
+                <div class="section-title">
+                    <div class="section-icon orange">👤</div>
+                    Representante Legal
+                </div>
 
                 <div class="form-group full">
-                    <label>Nome Completo</label>
-                    <input type="text" id="nome_completo">
+                    <label>Nome Completo <span class="required">*</span></label>
+                    <input type="text" id="nome_completo" required>
+                    <span class="error-text" id="err-nome">Campo obrigatório</span>
                 </div>
 
                 <div class="form-group">
                     <label>RG</label>
-                    <input type="text" id="rg">
+                    <input type="text" id="rg" placeholder="Opcional">
                 </div>
 
                 <div class="form-group">
-                    <label>CPF</label>
-                    <input type="text" id="cpf" placeholder="000.000.000-00">
+                    <label>CPF <span class="required">*</span></label>
+                    <input type="text" id="cpf" required placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)">
+                    <span class="error-text" id="err-cpf">Informe um CPF válido</span>
                 </div>
 
                 <div class="form-group">
@@ -331,26 +443,34 @@
                         <option value="SOLTEIRO">Solteiro(a)</option>
                         <option value="DIVORCIADO">Divorciado(a)</option>
                         <option value="VIUVO">Viúvo(a)</option>
+                        <option value="UNIAO_ESTAVEL">União Estável</option>
                     </select>
                 </div>
 
-                <div class="section-title">Contatos</div>
+                <div class="section-title">
+                    <div class="section-icon purple">📞</div>
+                    Contatos
+                </div>
 
                 <div class="form-group">
-                    <label>Telefone</label>
-                    <input type="text" id="telefone" placeholder="(00) 00000-0000">
+                    <label>Telefone <span class="required">*</span></label>
+                    <input type="text" id="telefone" required placeholder="(00) 00000-0000" maxlength="15" oninput="mascaraTelefone(this)">
+                    <span class="error-text" id="err-tel">Informe um telefone válido</span>
                 </div>
 
                 <div class="form-group">
                     <label>E-mail</label>
-                    <input type="email" id="email">
+                    <input type="email" id="email" placeholder="contato@empresa.com.br">
                 </div>
 
-                <div class="section-title">Dados Bancários</div>
+                <div class="section-title">
+                    <div class="section-icon blue">💳</div>
+                    Dados Bancários
+                </div>
 
                 <div class="form-group">
                     <label>Banco</label>
-                    <input type="text" id="banco" placeholder="Ex: Banco do Brasil, Bradesco, Itaú...">
+                    <input type="text" id="banco" placeholder="Ex: Banco do Brasil">
                 </div>
 
                 <div class="form-group">
@@ -365,18 +485,21 @@
 
                 <div class="form-group">
                     <label>Chave PIX</label>
-                    <input type="text" id="chave_pix">
+                    <input type="text" id="chave_pix" placeholder="CPF, e-mail, telefone ou aleatória">
                 </div>
 
             </div>
 
             <div class="actions">
-                <button type="button" class="btn btn-voltar" onclick="window.location.href='painel.html'">← Voltar ao Dashboard</button>
-                <button type="submit" class="btn btn-salvar">Salvar Dados da Empresa</button>
+                <button type="button" class="btn btn-voltar-form" onclick="window.location.href='painel.html'">← Voltar ao Dashboard</button>
+                <button type="submit" class="btn btn-salvar" id="btnSalvar">Salvar Dados da Empresa</button>
             </div>
         </form>
     </div>
 </div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
 
 <script>
     const CONFIG_URL = "https://ltjxofcbogdynbkssqlr.supabase.co";
@@ -390,11 +513,18 @@
     } else {
         try {
             const userData = JSON.parse(user);
-            document.getElementById('emailUsuario').innerText = userData.email || "Usuário";
+            document.getElementById('emailUsuario').textContent = userData.email || "Usuário";
         } catch (e) {
-            document.getElementById('emailUsuario').innerText = "Usuário";
+            document.getElementById('emailUsuario').textContent = "Usuário";
         }
         carregarEmpresa();
+    }
+
+    function showToast(msg, tipo) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = 'toast ' + tipo + ' show';
+        setTimeout(() => toast.classList.remove('show'), 4500);
     }
 
     function fazerLogout() {
@@ -403,14 +533,86 @@
         window.location.href = "index.html";
     }
 
-    function mostrarMensagem(texto, tipo) {
-        const msg = document.getElementById('mensagem');
-        msg.innerText = texto;
-        msg.className = 'msg ' + tipo;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        setTimeout(() => msg.className = 'msg', 4500);
+    // ===== MÁSCARAS =====
+    function mascaraCNPJ(input) {
+        let v = input.value.replace(/\D/g, '');
+        v = v.replace(/^(\d{2})(\d)/, '$1.$2');
+        v = v.replace(/^(\d{2})\.(\d{3})(\d)/, '$1.$2.$3');
+        v = v.replace(/\.(\d{3})(\d)/, '.$1/$2');
+        v = v.replace(/(\d{4})(\d)/, '$1-$2');
+        input.value = v;
     }
 
+    function mascaraCPF(input) {
+        let v = input.value.replace(/\D/g, '');
+        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+        v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        input.value = v;
+    }
+
+    function mascaraCEP(input) {
+        let v = input.value.replace(/\D/g, '');
+        v = v.replace(/(\d{5})(\d)/, '$1-$2');
+        input.value = v;
+    }
+
+    function mascaraTelefone(input) {
+        let v = input.value.replace(/\D/g, '');
+        if (v.length > 10) {
+            v = v.replace(/^(\d{2})(\d{5})(\d{0,4})/, '($1) $2-$3');
+        } else {
+            v = v.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+        }
+        input.value = v;
+    }
+
+    // ===== BUSCAR CEP =====
+    async function buscarCEP() {
+        const cepInput = document.getElementById('cep');
+        const btn = document.getElementById('btnCep');
+        const cep = cepInput.value.replace(/\D/g, '');
+
+        if (cep.length !== 8) {
+            showToast("Informe um CEP válido (8 dígitos).", "error");
+            return;
+        }
+
+        btn.classList.add('loading');
+        btn.textContent = '...';
+
+        try {
+            const res = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const data = await res.json();
+
+            if (data.erro) {
+                showToast("CEP não encontrado.", "error");
+                document.getElementById('err-cep').classList.add('show');
+            } else {
+                document.getElementById('endereco').value = data.logradouro || '';
+                document.getElementById('bairro').value = data.bairro || '';
+                document.getElementById('cidade').value = data.localidade || '';
+                document.getElementById('estado').value = data.uf || '';
+                showToast("Endereço preenchido automaticamente!", "success");
+                document.getElementById('err-cep').classList.remove('show');
+            }
+        } catch (e) {
+            showToast("Erro ao buscar CEP. Verifique sua conexão.", "error");
+        }
+
+        btn.classList.remove('loading');
+        btn.textContent = 'Buscar';
+    }
+
+    // Enter no CEP busca automaticamente
+    document.getElementById('cep').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            buscarCEP();
+        }
+    });
+
+    // ===== CARREGAR =====
     async function carregarEmpresa() {
         try {
             const userData = JSON.parse(user);
@@ -433,12 +635,12 @@
                 document.getElementById('bairro').value = emp.bairro || '';
                 document.getElementById('cep').value = emp.cep || '';
                 document.getElementById('cidade').value = emp.cidade || '';
-                document.getElementById('estado').value = emp.estado || '';
+                document.getElementById('estado').value = emp.estado || 'MA';
                 document.getElementById('nome_completo').value = emp.nome_completo || '';
                 document.getElementById('rg').value = emp.rg || '';
                 document.getElementById('cpf').value = emp.cpf || '';
                 document.getElementById('cargo').value = emp.cargo || '';
-                document.getElementById('estado_civil').value = emp.estado_civil || '';
+                document.getElementById('estado_civil').value = emp.estado_civil || 'SOLTEIRO';
                 document.getElementById('telefone').value = emp.telefone || '';
                 document.getElementById('email').value = emp.email || '';
                 document.getElementById('banco').value = emp.banco || '';
@@ -451,8 +653,83 @@
         }
     }
 
+    // ===== VALIDAÇÃO =====
+    function validarFormulario() {
+        let valido = true;
+
+        // Razão Social
+        const razao = document.getElementById('razao_social').value.trim();
+        if (!razao) {
+            document.getElementById('err-razao').classList.add('show');
+            document.getElementById('razao_social').classList.add('error');
+            valido = false;
+        } else {
+            document.getElementById('err-razao').classList.remove('show');
+            document.getElementById('razao_social').classList.remove('error');
+        }
+
+        // CNPJ (básico)
+        const cnpj = document.getElementById('cnpj').value.replace(/\D/g, '');
+        if (cnpj.length !== 14) {
+            document.getElementById('err-cnpj').classList.add('show');
+            document.getElementById('cnpj').classList.add('error');
+            valido = false;
+        } else {
+            document.getElementById('err-cnpj').classList.remove('show');
+            document.getElementById('cnpj').classList.remove('error');
+        }
+
+        // CPF (básico)
+        const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
+        if (cpf.length !== 11) {
+            document.getElementById('err-cpf').classList.add('show');
+            document.getElementById('cpf').classList.add('error');
+            valido = false;
+        } else {
+            document.getElementById('err-cpf').classList.remove('show');
+            document.getElementById('cpf').classList.remove('error');
+        }
+
+        // Nome
+        const nome = document.getElementById('nome_completo').value.trim();
+        if (!nome) {
+            document.getElementById('err-nome').classList.add('show');
+            document.getElementById('nome_completo').classList.add('error');
+            valido = false;
+        } else {
+            document.getElementById('err-nome').classList.remove('show');
+            document.getElementById('nome_completo').classList.remove('error');
+        }
+
+        // Telefone
+        const tel = document.getElementById('telefone').value.replace(/\D/g, '');
+        if (tel.length < 10) {
+            document.getElementById('err-tel').classList.add('show');
+            document.getElementById('telefone').classList.add('error');
+            valido = false;
+        } else {
+            document.getElementById('err-tel').classList.remove('show');
+            document.getElementById('telefone').classList.remove('error');
+        }
+
+        return valido;
+    }
+
+    // ===== SALVAR =====
     async function salvarEmpresa(event) {
         event.preventDefault();
+
+        if (!validarFormulario()) {
+            showToast("Corrija os campos obrigatórios antes de salvar.", "error");
+            // Scroll para o primeiro erro
+            const firstError = document.querySelector('.error');
+            if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return;
+        }
+
+        const btnSalvar = document.getElementById('btnSalvar');
+        btnSalvar.classList.add('loading');
+        btnSalvar.textContent = 'Salvando...';
 
         const userData = JSON.parse(user);
 
@@ -515,19 +792,33 @@
                 });
             }
 
+            btnSalvar.classList.remove('loading');
+            btnSalvar.textContent = 'Salvar Dados da Empresa';
+
             if (response.ok) {
-                mostrarMensagem('✅ Dados da empresa salvos com sucesso!', 'sucesso');
+                showToast("✅ Dados da empresa salvos com sucesso!", "success");
             } else {
                 const erro = await response.json();
                 console.error(erro);
-                mostrarMensagem('❌ Erro ao salvar. Verifique o console.', 'erro');
+                showToast("❌ Erro ao salvar. Tente novamente.", "error");
             }
 
         } catch (erro) {
             console.error(erro);
-            mostrarMensagem('❌ Erro de conexão com o servidor.', 'erro');
+            btnSalvar.classList.remove('loading');
+            btnSalvar.textContent = 'Salvar Dados da Empresa';
+            showToast("❌ Erro de conexão com o servidor.", "error");
         }
     }
+
+    // Limpar erros ao digitar
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', function() {
+            this.classList.remove('error');
+            const errEl = this.parentElement.querySelector('.error-text');
+            if (errEl) errEl.classList.remove('show');
+        });
+    });
 </script>
 
 </body>
