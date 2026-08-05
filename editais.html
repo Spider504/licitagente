@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editais - Sistema de Licitações</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #1e293b; min-height: 100vh; }
+
+        header {
+            background: white; border-bottom: 1px solid #e2e8f0; padding: 0 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            height: 64px; position: sticky; top: 0; z-index: 100;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+        }
+        .logo { display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 700; color: #1e3a8a; text-decoration: none; }
+        .logo-icon {
+            width: 36px; height: 36px; background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: white;
+        }
+        .user-area { display: flex; align-items: center; gap: 12px; font-size: 13px; }
+        .btn-voltar {
+            background: transparent; color: #3b82f6; border: 1px solid #e2e8f0;
+            padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px;
+            font-weight: 500; font-family: inherit; text-decoration: none;
+        }
+        .btn-voltar:hover { background: #eff6ff; }
+        .btn-sair {
+            background: transparent; color: #64748b; border: 1px solid #e2e8f0;
+            padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px;
+            font-weight: 500; font-family: inherit;
+        }
+        .btn-sair:hover { background: #fef2f2; color: #dc2626; }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+        .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+        .page-header h1 { font-size: 24px; color: #0f172a; font-weight: 700; }
+        .page-header p { color: #64748b; font-size: 14px; margin-top: 4px; }
+
+        .btn {
+            padding: 10px 18px; border-radius: 10px; font-size: 13px; font-weight: 600;
+            cursor: pointer; border: none; font-family: inherit; transition: all 0.2s;
+        }
+        .btn-primary { background: linear-gradient(135deg, #1e3a8a, #2563eb); color: white; }
+        .btn-primary:hover { box-shadow: 0 6px 20px rgba(30,58,138,0.3); }
+        .btn-secondary { background: #f1f5f9; color: #475569; }
+        .btn-secondary:hover { background: #e2e8f0; }
+        .btn-danger { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+        .card {
+            background: white; border-radius: 14px; padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; margin-bottom: 20px;
+        }
+        .card h2 { font-size: 16px; color: #0f172a; font-weight: 600; margin-bottom: 16px; }
+
+        .badge {
+            padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block;
+        }
+        .badge.rascunho { background: #f1f5f9; color: #64748b; }
+        .badge.em_disputa { background: #dbeafe; color: #1e40af; }
+        .badge.vencido { background: #d1fae5; color: #065f46; }
+        .badge.perdido { background: #fee2e2; color: #991b1b; }
+        .badge.arquivado { background: #f1f5f9; color: #94a3b8; }
+
+        .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #e2e8f0; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #f8fafc; padding: 12px 14px; text-align: left; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+        td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #374151; }
+        tr:hover td { background: #f8fafc; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full { grid-column: 1 / -1; }
+        label { font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #374151; }
+        input, select, textarea {
+            padding: 10px 12px; border: 2px solid #e5e7eb; border-radius: 8px;
+            font-size: 14px; font-family: inherit; background: #f9fafb;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); background: white;
+        }
+        textarea { min-height: 70px; resize: vertical; }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: #94a3b8; }
+        .empty-state .empty-icon { font-size: 36px; margin-bottom: 10px; }
+
+        .toast {
+            position: fixed; top: 20px; right: 20px; padding: 14px 20px; border-radius: 10px;
+            font-size: 13px; font-weight: 500; color: white; z-index: 9999;
+            transform: translateX(120%); transition: transform 0.3s ease; max-width: 360px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { background: #059669; }
+        .toast.error { background: #dc2626; }
+        .toast.info { background: #2563eb; }
+
+        .hidden { display: none !important; }
+        .actions-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+        .item-row input { width: 100%; padding: 6px 8px; font-size: 12px; }
+        .item-row td { padding: 6px 8px; vertical-align: middle; }
+        .check-cell { text-align: center; width: 40px; }
+
+        .totais-bar {
+            display: flex; gap: 24px; flex-wrap: wrap; padding: 14px 16px;
+            background: #f8fafc; border-radius: 10px; margin-top: 14px; font-size: 13px;
+        }
+        .totais-bar strong { color: #1e3a8a; font-size: 15px; }
+
+        @media (max-width: 700px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .container { padding: 20px 14px 50px; }
+            .page-header h1 { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="painel.html" class="logo">
+        <div class="logo-icon">📋</div>
+        <span>Licitações</span>
+    </a>
+    <div class="user-area">
+        <span id="emailUsuario">...</span>
+        <a href="painel.html" class="btn-voltar">Dashboard</a>
+        <button class="btn-sair" onclick="fazerLogout()">Sair</button>
+    </div>
+</header>
+
+<div class="container">
+    <!-- LISTA -->
+    <div id="viewLista">
+        <div class="page-header">
+            <div>
+                <h1>Meus Editais</h1>
+                <p>Cadastre editais, itens e prepare a precificação.</p>
+            </div>
+            <button class="btn btn-primary" onclick="novoEdital()">+ Novo Edital</button>
+        </div>
+        <div class="card">
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Número</th>
+                            <th>Órgão</th>
+                            <th>Modalidade</th>
+                            <th>Status</th>
+                            <th>Itens</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaEditais">
+                        <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><p>Carregando...</p></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORMULÁRIO -->
+    <div id="viewForm" class="hidden">
+        <div class="page-header">
+            <div>
+                <h1 id="formTitulo">Novo Edital</h1>
+                <p>Preencha o cabeçalho e os itens/lotes.</p>
+            </div>
+            <button class="btn btn-secondary" onclick="voltarLista()">← Voltar</button>
+        </div>
+
+        <div class="card">
+            <h2>📄 Dados do Edital</h2>
+            <form id="formEdital" onsubmit="salvarEdital(event)">
+                <input type="hidden" id="edital_id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Modalidade</label>
+                        <input type="text" id="modalidade" placeholder="Ex: Pregão Eletrônico">
+                    </div>
+                    <div class="form-group">
+                        <label>Número</label>
+                        <input type="text" id="numero" placeholder="Ex: 05/2026">
+                    </div>
+                    <div class="form-group">
+                        <label>Processo</label>
+                        <input type="text" id="processo" placeholder="Ex: 0501019/2026">
+                    </div>
+                    <div class="form-group">
+                        <label>UF</label>
+                        <input type="text" id="uf" value="MA" maxlength="2">
+                    </div>
+                    <div class="form-group full">
+                        <label>Órgão / Contratante</label>
+                        <input type="text" id="orgao" placeholder="Ex: Prefeitura Municipal de Bacabeira/MA">
+                    </div>
+                    <div class="form-group">
+                        <label>CNPJ do Órgão</label>
+                        <input type="text" id="cnpj_orgao" placeholder="00.000.000/0000-00">
+                    </div>
+                    <div class="form-group">
+                        <label>Data da Sessão</label>
+                        <input type="datetime-local" id="data_sessao">
+                    </div>
+                    <div class="form-group full">
+                        <label>Objeto</label>
+                        <textarea id="objeto" placeholder="Descrição do objeto da licitação"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Valor Estimado (R$)</label>
+                        <input type="number" id="valor_estimado" step="0.01" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Critério de Julgamento</label>
+                        <input type="text" id="criterio_julgamento" placeholder="Ex: Menor preço por Lote">
+                    </div>
+                    <div class="form-group">
+                        <label>Modo de Disputa</label>
+                        <input type="text" id="modo_disputa" placeholder="Ex: Aberto">
+                    </div>
+                    <div class="form-group">
+                        <label>Plataforma</label>
+                        <input type="text" id="plataforma" placeholder="Ex: portaldecompraspublicas.com.br">
+                    </div>
+                    <div class="form-group">
+                        <label>Tipo de Disputa</label>
+                        <select id="tipo_disputa">
+                            <option value="item">Por Item</option>
+                            <option value="lote">Por Lote</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="status">
+                            <option value="rascunho">Rascunho</option>
+                            <option value="em_disputa">Em Disputa</option>
+                            <option value="vencido">Vencido</option>
+                            <option value="perdido">Perdido</option>
+                            <option value="arquivado">Arquivado</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Margem padrão (%)</label>
+                        <input type="number" id="margem_padrao" step="0.01" value="20">
+                    </div>
+                    <div class="form-group">
+                        <label>Impostos padrão (%)</label>
+                        <input type="number" id="impostos_padrao" step="0.01" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label>Frete/Outros padrão (%)</label>
+                        <input type="number" id="frete_padrao" step="0.01" value="0">
+                    </div>
+                </div>
+                <div class="actions-row">
+                    <button type="submit" class="btn btn-primary" id="btnSalvarEdital">Salvar Edital</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ITENS (só após salvar o edital) -->
+        <div class="card" id="cardItens" style="display:none;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+                <h2 style="margin:0;">📦 Itens / Lotes</h2>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="abrirPaste()">📋 Colar tabela</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="adicionarItem()">+ Item</button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="check-cell">✔</th>
+                            <th>Item</th>
+                            <th>Lote</th>
+                            <th>Descrição</th>
+                            <th>Un</th>
+                            <th>Qtd</th>
+                            <th>Custo</th>
+                            <th>Margem%</th>
+                            <th>Unitário</th>
+                            <th>Total</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="listaItens"></tbody>
+                </table>
+            </div>
+
+            <div class="totais-bar">
+                <div>Itens participando: <strong id="totalItens">0</strong></div>
+                <div>Total estimado: <strong id="totalGeral">R$ 0,00</strong></div>
+            </div>
+
+            <div class="actions-row">
+                <button type="button" class="btn btn-primary" onclick="salvarItens()">Salvar Itens</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Smart Paste -->
+<div id="modalPaste" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:16px;padding:24px;max-width:560px;width:100%;">
+        <h3 style="margin-bottom:8px;">Colar tabela de itens</h3>
+        <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Cole linhas no formato: Item | Descrição | Unidade | Quantidade (separados por Tab ou ;)</p>
+        <textarea id="pasteArea" style="width:100%;min-height:140px;padding:12px;border:2px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px;" placeholder="1&#9;Camiseta malha PV&#9;UN&#9;100&#10;2&#9;Calça tactel&#9;UN&#9;50"></textarea>
+        <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
+            <button class="btn btn-secondary" onclick="fecharPaste()">Cancelar</button>
+            <button class="btn btn-primary" onclick="processarPaste()">Importar</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const CONFIG_URL = "https://ltjxofcbogdynbkssqlr.supabase.co";
+    const CONFIG_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
+
+    const token = localStorage.getItem('supabase_token');
+    const userStr = localStorage.getItem('supabase_user');
+    let userData = null;
+    let itensLocais = [];
+    let editalAtualId = null;
+
+    if (!token || !userStr) {
+        window.location.href = "index.html";
+    } else {
+        userData = JSON.parse(userStr);
+        document.getElementById('emailUsuario').textContent = userData.email || '...';
+        carregarEditais();
+    }
+
+    function showToast(msg, tipo) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = 'toast ' + tipo + ' show';
+        setTimeout(() => t.classList.remove('show'), 4000);
+    }
+
+    function fazerLogout() {
+        localStorage.removeItem('supabase_token');
+        localStorage.removeItem('supabase_user');
+        window.location.href = "index.html";
+    }
+
+    function voltarLista() {
+        document.getElementById('viewForm').classList.add('hidden');
+        document.getElementById('viewLista').classList.remove('hidden');
+        carregarEditais();
+    }
+
+    function novoEdital() {
+        editalAtualId = null;
+        itensLocais = [];
+        document.getElementById('formEdital').reset();
+        document.getElementById('edital_id').value = '';
+        document.getElementById('uf').value = 'MA';
+        document.getElementById('margem_padrao').value = 20;
+        document.getElementById('formTitulo').textContent = 'Novo Edital';
+        document.getElementById('cardItens').style.display = 'none';
+        document.getElementById('viewLista').classList.add('hidden');
+        document.getElementById('viewForm').classList.remove('hidden');
+        renderItens();
+    }
+
+    async function carregarEditais() {
+        try {
+            const res = await fetch(`${CONFIG_URL}/rest/v1/editais?select=id,numero,orgao,modalidade,status&order=created_at.desc`, {
+                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            const tbody = document.getElementById('listaEditais');
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><p>Nenhum edital cadastrado</p></div></td></tr>';
+                return;
+            }
+
+            // Conta itens por edital
+            const counts = {};
+            for (const e of data) {
+                const r = await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${e.id}&select=id`, {
+                    headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`, 'Prefer': 'count=exact' }
+                });
+                counts[e.id] = r.headers.get('content-range')?.split('/')[1] || '0';
+            }
+
+            tbody.innerHTML = data.map(e => `
+                <tr>
+                    <td style="font-weight:500;">${e.numero || '-'}</td>
+                    <td>${e.orgao || '-'}</td>
+                    <td>${e.modalidade || '-'}</td>
+                    <td><span class="badge ${e.status}">${(e.status || '').replace('_', ' ')}</span></td>
+                    <td>${counts[e.id] || 0}</td>
+                    <td>
+                        <button class="btn btn-secondary btn-sm" onclick="editarEdital('${e.id}')">Abrir</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirEdital('${e.id}')">Excluir</button>
+                    </td>
+                </tr>
+            `).join('');
+        } catch (e) {
+            console.error(e);
+            document.getElementById('listaEditais').innerHTML = '<tr><td colspan="6">Erro ao carregar</td></tr>';
+        }
+    }
+
+    async function editarEdital(id) {
+        try {
+            const res = await fetch(`${CONFIG_URL}/rest/v1/editais?id=eq.${id}&select=*`, {
+                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (!data || !data[0]) return showToast('Edital não encontrado', 'error');
+
+            const e = data[0];
+            editalAtualId = e.id;
+            document.getElementById('edital_id').value = e.id;
+            document.getElementById('modalidade').value = e.modalidade || '';
+            document.getElementById('numero').value = e.numero || '';
+            document.getElementById('processo').value = e.processo || '';
+            document.getElementById('orgao').value = e.orgao || '';
+            document.getElementById('cnpj_orgao').value = e.cnpj_orgao || '';
+            document.getElementById('objeto').value = e.objeto || '';
+            document.getElementById('valor_estimado').value = e.valor_estimado || '';
+            document.getElementById('criterio_julgamento').value = e.criterio_julgamento || '';
+            document.getElementById('modo_disputa').value = e.modo_disputa || '';
+            document.getElementById('plataforma').value = e.plataforma || '';
+            document.getElementById('uf').value = e.uf || 'MA';
+            document.getElementById('tipo_disputa').value = e.tipo_disputa || 'item';
+            document.getElementById('status').value = e.status || 'rascunho';
+            document.getElementById('margem_padrao').value = e.margem_padrao ?? 20;
+            document.getElementById('impostos_padrao').value = e.impostos_padrao ?? 0;
+            document.getElementById('frete_padrao').value = e.frete_padrao ?? 0;
+
+            if (e.data_sessao) {
+                const d = new Date(e.data_sessao);
+                document.getElementById('data_sessao').value = d.toISOString().slice(0, 16);
+            }
+
+            document.getElementById('formTitulo').textContent = `Edital ${e.numero || ''}`.trim();
+            document.getElementById('cardItens').style.display = 'block';
+            document.getElementById('viewLista').classList.add('hidden');
+            document.getElementById('viewForm').classList.remove('hidden');
+
+            await carregarItens(e.id);
+        } catch (err) {
+            console.error(err);
+            showToast('Erro ao abrir edital', 'error');
+        }
+    }
+
+    async function salvarEdital(event) {
+        event.preventDefault();
+        const btn = document.getElementById('btnSalvarEdital');
+        btn.disabled = true;
+        btn.textContent = 'Salvando...';
+
+        const dados = {
+            user_id: userData.id,
+            modalidade: document.getElementById('modalidade').value.trim() || null,
+            numero: document.getElementById('numero').value.trim() || null,
+            processo: document.getElementById('processo').value.trim() || null,
+            orgao: document.getElementById('orgao').value.trim() || null,
+            cnpj_orgao: document.getElementById('cnpj_orgao').value.trim() || null,
+            objeto: document.getElementById('objeto').value.trim() || null,
+            valor_estimado: parseFloat(document.getElementById('valor_estimado').value) || null,
+            criterio_julgamento: document.getElementById('criterio_julgamento').value.trim() || null,
+            modo_disputa: document.getElementById('modo_disputa').value.trim() || null,
+            plataforma: document.getElementById('plataforma').value.trim() || null,
+            uf: document.getElementById('uf').value.trim() || 'MA',
+            tipo_disputa: document.getElementById('tipo_disputa').value,
+            status: document.getElementById('status').value,
+            margem_padrao: parseFloat(document.getElementById('margem_padrao').value) || 0,
+            impostos_padrao: parseFloat(document.getElementById('impostos_padrao').value) || 0,
+            frete_padrao: parseFloat(document.getElementById('frete_padrao').value) || 0,
+            updated_at: new Date().toISOString()
+        };
+
+        const ds = document.getElementById('data_sessao').value;
+        if (ds) dados.data_sessao = new Date(ds).toISOString();
+
+        try {
+            let res;
+            if (editalAtualId) {
+                res = await fetch(`${CONFIG_URL}/rest/v1/editais?id=eq.${editalAtualId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json', 'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(dados)
+                });
+            } else {
+                res = await fetch(`${CONFIG_URL}/rest/v1/editais`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json', 'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(dados)
+                });
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Salvar Edital';
+
+            if (res.ok) {
+                const saved = await res.json();
+                editalAtualId = Array.isArray(saved) ? saved[0].id : saved.id;
+                document.getElementById('edital_id').value = editalAtualId;
+                document.getElementById('cardItens').style.display = 'block';
+                showToast('✅ Edital salvo!', 'success');
+            } else {
+                const err = await res.json();
+                console.error(err);
+                showToast('Erro ao salvar edital', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            btn.disabled = false;
+            btn.textContent = 'Salvar Edital';
+            showToast('Erro de conexão', 'error');
+        }
+    }
+
+    async function excluirEdital(id) {
+        if (!confirm('Excluir este edital e todos os itens?')) return;
+        try {
+            await fetch(`${CONFIG_URL}/rest/v1/editais?id=eq.${id}`, {
+                method: 'DELETE',
+                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+            });
+            showToast('Edital excluído', 'success');
+            carregarEditais();
+        } catch (e) {
+            showToast('Erro ao excluir', 'error');
+        }
+    }
+
+    // ===== ITENS =====
+    async function carregarItens(editalId) {
+        try {
+            const res = await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${editalId}&order=ordem.asc`, {
+                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+            });
+            itensLocais = await res.json() || [];
+            renderItens();
+        } catch (e) {
+            itensLocais = [];
+            renderItens();
+        }
+    }
+
+    function calcUnitario(item) {
+        const custo = parseFloat(item.preco_custo) || 0;
+        const margem = parseFloat(item.margem_lucro ?? document.getElementById('margem_padrao').value) || 0;
+        const impostos = parseFloat(item.impostos ?? document.getElementById('impostos_padrao').value) || 0;
+        const frete = parseFloat(item.frete_outros ?? document.getElementById('frete_padrao').value) || 0;
+        const fator = 1 + (margem + impostos + frete) / 100;
+        return +(custo * fator).toFixed(4);
+    }
+
+    function renderItens() {
+        const tbody = document.getElementById('listaItens');
+        if (!itensLocais.length) {
+            tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><p>Nenhum item. Use "+ Item" ou "Colar tabela".</p></div></td></tr>';
+            atualizarTotais();
+            return;
+        }
+
+        tbody.innerHTML = itensLocais.map((it, i) => {
+            const unit = it.preco_unitario || calcUnitario(it);
+            const qtd = parseFloat(it.quantidade) || 0;
+            const total = +(unit * qtd).toFixed(2);
+            return `
+            <tr class="item-row">
+                <td class="check-cell"><input type="checkbox" ${it.participar !== false ? 'checked' : ''} onchange="updItem(${i},'participar',this.checked)"></td>
+                <td><input value="${it.numero_item || ''}" onchange="updItem(${i},'numero_item',this.value)" style="width:60px"></td>
+                <td><input value="${it.numero_lote || ''}" onchange="updItem(${i},'numero_lote',this.value)" style="width:60px"></td>
+                <td><input value="${it.descricao || ''}" onchange="updItem(${i},'descricao',this.value)"></td>
+                <td><input value="${it.unidade || 'UN'}" onchange="updItem(${i},'unidade',this.value)" style="width:50px"></td>
+                <td><input type="number" step="0.01" value="${it.quantidade || 1}" onchange="updItem(${i},'quantidade',this.value)" style="width:70px"></td>
+                <td><input type="number" step="0.01" value="${it.preco_custo || 0}" onchange="updItem(${i},'preco_custo',this.value); recalc(${i})" style="width:80px"></td>
+                <td><input type="number" step="0.01" value="${it.margem_lucro ?? document.getElementById('margem_padrao').value}" onchange="updItem(${i},'margem_lucro',this.value); recalc(${i})" style="width:60px"></td>
+                <td><input type="number" step="0.01" value="${unit}" onchange="updItem(${i},'preco_unitario',this.value); atualizarTotais()" style="width:80px"></td>
+                <td>R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+                <td><button class="btn btn-danger btn-sm" onclick="removerItem(${i})">✕</button></td>
+            </tr>`;
+        }).join('');
+        atualizarTotais();
+    }
+
+    function updItem(i, field, value) {
+        if (field === 'participar') itensLocais[i][field] = value;
+        else if (['quantidade','preco_custo','margem_lucro','impostos','frete_outros','preco_unitario'].includes(field))
+            itensLocais[i][field] = parseFloat(value) || 0;
+        else itensLocais[i][field] = value;
+    }
+
+    function recalc(i) {
+        itensLocais[i].preco_unitario = calcUnitario(itensLocais[i]);
+        renderItens();
+    }
+
+    function atualizarTotais() {
+        let qtd = 0, soma = 0;
+        itensLocais.forEach(it => {
+            if (it.participar === false) return;
+            qtd++;
+            const unit = parseFloat(it.preco_unitario) || calcUnitario(it);
+            soma += unit * (parseFloat(it.quantidade) || 0);
+        });
+        document.getElementById('totalItens').textContent = qtd;
+        document.getElementById('totalGeral').textContent = 'R$ ' + soma.toLocaleString('pt-BR', {minimumFractionDigits:2});
+    }
+
+    function adicionarItem() {
+        const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
+        itensLocais.push({
+            numero_item: String(itensLocais.length + 1),
+            numero_lote: '',
+            descricao: '',
+            unidade: 'UN',
+            quantidade: 1,
+            preco_custo: 0,
+            margem_lucro: margem,
+            preco_unitario: 0,
+            participar: true,
+            ordem: itensLocais.length
+        });
+        renderItens();
+    }
+
+    function removerItem(i) {
+        itensLocais.splice(i, 1);
+        renderItens();
+    }
+
+    async function salvarItens() {
+        if (!editalAtualId) return showToast('Salve o edital primeiro', 'error');
+
+        try {
+            // Apaga itens antigos e reinsere (simples e confiável para MVP)
+            await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${editalAtualId}`, {
+                method: 'DELETE',
+                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+            });
+
+            if (itensLocais.length === 0) {
+                showToast('Itens salvos (lista vazia)', 'success');
+                return;
+            }
+
+            const rows = itensLocais.map((it, i) => {
+                const unit = parseFloat(it.preco_unitario) || calcUnitario(it);
+                const qtd = parseFloat(it.quantidade) || 0;
+                return {
+                    edital_id: editalAtualId,
+                    user_id: userData.id,
+                    numero_item: it.numero_item || null,
+                    numero_lote: it.numero_lote || null,
+                    descricao: it.descricao || 'Sem descrição',
+                    unidade: it.unidade || 'UN',
+                    quantidade: qtd,
+                    preco_custo: parseFloat(it.preco_custo) || 0,
+                    margem_lucro: parseFloat(it.margem_lucro) || null,
+                    impostos: parseFloat(it.impostos) || null,
+                    frete_outros: parseFloat(it.frete_outros) || null,
+                    preco_unitario: unit,
+                    preco_total: +(unit * qtd).toFixed(4),
+                    participar: it.participar !== false,
+                    ganhou: it.ganhou === true,
+                    valor_lance_final: it.valor_lance_final || null,
+                    ordem: i
+                };
+            });
+
+            const res = await fetch(`${CONFIG_URL}/rest/v1/edital_itens`, {
+                method: 'POST',
+                headers: {
+                    'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(rows)
+            });
+
+            if (res.ok) showToast('✅ Itens salvos!', 'success');
+            else {
+                const err = await res.json();
+                console.error(err);
+                showToast('Erro ao salvar itens', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            showToast('Erro de conexão', 'error');
+        }
+    }
+
+    // Smart Paste
+    function abrirPaste() {
+        document.getElementById('modalPaste').classList.remove('hidden');
+        document.getElementById('modalPaste').style.display = 'flex';
+    }
+    function fecharPaste() {
+        document.getElementById('modalPaste').classList.add('hidden');
+        document.getElementById('modalPaste').style.display = 'none';
+    }
+    function processarPaste() {
+        const texto = document.getElementById('pasteArea').value.trim();
+        if (!texto) return;
+        const linhas = texto.split(/\r?\n/).filter(l => l.trim());
+        const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
+
+        linhas.forEach(linha => {
+            const cols = linha.split(/\t|;|\|/).map(c => c.trim());
+            if (cols.length < 2) return;
+            // Formatos aceitos: Item | Desc | Un | Qtd  OU  Desc | Un | Qtd
+            let numero_item = '', descricao = '', unidade = 'UN', quantidade = 1;
+            if (cols.length >= 4) {
+                numero_item = cols[0];
+                descricao = cols[1];
+                unidade = cols[2] || 'UN';
+                quantidade = parseFloat(cols[3]) || 1;
+            } else if (cols.length === 3) {
+                descricao = cols[0];
+                unidade = cols[1] || 'UN';
+                quantidade = parseFloat(cols[2]) || 1;
+            } else {
+                descricao = cols[0];
+                quantidade = parseFloat(cols[1]) || 1;
+            }
+            itensLocais.push({
+                numero_item: numero_item || String(itensLocais.length + 1),
+                numero_lote: '',
+                descricao,
+                unidade,
+                quantidade,
+                preco_custo: 0,
+                margem_lucro: margem,
+                preco_unitario: 0,
+                participar: true,
+                ordem: itensLocais.length
+            });
+        });
+        fecharPaste();
+        renderItens();
+        showToast(`${linhas.length} linha(s) importada(s)`, 'success');
+    }
+</script>
+</body>
+</html>
