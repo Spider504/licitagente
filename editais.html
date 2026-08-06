@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Editais - Sistema de Licitações</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
@@ -29,7 +28,7 @@
         }
         .btn-nav:hover { background: #f8fafc; }
         .btn-voltar { color: #3b82f6; }
-        .container { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 28px 20px 60px; }
         .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
         .page-header h1 { font-size: 24px; color: #0f172a; font-weight: 700; }
         .page-header p { color: #64748b; font-size: 14px; margin-top: 4px; }
@@ -57,8 +56,8 @@
         .badge.arquivado { background: #f1f5f9; color: #94a3b8; }
         .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; }
-        th { background: #f8fafc; padding: 12px 14px; text-align: left; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
-        td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; color: #374151; }
+        th { background: #f8fafc; padding: 10px 12px; text-align: left; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
+        td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; color: #374151; vertical-align: middle; }
         tr:hover td { background: #f8fafc; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .form-group { display: flex; flex-direction: column; }
@@ -71,9 +70,9 @@
         input:focus, select:focus, textarea:focus {
             outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); background: white;
         }
+        input:disabled { background: #f1f5f9; color: #94a3b8; }
         textarea { min-height: 70px; resize: vertical; }
-        .empty-state { text-align: center; padding: 40px 20px; color: #94a3b8; }
-        .empty-state .empty-icon { font-size: 36px; margin-bottom: 10px; }
+        .empty-state { text-align: center; padding: 36px 20px; color: #94a3b8; }
         .toast {
             position: fixed; top: 20px; right: 20px; padding: 14px 20px; border-radius: 10px;
             font-size: 13px; font-weight: 500; color: white; z-index: 9999;
@@ -86,34 +85,30 @@
         .toast.info { background: #2563eb; }
         .hidden { display: none !important; }
         .actions-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
-        .item-row input { width: 100%; padding: 6px 8px; font-size: 12px; }
-        .item-row td { padding: 6px 8px; vertical-align: middle; }
-        .check-cell { text-align: center; width: 40px; }
+        .item-row input { width: 100%; padding: 6px 8px; font-size: 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: #fff; }
+        .check-cell { text-align: center; width: 36px; }
         .totais-bar {
-            display: flex; gap: 24px; flex-wrap: wrap; padding: 14px 16px;
+            display: flex; gap: 20px; flex-wrap: wrap; padding: 14px 16px;
             background: #f8fafc; border-radius: 10px; margin-top: 14px; font-size: 13px;
         }
         .totais-bar strong { color: #1e3a8a; font-size: 15px; }
-        .import-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
-        .import-btn {
-            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
-            padding: 14px 12px; text-align: center; cursor: pointer; font-size: 13px;
-            font-weight: 600; color: #334155; font-family: inherit; transition: all 0.2s;
+        .lote-box {
+            margin-top: 12px; padding: 12px 14px; background: #eff6ff; border: 1px solid #bfdbfe;
+            border-radius: 10px; font-size: 13px;
         }
-        .import-btn:hover { background: #eff6ff; border-color: #bfdbfe; color: #1e3a8a; }
+        .lote-box h3 { font-size: 13px; color: #1e40af; margin-bottom: 8px; }
+        .lote-line { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #dbeafe; }
+        .lote-line:last-child { border-bottom: none; font-weight: 700; }
+        .hint { font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.45; }
         .modal-overlay {
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
             z-index: 10000; align-items: center; justify-content: center; padding: 20px;
         }
         .modal-overlay.show { display: flex; }
-        .modal-box {
-            background: white; border-radius: 16px; padding: 24px; max-width: 520px; width: 100%;
-        }
-        .hint { font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.45; }
+        .modal-box { background: white; border-radius: 16px; padding: 24px; max-width: 520px; width: 100%; }
         @media (max-width: 700px) {
             .form-grid { grid-template-columns: 1fr; }
             .container { padding: 20px 14px 50px; }
-            .page-header h1 { font-size: 20px; }
         }
     </style>
 </head>
@@ -133,16 +128,14 @@
 
 <div class="container">
 
-    <!-- LISTA -->
     <div id="viewLista">
         <div class="page-header">
             <div>
                 <h1>Meus Editais</h1>
-                <p>Cadastre o edital, importe os itens e prepare a precificação.</p>
+                <p>Cadastre o edital, importe os produtos e orce item a item.</p>
             </div>
             <button class="btn btn-primary" onclick="novoEdital()">+ Novo Edital</button>
         </div>
-
         <div class="card">
             <div class="table-wrapper">
                 <table>
@@ -158,19 +151,18 @@
                         </tr>
                     </thead>
                     <tbody id="listaEditais">
-                        <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⏳</div><p>Carregando...</p></div></td></tr>
+                        <tr><td colspan="7"><div class="empty-state">Carregando...</div></td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- FORMULÁRIO -->
     <div id="viewForm" class="hidden">
         <div class="page-header">
             <div>
                 <h1 id="formTitulo">Novo Edital</h1>
-                <p>Preencha o cabeçalho e os itens (manual, Excel ou colar).</p>
+                <p>Cabeçalho + produtos (custo individual; disputa por item ou por lote).</p>
             </div>
             <button class="btn btn-secondary" onclick="voltarLista()">← Voltar</button>
         </div>
@@ -190,19 +182,19 @@
                     </div>
                     <div class="form-group">
                         <label>Processo</label>
-                        <input type="text" id="processo" placeholder="Ex: 0501019/2026">
+                        <input type="text" id="processo">
                     </div>
                     <div class="form-group">
                         <label>UF</label>
-                        <input type="text" id="uf" maxlength="2" placeholder="Ex: SP, RJ, BA...">
+                        <input type="text" id="uf" maxlength="2" placeholder="SP, RJ, BA...">
                     </div>
                     <div class="form-group full">
                         <label>Órgão / Contratante</label>
-                        <input type="text" id="orgao" placeholder="Nome do órgão">
+                        <input type="text" id="orgao">
                     </div>
                     <div class="form-group">
                         <label>CNPJ do Órgão</label>
-                        <input type="text" id="cnpj_orgao" placeholder="00.000.000/0000-00">
+                        <input type="text" id="cnpj_orgao">
                     </div>
                     <div class="form-group">
                         <label>Data da Sessão</label>
@@ -210,7 +202,7 @@
                     </div>
                     <div class="form-group full">
                         <label>Objeto</label>
-                        <textarea id="objeto" placeholder="Objeto da licitação"></textarea>
+                        <textarea id="objeto"></textarea>
                     </div>
                     <div class="form-group">
                         <label>Valor Estimado (R$)</label>
@@ -218,19 +210,19 @@
                     </div>
                     <div class="form-group">
                         <label>Critério de Julgamento</label>
-                        <input type="text" id="criterio_julgamento" placeholder="Ex: Menor preço por lote">
+                        <input type="text" id="criterio_julgamento" placeholder="Menor preço por item/lote">
                     </div>
                     <div class="form-group">
                         <label>Modo de Disputa</label>
-                        <input type="text" id="modo_disputa" placeholder="Ex: Aberto">
+                        <input type="text" id="modo_disputa" placeholder="Aberto">
                     </div>
                     <div class="form-group">
                         <label>Plataforma</label>
-                        <input type="text" id="plataforma" placeholder="Ex: Compras.gov.br, BLL, PCP...">
+                        <input type="text" id="plataforma">
                     </div>
                     <div class="form-group">
                         <label>Tipo de Disputa</label>
-                        <select id="tipo_disputa">
+                        <select id="tipo_disputa" onchange="renderItens()">
                             <option value="item">Por Item</option>
                             <option value="lote">Por Lote</option>
                         </select>
@@ -264,23 +256,22 @@
             </form>
         </div>
 
-        <!-- ITENS — sempre visível no formulário -->
         <div class="card" id="cardItens">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
-                <h2 style="margin:0;">📦 Itens / Lotes</h2>
+                <h2 style="margin:0;">📦 Produtos</h2>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                     <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
                         📊 Excel / CSV
                         <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="importarPlanilha(event)">
                     </label>
-                    <button type="button" class="btn btn-secondary btn-sm" onclick="abrirPaste()">📋 Colar tabela</button>
-                    <button type="button" class="btn btn-primary btn-sm" onclick="adicionarItem()">+ Item</button>
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="abrirPaste()">📋 Colar</button>
+                    <button type="button" class="btn btn-primary btn-sm" onclick="adicionarItem()">+ Produto</button>
                 </div>
             </div>
-
             <p class="hint">
-                Preencha manualmente com <strong>+ Item</strong>, importe planilha ou cole a tabela do Termo de Referência.
-                Depois clique em <strong>Salvar Edital</strong> e em seguida <strong>Salvar Itens</strong>.
+                <strong>Custo</strong> é sempre por produto (sua pesquisa). 
+                Se a disputa for <strong>por lote</strong>, os produtos do mesmo lote são somados para o lance.
+                Planilha aceita: LOTE, DESCRIÇÃO, QUANTIDADE, VALOR UNITÁRIO.
             </p>
 
             <div class="table-wrapper">
@@ -288,11 +279,12 @@
                     <thead>
                         <tr>
                             <th class="check-cell">✔</th>
-                            <th>Item</th>
                             <th>Lote</th>
+                            <th>Item</th>
                             <th>Descrição</th>
                             <th>Un</th>
                             <th>Qtd</th>
+                            <th>Ref. R$</th>
                             <th>Custo</th>
                             <th>Margem%</th>
                             <th>Unitário</th>
@@ -304,8 +296,10 @@
                 </table>
             </div>
 
+            <div id="resumoLotes"></div>
+
             <div class="totais-bar">
-                <div>Itens participando: <strong id="totalItens">0</strong></div>
+                <div>Produtos participando: <strong id="totalItens">0</strong></div>
                 <div>Total estimado: <strong id="totalGeral">R$ 0,00</strong></div>
             </div>
 
@@ -316,14 +310,13 @@
     </div>
 </div>
 
-<!-- Modal Colar -->
 <div class="modal-overlay" id="modalPaste">
     <div class="modal-box">
-        <h3 style="margin-bottom:8px;">Colar tabela de itens</h3>
+        <h3 style="margin-bottom:8px;">Colar tabela</h3>
         <p style="font-size:13px;color:#64748b;margin-bottom:12px;">
-            Formato: <strong>Item | Descrição | Unidade | Quantidade</strong> (separado por Tab ou ;)
+            Formato: Lote | Descrição | Unidade | Quantidade | Valor unit. ref. (Tab ou ;)
         </p>
-        <textarea id="pasteArea" style="width:100%;min-height:150px;padding:12px;border:2px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px;" placeholder="1&#9;Camiseta malha PV&#9;UN&#9;100&#10;2&#9;Calça tactel&#9;UN&#9;50"></textarea>
+        <textarea id="pasteArea" style="width:100%;min-height:140px;padding:12px;border:2px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px;"></textarea>
         <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
             <button class="btn btn-secondary" onclick="fecharPaste()">Cancelar</button>
             <button class="btn btn-primary" onclick="processarPaste()">Importar</button>
@@ -357,16 +350,29 @@ function showToast(msg, tipo) {
     t.className = 'toast ' + tipo + ' show';
     setTimeout(() => t.classList.remove('show'), 4000);
 }
-
 function fazerLogout() {
     localStorage.removeItem('supabase_token');
     localStorage.removeItem('supabase_user');
     window.location.href = "index.html";
 }
-
 function val(id) {
     const v = document.getElementById(id).value.trim();
     return v || null;
+}
+function isPorLote() {
+    return document.getElementById('tipo_disputa').value === 'lote';
+}
+function parseNum(v) {
+    if (v === null || v === undefined || v === '') return null;
+    if (typeof v === 'number') return v;
+    const s = String(v).replace(/\s/g, '').replace(/R\$/i, '');
+    if (/[a-zA-Z]/.test(s)) return null; // "Sigiloso" etc.
+    if (s.includes(',') && s.includes('.')) return parseFloat(s.replace(/\./g, '').replace(',', '.')) || null;
+    if (s.includes(',')) return parseFloat(s.replace(',', '.')) || null;
+    return parseFloat(s) || null;
+}
+function money(n) {
+    return 'R$ ' + (Number(n) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 }
 
 function abrirFormulario(titulo) {
@@ -374,19 +380,16 @@ function abrirFormulario(titulo) {
     document.getElementById('viewForm').classList.remove('hidden');
     document.getElementById('formTitulo').textContent = titulo || 'Novo Edital';
 }
-
 function voltarLista() {
     document.getElementById('viewForm').classList.add('hidden');
     document.getElementById('viewLista').classList.remove('hidden');
     carregarEditais();
 }
-
 function novoEdital() {
     editalAtualId = null;
     itensLocais = [];
     document.getElementById('formEdital').reset();
     document.getElementById('edital_id').value = '';
-    document.getElementById('uf').value = '';
     document.getElementById('margem_padrao').value = 20;
     document.getElementById('impostos_padrao').value = 0;
     document.getElementById('frete_padrao').value = 0;
@@ -402,12 +405,10 @@ async function carregarEditais() {
         });
         const data = await res.json();
         const tbody = document.getElementById('listaEditais');
-
-        if (!data || data.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📭</div><p>Nenhum edital cadastrado</p></div></td></tr>';
+        if (!data?.length) {
+            tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state">Nenhum edital cadastrado</div></td></tr>';
             return;
         }
-
         const counts = {};
         await Promise.all(data.map(async (e) => {
             const r = await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${e.id}&select=id`, {
@@ -415,14 +416,13 @@ async function carregarEditais() {
             });
             counts[e.id] = r.headers.get('content-range')?.split('/')[1] || '0';
         }));
-
         tbody.innerHTML = data.map(e => `
             <tr>
                 <td style="font-weight:500;">${e.numero || '-'}</td>
                 <td>${e.orgao || '-'}</td>
                 <td>${e.uf || '-'}</td>
                 <td>${e.modalidade || '-'}</td>
-                <td><span class="badge ${e.status}">${(e.status || '').replace('_', ' ')}</span></td>
+                <td><span class="badge ${e.status}">${(e.status || '').replace('_',' ')}</span></td>
                 <td>${counts[e.id] || 0}</td>
                 <td>
                     <button class="btn btn-secondary btn-sm" onclick="editarEdital('${e.id}')">Abrir</button>
@@ -443,30 +443,19 @@ async function editarEdital(id) {
         });
         const data = await res.json();
         if (!data?.[0]) return showToast('Edital não encontrado', 'error');
-
         const e = data[0];
         editalAtualId = e.id;
         document.getElementById('edital_id').value = e.id;
-        document.getElementById('modalidade').value = e.modalidade || '';
-        document.getElementById('numero').value = e.numero || '';
-        document.getElementById('processo').value = e.processo || '';
-        document.getElementById('orgao').value = e.orgao || '';
-        document.getElementById('cnpj_orgao').value = e.cnpj_orgao || '';
-        document.getElementById('objeto').value = e.objeto || '';
+        ['modalidade','numero','processo','orgao','cnpj_orgao','objeto','criterio_julgamento','modo_disputa','plataforma','uf'].forEach(k => {
+            document.getElementById(k).value = e[k] || '';
+        });
         document.getElementById('valor_estimado').value = e.valor_estimado || '';
-        document.getElementById('criterio_julgamento').value = e.criterio_julgamento || '';
-        document.getElementById('modo_disputa').value = e.modo_disputa || '';
-        document.getElementById('plataforma').value = e.plataforma || '';
-        document.getElementById('uf').value = e.uf || '';
         document.getElementById('tipo_disputa').value = e.tipo_disputa || 'item';
         document.getElementById('status').value = e.status || 'rascunho';
         document.getElementById('margem_padrao').value = e.margem_padrao ?? 20;
         document.getElementById('impostos_padrao').value = e.impostos_padrao ?? 0;
         document.getElementById('frete_padrao').value = e.frete_padrao ?? 0;
-        if (e.data_sessao) {
-            document.getElementById('data_sessao').value = new Date(e.data_sessao).toISOString().slice(0, 16);
-        }
-
+        if (e.data_sessao) document.getElementById('data_sessao').value = new Date(e.data_sessao).toISOString().slice(0, 16);
         abrirFormulario(`Edital ${e.numero || ''}`.trim());
         await carregarItens(e.id);
     } catch (err) {
@@ -480,20 +469,13 @@ async function salvarEdital(event) {
     const btn = document.getElementById('btnSalvarEdital');
     btn.disabled = true;
     btn.textContent = 'Salvando...';
-
     const dados = {
         user_id: userData.id,
-        modalidade: val('modalidade'),
-        numero: val('numero'),
-        processo: val('processo'),
-        orgao: val('orgao'),
-        cnpj_orgao: val('cnpj_orgao'),
-        objeto: val('objeto'),
+        modalidade: val('modalidade'), numero: val('numero'), processo: val('processo'),
+        orgao: val('orgao'), cnpj_orgao: val('cnpj_orgao'), objeto: val('objeto'),
         valor_estimado: parseFloat(document.getElementById('valor_estimado').value) || null,
-        criterio_julgamento: val('criterio_julgamento'),
-        modo_disputa: val('modo_disputa'),
-        plataforma: val('plataforma'),
-        uf: document.getElementById('uf').value.trim() || null,
+        criterio_julgamento: val('criterio_julgamento'), modo_disputa: val('modo_disputa'),
+        plataforma: val('plataforma'), uf: document.getElementById('uf').value.trim() || null,
         tipo_disputa: document.getElementById('tipo_disputa').value,
         status: document.getElementById('status').value,
         margem_padrao: parseFloat(document.getElementById('margem_padrao').value) || 0,
@@ -511,16 +493,13 @@ async function salvarEdital(event) {
         const res = await fetch(url, {
             method: editalAtualId ? 'PATCH' : 'POST',
             headers: {
-                'apikey': CONFIG_KEY,
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=representation'
+                'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json', 'Prefer': 'return=representation'
             },
             body: JSON.stringify(dados)
         });
         btn.disabled = false;
         btn.textContent = 'Salvar Edital';
-
         if (res.ok) {
             const saved = await res.json();
             editalAtualId = Array.isArray(saved) ? saved[0].id : saved.id;
@@ -571,44 +550,92 @@ function calcUnitario(item) {
     const margem = parseFloat(item.margem_lucro ?? document.getElementById('margem_padrao').value) || 0;
     const impostos = parseFloat(item.impostos ?? document.getElementById('impostos_padrao').value) || 0;
     const frete = parseFloat(item.frete_outros ?? document.getElementById('frete_padrao').value) || 0;
+    if (!custo) return parseFloat(item.preco_unitario) || 0;
     return +(custo * (1 + (margem + impostos + frete) / 100)).toFixed(4);
 }
 
 function renderItens() {
     const tbody = document.getElementById('listaItens');
+    const porLote = isPorLote();
+
     if (!itensLocais.length) {
-        tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><p>Nenhum item. Use + Item, Excel ou Colar tabela.</p></div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state">Nenhum produto. Use + Produto, Excel ou Colar.</div></td></tr>';
+        document.getElementById('resumoLotes').innerHTML = '';
         atualizarTotais();
         return;
     }
 
     tbody.innerHTML = itensLocais.map((it, i) => {
-        const unit = it.preco_unitario || calcUnitario(it);
+        const unit = (it.preco_unitario && parseFloat(it.preco_custo)) ? calcUnitario(it) : (parseFloat(it.preco_unitario) || calcUnitario(it));
+        // se tem custo, recalcula; se usuário editou unitário sem custo, mantém
+        const unitFinal = parseFloat(it.preco_custo) > 0 ? calcUnitario(it) : (parseFloat(it.preco_unitario) || 0);
         const qtd = parseFloat(it.quantidade) || 0;
-        const total = +(unit * qtd).toFixed(2);
+        const total = +(unitFinal * qtd).toFixed(2);
+        const ref = it.valor_referencia != null && it.valor_referencia !== '' ? it.valor_referencia : '';
+
         return `<tr class="item-row">
             <td class="check-cell"><input type="checkbox" ${it.participar !== false ? 'checked' : ''} onchange="updItem(${i},'participar',this.checked)"></td>
-            <td><input value="${it.numero_item || ''}" onchange="updItem(${i},'numero_item',this.value)" style="width:60px"></td>
-            <td><input value="${it.numero_lote || ''}" onchange="updItem(${i},'numero_lote',this.value)" style="width:60px"></td>
+            <td><input value="${it.numero_lote || ''}" onchange="updItem(${i},'numero_lote',this.value); renderItens()" style="width:55px" title="Número do lote"></td>
+            <td><input value="${it.numero_item || ''}" onchange="updItem(${i},'numero_item',this.value)" style="width:55px" title="Nº item (opcional)"></td>
             <td><input value="${(it.descricao || '').replace(/"/g, '&quot;')}" onchange="updItem(${i},'descricao',this.value)"></td>
-            <td><input value="${it.unidade || 'UN'}" onchange="updItem(${i},'unidade',this.value)" style="width:50px"></td>
-            <td><input type="number" step="0.01" value="${it.quantidade || 1}" onchange="updItem(${i},'quantidade',this.value)" style="width:70px"></td>
-            <td><input type="number" step="0.01" value="${it.preco_custo || 0}" onchange="updItem(${i},'preco_custo',this.value); recalc(${i})" style="width:80px"></td>
-            <td><input type="number" step="0.01" value="${it.margem_lucro ?? document.getElementById('margem_padrao').value}" onchange="updItem(${i},'margem_lucro',this.value); recalc(${i})" style="width:60px"></td>
-            <td><input type="number" step="0.01" value="${unit}" onchange="updItem(${i},'preco_unitario',this.value); atualizarTotais()" style="width:80px"></td>
-            <td>R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+            <td><input value="${it.unidade || 'UN'}" onchange="updItem(${i},'unidade',this.value)" style="width:48px"></td>
+            <td><input type="number" step="0.01" value="${it.quantidade || 1}" onchange="updItem(${i},'quantidade',this.value); renderItens()" style="width:70px"></td>
+            <td><input type="number" step="0.01" value="${ref}" onchange="updItem(${i},'valor_referencia',this.value)" style="width:75px" title="Valor unitário de referência do edital"></td>
+            <td><input type="number" step="0.01" value="${it.preco_custo || 0}" onchange="updItem(${i},'preco_custo',this.value); recalc(${i})" style="width:75px" title="Seu custo de pesquisa"></td>
+            <td><input type="number" step="0.01" value="${it.margem_lucro ?? document.getElementById('margem_padrao').value}" onchange="updItem(${i},'margem_lucro',this.value); recalc(${i})" style="width:58px"></td>
+            <td><input type="number" step="0.01" value="${unitFinal}" onchange="updItem(${i},'preco_unitario',this.value); renderItens()" style="width:75px"></td>
+            <td style="white-space:nowrap;font-weight:500;">${money(total)}</td>
             <td><button class="btn btn-danger btn-sm" onclick="removerItem(${i})">✕</button></td>
         </tr>`;
     }).join('');
+
+    renderResumoLotes();
     atualizarTotais();
+}
+
+function renderResumoLotes() {
+    const box = document.getElementById('resumoLotes');
+    if (!isPorLote()) {
+        box.innerHTML = '';
+        return;
+    }
+    const mapa = {};
+    itensLocais.forEach(it => {
+        if (it.participar === false) return;
+        const lote = String(it.numero_lote || '—');
+        const unit = parseFloat(it.preco_custo) > 0 ? calcUnitario(it) : (parseFloat(it.preco_unitario) || 0);
+        const total = unit * (parseFloat(it.quantidade) || 0);
+        if (!mapa[lote]) mapa[lote] = 0;
+        mapa[lote] += total;
+    });
+    const keys = Object.keys(mapa).sort((a, b) => {
+        const na = parseFloat(a), nb = parseFloat(b);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return String(a).localeCompare(String(b));
+    });
+    if (!keys.length) {
+        box.innerHTML = '';
+        return;
+    }
+    let html = '<div class="lote-box"><h3>Soma por lote (produtos marcados)</h3>';
+    let geral = 0;
+    keys.forEach(k => {
+        geral += mapa[k];
+        html += `<div class="lote-line"><span>Lote ${k}</span><span>${money(mapa[k])}</span></div>`;
+    });
+    html += `<div class="lote-line"><span>Total geral</span><span>${money(geral)}</span></div></div>`;
+    box.innerHTML = html;
 }
 
 function updItem(i, field, value) {
     if (field === 'participar') itensLocais[i][field] = value;
-    else if (['quantidade','preco_custo','margem_lucro','impostos','frete_outros','preco_unitario'].includes(field))
-        itensLocais[i][field] = parseFloat(value) || 0;
+    else if (['quantidade','preco_custo','margem_lucro','impostos','frete_outros','preco_unitario','valor_referencia'].includes(field))
+        itensLocais[i][field] = value === '' || value === null ? null : (parseFloat(value) || 0);
     else itensLocais[i][field] = value;
-    if (field === 'participar') atualizarTotais();
+    if (field === 'participar') {
+        renderResumoLotes();
+        atualizarTotais();
+    }
 }
 
 function recalc(i) {
@@ -621,21 +648,23 @@ function atualizarTotais() {
     itensLocais.forEach(it => {
         if (it.participar === false) return;
         qtd++;
-        const unit = parseFloat(it.preco_unitario) || calcUnitario(it);
+        const unit = parseFloat(it.preco_custo) > 0 ? calcUnitario(it) : (parseFloat(it.preco_unitario) || 0);
         soma += unit * (parseFloat(it.quantidade) || 0);
     });
     document.getElementById('totalItens').textContent = qtd;
-    document.getElementById('totalGeral').textContent = 'R$ ' + soma.toLocaleString('pt-BR', {minimumFractionDigits:2});
+    document.getElementById('totalGeral').textContent = money(soma);
 }
 
 function adicionarItem() {
     const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
+    const n = itensLocais.length + 1;
     itensLocais.push({
-        numero_item: String(itensLocais.length + 1),
-        numero_lote: '',
+        numero_lote: isPorLote() ? String(n) : '',
+        numero_item: String(n),
         descricao: '',
         unidade: 'UN',
         quantidade: 1,
+        valor_referencia: null,
         preco_custo: 0,
         margem_lucro: margem,
         preco_unitario: 0,
@@ -652,20 +681,17 @@ function removerItem(i) {
 
 async function salvarItens() {
     if (!editalAtualId) return showToast('Salve o edital primeiro', 'error');
-
     try {
         await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${editalAtualId}`, {
             method: 'DELETE',
             headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
         });
-
         if (!itensLocais.length) {
             showToast('Itens salvos (lista vazia)', 'success');
             return;
         }
-
         const rows = itensLocais.map((it, i) => {
-            const unit = parseFloat(it.preco_unitario) || calcUnitario(it);
+            const unit = parseFloat(it.preco_custo) > 0 ? calcUnitario(it) : (parseFloat(it.preco_unitario) || 0);
             const qtd = parseFloat(it.quantidade) || 0;
             return {
                 edital_id: editalAtualId,
@@ -679,6 +705,7 @@ async function salvarItens() {
                 margem_lucro: parseFloat(it.margem_lucro) || null,
                 impostos: parseFloat(it.impostos) || null,
                 frete_outros: parseFloat(it.frete_outros) || null,
+                valor_referencia: it.valor_referencia != null ? parseFloat(it.valor_referencia) : null,
                 preco_unitario: unit,
                 preco_total: +(unit * qtd).toFixed(4),
                 participar: it.participar !== false,
@@ -687,18 +714,14 @@ async function salvarItens() {
                 ordem: i
             };
         });
-
         const res = await fetch(`${CONFIG_URL}/rest/v1/edital_itens`, {
             method: 'POST',
             headers: {
-                'apikey': CONFIG_KEY,
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-                'Prefer': 'return=minimal'
+                'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json', 'Prefer': 'return=minimal'
             },
             body: JSON.stringify(rows)
         });
-
         if (res.ok) showToast('✅ Itens salvos!', 'success');
         else {
             console.error(await res.json());
@@ -711,44 +734,43 @@ async function salvarItens() {
 }
 
 /* ===== COLAR ===== */
-function abrirPaste() {
-    document.getElementById('modalPaste').classList.add('show');
-}
-function fecharPaste() {
-    document.getElementById('modalPaste').classList.remove('show');
-}
+function abrirPaste() { document.getElementById('modalPaste').classList.add('show'); }
+function fecharPaste() { document.getElementById('modalPaste').classList.remove('show'); }
 function processarPaste() {
     const texto = document.getElementById('pasteArea').value.trim();
     if (!texto) return;
     const linhas = texto.split(/\r?\n/).filter(l => l.trim());
     const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
-
     linhas.forEach(linha => {
         const cols = linha.split(/\t|;|\|/).map(c => c.trim());
         if (cols.length < 2) return;
-        let numero_item = '', descricao = '', unidade = 'UN', quantidade = 1;
-        if (cols.length >= 4) {
-            numero_item = cols[0]; descricao = cols[1]; unidade = cols[2] || 'UN'; quantidade = parseFloat(cols[3]) || 1;
+        // Lote | Desc | Un | Qtd | Ref
+        let numero_lote = '', descricao = '', unidade = 'UN', quantidade = 1, valor_referencia = null;
+        if (cols.length >= 5) {
+            numero_lote = cols[0]; descricao = cols[1]; unidade = cols[2] || 'UN';
+            quantidade = parseNum(cols[3]) || 1; valor_referencia = parseNum(cols[4]);
+        } else if (cols.length >= 4) {
+            numero_lote = cols[0]; descricao = cols[1]; unidade = cols[2] || 'UN'; quantidade = parseNum(cols[3]) || 1;
         } else if (cols.length === 3) {
-            descricao = cols[0]; unidade = cols[1] || 'UN'; quantidade = parseFloat(cols[2]) || 1;
+            descricao = cols[0]; unidade = cols[1] || 'UN'; quantidade = parseNum(cols[2]) || 1;
         } else {
-            descricao = cols[0]; quantidade = parseFloat(cols[1]) || 1;
+            descricao = cols[0]; quantidade = parseNum(cols[1]) || 1;
         }
         itensLocais.push({
-            numero_item: numero_item || String(itensLocais.length + 1),
-            numero_lote: '', descricao, unidade, quantidade,
+            numero_lote, numero_item: String(itensLocais.length + 1),
+            descricao, unidade, quantidade, valor_referencia,
             preco_custo: 0, margem_lucro: margem, preco_unitario: 0,
             participar: true, ordem: itensLocais.length
         });
     });
-
+    if (itensLocais.some(i => i.numero_lote)) document.getElementById('tipo_disputa').value = 'lote';
     fecharPaste();
     document.getElementById('pasteArea').value = '';
     renderItens();
     showToast(`${linhas.length} linha(s) importada(s)`, 'success');
 }
 
-/* ===== EXCEL / CSV ===== */
+/* ===== EXCEL — alinhado ao modelo LOTE / DESCRIÇÃO / QUANTIDADE / VALOR UNITÁRIO ===== */
 function importarPlanilha(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -767,51 +789,72 @@ function importarPlanilha(event) {
             }
             if (!rows.length) return showToast('Planilha vazia', 'error');
 
-            const header = rows[0].map(h => String(h).toLowerCase());
-            const hasHeader = header.some(h => /item|desc|qtd|quant|unid/.test(h));
+            const norm = (h) => String(h).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+            const header = rows[0].map(norm);
+            const hasHeader = header.some(h => /lote|desc|qtd|quant|valor|unit|item/.test(h));
             const start = hasHeader ? 1 : 0;
-            const idxItem = header.findIndex(h => /item|n[ºo°]|num/.test(h));
-            const idxDesc = header.findIndex(h => /desc|especific|objeto/.test(h));
-            const idxUn = header.findIndex(h => /unid|^un$|^und$/.test(h));
-            const idxQtd = header.findIndex(h => /qtd|quant/.test(h));
+
+            const idxLote = header.findIndex(h => /^lote$|n[oº]?\s*lote|numero\s*lote/.test(h));
+            const idxDesc = header.findIndex(h => /desc|especific|objeto|produto/.test(h));
+            const idxQtd  = header.findIndex(h => /quantidade|qtd|quant/.test(h));
+            const idxUn   = header.findIndex(h => /^un$|^und$|unidade/.test(h));
+            // VALOR UNITÁRIO = referência do edital (não o código)
+            const idxRef  = header.findIndex(h =>
+                /valor\s*unitario|vlr?\s*unit|preco\s*unitario|valor\s*unit/.test(h)
+            );
+
+            if (idxLote >= 0) document.getElementById('tipo_disputa').value = 'lote';
+
             const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
             let importados = 0;
 
             for (let r = start; r < rows.length; r++) {
                 const cols = rows[r];
                 if (!cols?.length) continue;
-                let numero_item = '', descricao = '', unidade = 'UN', quantidade = 1;
 
-                if (hasHeader && (idxDesc >= 0 || idxItem >= 0)) {
-                    numero_item = idxItem >= 0 ? String(cols[idxItem] || '') : String(r);
-                    descricao = idxDesc >= 0 ? String(cols[idxDesc] || '') : String(cols[0] || '');
-                    unidade = idxUn >= 0 ? String(cols[idxUn] || 'UN') : 'UN';
-                    quantidade = idxQtd >= 0 ? parseFloat(cols[idxQtd]) || 1 : 1;
-                } else if (cols.length >= 4) {
-                    numero_item = String(cols[0]); descricao = String(cols[1]);
-                    unidade = String(cols[2] || 'UN'); quantidade = parseFloat(cols[3]) || 1;
-                } else if (cols.length === 3) {
-                    descricao = String(cols[0]); unidade = String(cols[1] || 'UN'); quantidade = parseFloat(cols[2]) || 1;
+                let numero_lote = '', descricao = '', unidade = 'UN', quantidade = 1, valor_referencia = null;
+
+                if (hasHeader) {
+                    numero_lote = idxLote >= 0 ? String(cols[idxLote] ?? '').trim() : '';
+                    descricao = idxDesc >= 0 ? String(cols[idxDesc] ?? '').trim() : String(cols[1] ?? cols[0] ?? '').trim();
+                    unidade = idxUn >= 0 ? String(cols[idxUn] ?? 'UN').trim() || 'UN' : 'UN';
+                    quantidade = idxQtd >= 0 ? (parseNum(cols[idxQtd]) || 1) : 1;
+                    valor_referencia = idxRef >= 0 ? parseNum(cols[idxRef]) : null;
                 } else {
-                    descricao = String(cols[0] || '');
-                    if (!descricao) continue;
+                    // posicional: Lote | Desc | Qtd | Valor unit
+                    if (cols.length >= 4) {
+                        numero_lote = String(cols[0]); descricao = String(cols[1]);
+                        quantidade = parseNum(cols[2]) || 1; valor_referencia = parseNum(cols[3]);
+                    } else if (cols.length >= 3) {
+                        descricao = String(cols[0]); quantidade = parseNum(cols[1]) || 1; valor_referencia = parseNum(cols[2]);
+                    } else {
+                        descricao = String(cols[0] || '');
+                    }
                 }
+
                 if (!descricao || descricao.length < 2) continue;
 
                 itensLocais.push({
-                    numero_item: numero_item || String(itensLocais.length + 1),
-                    numero_lote: '', descricao, unidade, quantidade,
-                    preco_custo: 0, margem_lucro: margem, preco_unitario: 0,
-                    participar: true, ordem: itensLocais.length
+                    numero_lote,
+                    numero_item: String(itensLocais.length + 1),
+                    descricao,
+                    unidade,
+                    quantidade,
+                    valor_referencia,
+                    preco_custo: 0,
+                    margem_lucro: margem,
+                    preco_unitario: 0,
+                    participar: true,
+                    ordem: itensLocais.length
                 });
                 importados++;
             }
 
             renderItens();
-            showToast(`✅ ${importados} item(ns) importado(s)`, 'success');
+            showToast(`✅ ${importados} produto(s) importado(s)`, 'success');
         } catch (err) {
             console.error(err);
-            showToast('Falha ao ler planilha. Use colar ou + Item.', 'error');
+            showToast('Falha ao ler planilha', 'error');
         }
         event.target.value = '';
     };
