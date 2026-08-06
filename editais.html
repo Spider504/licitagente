@@ -6,6 +6,8 @@
     <title>Editais - Sistema de Licitações</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #1e293b; min-height: 100vh; }
@@ -138,6 +140,24 @@
     <!-- LISTA -->
     <div id="viewLista">
         <div class="page-header">
+            <div class="card" id="cardImportacao">
+    <h2>⚡ Importação rápida</h2>
+    <p style="font-size:13px;color:#64748b;margin-bottom:14px;">
+        Tente na ordem: planilha → PNCP → PDF → manual. O que não vier automático você completa na tabela.
+    </p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+        <label class="btn btn-secondary" style="text-align:center;cursor:pointer;">
+            📊 Excel / CSV
+            <input type="file" id="filePlanilha" accept=".xlsx,.xls,.csv" hidden onchange="importarPlanilha(event)">
+        </label>
+        <button type="button" class="btn btn-secondary" onclick="abrirPncp()">🔎 Buscar no PNCP</button>
+        <label class="btn btn-secondary" style="text-align:center;cursor:pointer;">
+            📄 PDF do Edital
+            <input type="file" id="filePdf" accept=".pdf" hidden onchange="importarPdf(event)">
+        </label>
+        <button type="button" class="btn btn-secondary" onclick="abrirPaste()">📋 Colar tabela</button>
+    </div>
+</div>
             <div>
                 <h1>Meus Editais</h1>
                 <p>Cadastre editais, itens e prepare a precificação.</p>
