@@ -24,17 +24,13 @@
             font-size: 18px; color: white;
         }
         .user-area { display: flex; align-items: center; gap: 12px; font-size: 13px; }
-        .btn-voltar {
-            background: transparent; color: #3b82f6; border: 1px solid #e2e8f0;
-            padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px;
-            font-weight: 500; font-family: inherit; text-decoration: none;
+        .btn-nav {
+            background: transparent; border: 1px solid #e2e8f0; padding: 7px 14px; border-radius: 8px;
+            cursor: pointer; font-size: 13px; font-weight: 500; font-family: inherit; text-decoration: none;
         }
+        .btn-voltar { color: #3b82f6; }
         .btn-voltar:hover { background: #eff6ff; }
-        .btn-sair {
-            background: transparent; color: #64748b; border: 1px solid #e2e8f0;
-            padding: 7px 14px; border-radius: 8px; cursor: pointer; font-size: 13px;
-            font-weight: 500; font-family: inherit;
-        }
+        .btn-sair { color: #64748b; }
         .btn-sair:hover { background: #fef2f2; color: #dc2626; }
         .container { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
         .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
@@ -55,10 +51,8 @@
             background: white; border-radius: 14px; padding: 24px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; margin-bottom: 20px;
         }
-        .card h2 { font-size: 16px; color: #0f172a; font-weight: 600; margin-bottom: 16px; }
-        .badge {
-            padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block;
-        }
+        .card h2 { font-size: 16px; color: #0f172a; font-weight: 600; margin-bottom: 14px; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; display: inline-block; }
         .badge.rascunho { background: #f1f5f9; color: #64748b; }
         .badge.em_disputa { background: #dbeafe; color: #1e40af; }
         .badge.vencido { background: #d1fae5; color: #065f46; }
@@ -103,9 +97,7 @@
             background: #f8fafc; border-radius: 10px; margin-top: 14px; font-size: 13px;
         }
         .totais-bar strong { color: #1e3a8a; font-size: 15px; }
-        .import-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px;
-        }
+        .import-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
         .import-btn {
             background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
             padding: 14px 12px; text-align: center; cursor: pointer; font-size: 13px;
@@ -118,9 +110,10 @@
         }
         .modal-overlay.show { display: flex; }
         .modal-box {
-            background: white; border-radius: 16px; padding: 24px; max-width: 520px; width: 100%;
-            max-height: 90vh; overflow-y: auto;
+            background: white; border-radius: 16px; padding: 24px; max-width: 560px; width: 100%;
+            max-height: 92vh; overflow-y: auto;
         }
+        .hint { font-size: 12px; color: #94a3b8; margin-top: 4px; }
         @media (max-width: 700px) {
             .form-grid { grid-template-columns: 1fr; }
             .container { padding: 20px 14px 50px; }
@@ -137,18 +130,19 @@
     </a>
     <div class="user-area">
         <span id="emailUsuario">...</span>
-        <a href="painel.html" class="btn-voltar">Dashboard</a>
-        <button class="btn-sair" onclick="fazerLogout()">Sair</button>
+        <a href="painel.html" class="btn-nav btn-voltar">Dashboard</a>
+        <button class="btn-nav btn-sair" onclick="fazerLogout()">Sair</button>
     </div>
 </header>
 
 <div class="container">
-    <!-- LISTA -->
+
+    <!-- ===== LISTA ===== -->
     <div id="viewLista">
         <div class="page-header">
             <div>
                 <h1>Meus Editais</h1>
-                <p>Cadastre editais, itens e prepare a precificação.</p>
+                <p>Cadastre editais de todo o Brasil, itens e precificação.</p>
             </div>
             <button class="btn btn-primary" onclick="novoEdital()">+ Novo Edital</button>
         </div>
@@ -156,17 +150,15 @@
         <div class="card">
             <h2>⚡ Importação rápida</h2>
             <p style="font-size:13px;color:#64748b;margin-bottom:14px;">
-                Ordem sugerida: planilha → PNCP → PDF → manual. O que não vier automático você completa na tabela.
+                Ordem sugerida: <strong>Excel</strong> → <strong>PNCP</strong> → <strong>PDF</strong> → manual/colar.
             </p>
             <div class="import-grid">
-                <label class="import-btn">
-                    📊 Excel / CSV
-                    <input type="file" id="filePlanilha" accept=".xlsx,.xls,.csv" hidden onchange="importarPlanilha(event)">
+                <label class="import-btn">📊 Excel / CSV
+                    <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="importarPlanilha(event)">
                 </label>
                 <button type="button" class="import-btn" onclick="abrirPncp()">🔎 Buscar no PNCP</button>
-                <label class="import-btn">
-                    📄 PDF do Edital
-                    <input type="file" id="filePdf" accept=".pdf" hidden onchange="importarPdf(event)">
+                <label class="import-btn">📄 PDF do Edital
+                    <input type="file" accept=".pdf" hidden onchange="importarPdf(event)">
                 </label>
                 <button type="button" class="import-btn" onclick="novoEdital(); abrirPaste();">📋 Colar tabela</button>
             </div>
@@ -179,6 +171,7 @@
                         <tr>
                             <th>Número</th>
                             <th>Órgão</th>
+                            <th>UF</th>
                             <th>Modalidade</th>
                             <th>Status</th>
                             <th>Itens</th>
@@ -186,19 +179,19 @@
                         </tr>
                     </thead>
                     <tbody id="listaEditais">
-                        <tr><td colspan="6"><div class="empty-state"><div class="empty-icon">⏳</div><p>Carregando...</p></div></td></tr>
+                        <tr><td colspan="7"><div class="empty-state"><div class="empty-icon">⏳</div><p>Carregando...</p></div></td></tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <!-- FORMULÁRIO -->
+    <!-- ===== FORMULÁRIO ===== -->
     <div id="viewForm" class="hidden">
         <div class="page-header">
             <div>
                 <h1 id="formTitulo">Novo Edital</h1>
-                <p>Preencha o cabeçalho e os itens/lotes.</p>
+                <p>Cabeçalho do edital + itens/lotes.</p>
             </div>
             <button class="btn btn-secondary" onclick="voltarLista()">← Voltar</button>
         </div>
@@ -206,14 +199,12 @@
         <div class="card">
             <h2>⚡ Complementar importação</h2>
             <div class="import-grid">
-                <label class="import-btn">
-                    📊 Excel / CSV
-                    <input type="file" id="filePlanilha2" accept=".xlsx,.xls,.csv" hidden onchange="importarPlanilha(event)">
+                <label class="import-btn">📊 Excel / CSV
+                    <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="importarPlanilha(event)">
                 </label>
                 <button type="button" class="import-btn" onclick="abrirPncp()">🔎 PNCP</button>
-                <label class="import-btn">
-                    📄 PDF
-                    <input type="file" id="filePdf2" accept=".pdf" hidden onchange="importarPdf(event)">
+                <label class="import-btn">📄 PDF
+                    <input type="file" accept=".pdf" hidden onchange="importarPdf(event)">
                 </label>
                 <button type="button" class="import-btn" onclick="abrirPaste()">📋 Colar tabela</button>
             </div>
@@ -238,11 +229,11 @@
                     </div>
                     <div class="form-group">
                         <label>UF</label>
-                        <input type="text" id="uf" value="MA" maxlength="2">
+                        <input type="text" id="uf" maxlength="2" placeholder="Ex: SP, RJ, BA...">
                     </div>
                     <div class="form-group full">
                         <label>Órgão / Contratante</label>
-                        <input type="text" id="orgao" placeholder="Ex: Prefeitura Municipal de Bacabeira/MA">
+                        <input type="text" id="orgao" placeholder="Nome do órgão">
                     </div>
                     <div class="form-group">
                         <label>CNPJ do Órgão</label>
@@ -254,7 +245,7 @@
                     </div>
                     <div class="form-group full">
                         <label>Objeto</label>
-                        <textarea id="objeto" placeholder="Descrição do objeto da licitação"></textarea>
+                        <textarea id="objeto" placeholder="Objeto da licitação"></textarea>
                     </div>
                     <div class="form-group">
                         <label>Valor Estimado (R$)</label>
@@ -262,7 +253,7 @@
                     </div>
                     <div class="form-group">
                         <label>Critério de Julgamento</label>
-                        <input type="text" id="criterio_julgamento" placeholder="Ex: Menor preço por Lote">
+                        <input type="text" id="criterio_julgamento" placeholder="Ex: Menor preço por item/lote">
                     </div>
                     <div class="form-group">
                         <label>Modo de Disputa</label>
@@ -270,7 +261,7 @@
                     </div>
                     <div class="form-group">
                         <label>Plataforma</label>
-                        <input type="text" id="plataforma" placeholder="Ex: portaldecompraspublicas.com.br">
+                        <input type="text" id="plataforma" placeholder="Ex: Compras.gov.br, BLL, PCP...">
                     </div>
                     <div class="form-group">
                         <label>Tipo de Disputa</label>
@@ -352,7 +343,7 @@
     <div class="modal-box">
         <h3 style="margin-bottom:8px;">Colar tabela de itens</h3>
         <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Formato: Item | Descrição | Unidade | Quantidade (Tab ou ;)</p>
-        <textarea id="pasteArea" style="width:100%;min-height:140px;padding:12px;border:2px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px;" placeholder="1&#9;Camiseta malha PV&#9;UN&#9;100"></textarea>
+        <textarea id="pasteArea" style="width:100%;min-height:140px;padding:12px;border:2px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px;"></textarea>
         <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
             <button class="btn btn-secondary" onclick="fecharPaste()">Cancelar</button>
             <button class="btn btn-primary" onclick="processarPaste()">Importar</button>
@@ -360,627 +351,673 @@
     </div>
 </div>
 
-<!-- Modal PNCP -->
+<!-- Modal PNCP — busca específica -->
 <div class="modal-overlay" id="modalPncp">
     <div class="modal-box">
-        <h3 style="margin-bottom:8px;">Buscar no PNCP</h3>
-        <p style="font-size:13px;color:#64748b;margin-bottom:12px;">API pública do governo. Preenche o cabeçalho quando encontrar.</p>
-        <div class="form-group" style="margin-bottom:10px;">
-            <label>Palavra-chave / objeto</label>
-            <input type="text" id="pncp_q" placeholder="Ex: malharia">
+        <h3 style="margin-bottom:6px;">Buscar contratação no PNCP</h3>
+        <p style="font-size:13px;color:#64748b;margin-bottom:14px;">
+            Preencha o máximo possível para refinar. Cobertura: Brasil inteiro.
+        </p>
+        <div class="form-grid">
+            <div class="form-group full">
+                <label>Palavra-chave no objeto</label>
+                <input type="text" id="pncp_q" placeholder="Ex: malharia, limpeza, software...">
+            </div>
+            <div class="form-group">
+                <label>UF (opcional)</label>
+                <input type="text" id="pncp_uf" maxlength="2" placeholder="Ex: SP">
+                <span class="hint">Vazio = todas as UFs</span>
+            </div>
+            <div class="form-group">
+                <label>Modalidade</label>
+                <select id="pncp_modalidade">
+                    <option value="6">Pregão Eletrônico</option>
+                    <option value="8">Dispensa</option>
+                    <option value="9">Inexigibilidade</option>
+                    <option value="4">Concorrência</option>
+                    <option value="5">Concurso</option>
+                    <option value="7">Pregão Presencial</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Data inicial</label>
+                <input type="date" id="pncp_data_ini">
+            </div>
+            <div class="form-group">
+                <label>Data final</label>
+                <input type="date" id="pncp_data_fim">
+            </div>
+            <div class="form-group full">
+                <label>CNPJ do órgão (opcional)</label>
+                <input type="text" id="pncp_cnpj" placeholder="Somente números ou formatado">
+            </div>
         </div>
-        <div class="form-group" style="margin-bottom:10px;">
-            <label>UF</label>
-            <input type="text" id="pncp_uf" value="MA" maxlength="2">
-        </div>
-        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
             <button class="btn btn-secondary" onclick="fecharPncp()">Cancelar</button>
             <button class="btn btn-primary" onclick="buscarPncp()">Buscar</button>
         </div>
-        <div id="pncpResultados" style="margin-top:16px;max-height:240px;overflow:auto;font-size:13px;"></div>
+        <div id="pncpResultados" style="margin-top:16px;max-height:260px;overflow:auto;font-size:13px;"></div>
     </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-    const CONFIG_URL = "https://ltjxofcbogdynbkssqlr.supabase.co";
-    const CONFIG_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
+const CONFIG_URL = "https://ltjxofcbogdynbkssqlr.supabase.co";
+const CONFIG_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
 
-    const token = localStorage.getItem('supabase_token');
-    const userStr = localStorage.getItem('supabase_user');
-    let userData = null;
-    let itensLocais = [];
-    let editalAtualId = null;
+const token = localStorage.getItem('supabase_token');
+const userStr = localStorage.getItem('supabase_user');
+let userData = null;
+let itensLocais = [];
+let editalAtualId = null;
 
-    if (!token || !userStr) {
-        window.location.href = "index.html";
-    } else {
-        userData = JSON.parse(userStr);
-        document.getElementById('emailUsuario').textContent = userData.email || '...';
-        carregarEditais();
-    }
+if (!token || !userStr) {
+    window.location.href = "index.html";
+} else {
+    userData = JSON.parse(userStr);
+    document.getElementById('emailUsuario').textContent = userData.email || '...';
+    carregarEditais();
+    // Datas padrão PNCP: últimos 30 dias (sem forçar UF)
+    const hoje = new Date();
+    const ini = new Date(hoje.getTime() - 30 * 24 * 3600 * 1000);
+    document.getElementById('pncp_data_fim').value = hoje.toISOString().slice(0, 10);
+    document.getElementById('pncp_data_ini').value = ini.toISOString().slice(0, 10);
+}
 
-    function showToast(msg, tipo) {
-        const t = document.getElementById('toast');
-        t.textContent = msg;
-        t.className = 'toast ' + tipo + ' show';
-        setTimeout(() => t.classList.remove('show'), 4500);
-    }
+function showToast(msg, tipo) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'toast ' + tipo + ' show';
+    setTimeout(() => t.classList.remove('show'), 4500);
+}
 
-    function fazerLogout() {
-        localStorage.removeItem('supabase_token');
-        localStorage.removeItem('supabase_user');
-        window.location.href = "index.html";
-    }
+function fazerLogout() {
+    localStorage.removeItem('supabase_token');
+    localStorage.removeItem('supabase_user');
+    window.location.href = "index.html";
+}
 
-    function abrirFormulario(titulo) {
-        document.getElementById('viewLista').classList.add('hidden');
-        document.getElementById('viewForm').classList.remove('hidden');
-        document.getElementById('formTitulo').textContent = titulo || 'Novo Edital';
-    }
+function abrirFormulario(titulo) {
+    document.getElementById('viewLista').classList.add('hidden');
+    document.getElementById('viewForm').classList.remove('hidden');
+    document.getElementById('formTitulo').textContent = titulo || 'Novo Edital';
+}
 
-    function voltarLista() {
-        document.getElementById('viewForm').classList.add('hidden');
-        document.getElementById('viewLista').classList.remove('hidden');
-        carregarEditais();
-    }
+function voltarLista() {
+    document.getElementById('viewForm').classList.add('hidden');
+    document.getElementById('viewLista').classList.remove('hidden');
+    carregarEditais();
+}
 
-    function novoEdital() {
-        editalAtualId = null;
-        itensLocais = [];
-        document.getElementById('formEdital').reset();
-        document.getElementById('edital_id').value = '';
-        document.getElementById('uf').value = 'MA';
-        document.getElementById('margem_padrao').value = 20;
-        document.getElementById('impostos_padrao').value = 0;
-        document.getElementById('frete_padrao').value = 0;
-        document.getElementById('cardItens').style.display = 'none';
-        abrirFormulario('Novo Edital');
-        renderItens();
-    }
+function novoEdital() {
+    editalAtualId = null;
+    itensLocais = [];
+    document.getElementById('formEdital').reset();
+    document.getElementById('edital_id').value = '';
+    document.getElementById('uf').value = '';
+    document.getElementById('margem_padrao').value = 20;
+    document.getElementById('impostos_padrao').value = 0;
+    document.getElementById('frete_padrao').value = 0;
+    document.getElementById('cardItens').style.display = 'none';
+    abrirFormulario('Novo Edital');
+    renderItens();
+}
 
-    async function carregarEditais() {
-        try {
-            const res = await fetch(`${CONFIG_URL}/rest/v1/editais?select=id,numero,orgao,modalidade,status&order=created_at.desc`, {
-                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
-            });
-            const data = await res.json();
-            const tbody = document.getElementById('listaEditais');
+/* ===================== LISTA / CRUD EDITAL ===================== */
+async function carregarEditais() {
+    try {
+        const res = await fetch(`${CONFIG_URL}/rest/v1/editais?select=id,numero,orgao,uf,modalidade,status&order=created_at.desc`, {
+            headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        const tbody = document.getElementById('listaEditais');
 
-            if (!data || data.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6"><div class="empty-state"><div class="empty-icon">📭</div><p>Nenhum edital cadastrado</p></div></td></tr>';
-                return;
-            }
-
-            const counts = {};
-            await Promise.all(data.map(async (e) => {
-                const r = await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${e.id}&select=id`, {
-                    headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`, 'Prefer': 'count=exact' }
-                });
-                counts[e.id] = r.headers.get('content-range')?.split('/')[1] || '0';
-            }));
-
-            tbody.innerHTML = data.map(e => `
-                <tr>
-                    <td style="font-weight:500;">${e.numero || '-'}</td>
-                    <td>${e.orgao || '-'}</td>
-                    <td>${e.modalidade || '-'}</td>
-                    <td><span class="badge ${e.status}">${(e.status || '').replace('_', ' ')}</span></td>
-                    <td>${counts[e.id] || 0}</td>
-                    <td>
-                        <button class="btn btn-secondary btn-sm" onclick="editarEdital('${e.id}')">Abrir</button>
-                        <button class="btn btn-danger btn-sm" onclick="excluirEdital('${e.id}')">Excluir</button>
-                    </td>
-                </tr>
-            `).join('');
-        } catch (e) {
-            console.error(e);
-            document.getElementById('listaEditais').innerHTML = '<tr><td colspan="6">Erro ao carregar</td></tr>';
-        }
-    }
-
-    async function editarEdital(id) {
-        try {
-            const res = await fetch(`${CONFIG_URL}/rest/v1/editais?id=eq.${id}&select=*`, {
-                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
-            });
-            const data = await res.json();
-            if (!data || !data[0]) return showToast('Edital não encontrado', 'error');
-
-            const e = data[0];
-            editalAtualId = e.id;
-            document.getElementById('edital_id').value = e.id;
-            document.getElementById('modalidade').value = e.modalidade || '';
-            document.getElementById('numero').value = e.numero || '';
-            document.getElementById('processo').value = e.processo || '';
-            document.getElementById('orgao').value = e.orgao || '';
-            document.getElementById('cnpj_orgao').value = e.cnpj_orgao || '';
-            document.getElementById('objeto').value = e.objeto || '';
-            document.getElementById('valor_estimado').value = e.valor_estimado || '';
-            document.getElementById('criterio_julgamento').value = e.criterio_julgamento || '';
-            document.getElementById('modo_disputa').value = e.modo_disputa || '';
-            document.getElementById('plataforma').value = e.plataforma || '';
-            document.getElementById('uf').value = e.uf || 'MA';
-            document.getElementById('tipo_disputa').value = e.tipo_disputa || 'item';
-            document.getElementById('status').value = e.status || 'rascunho';
-            document.getElementById('margem_padrao').value = e.margem_padrao ?? 20;
-            document.getElementById('impostos_padrao').value = e.impostos_padrao ?? 0;
-            document.getElementById('frete_padrao').value = e.frete_padrao ?? 0;
-            if (e.data_sessao) {
-                document.getElementById('data_sessao').value = new Date(e.data_sessao).toISOString().slice(0, 16);
-            }
-
-            document.getElementById('cardItens').style.display = 'block';
-            abrirFormulario(`Edital ${e.numero || ''}`.trim());
-            await carregarItens(e.id);
-        } catch (err) {
-            console.error(err);
-            showToast('Erro ao abrir edital', 'error');
-        }
-    }
-
-    async function salvarEdital(event) {
-        event.preventDefault();
-        const btn = document.getElementById('btnSalvarEdital');
-        btn.disabled = true;
-        btn.textContent = 'Salvando...';
-
-        const dados = {
-            user_id: userData.id,
-            modalidade: document.getElementById('modalidade').value.trim() || null,
-            numero: document.getElementById('numero').value.trim() || null,
-            processo: document.getElementById('processo').value.trim() || null,
-            orgao: document.getElementById('orgao').value.trim() || null,
-            cnpj_orgao: document.getElementById('cnpj_orgao').value.trim() || null,
-            objeto: document.getElementById('objeto').value.trim() || null,
-            valor_estimado: parseFloat(document.getElementById('valor_estimado').value) || null,
-            criterio_julgamento: document.getElementById('criterio_julgamento').value.trim() || null,
-            modo_disputa: document.getElementById('modo_disputa').value.trim() || null,
-            plataforma: document.getElementById('plataforma').value.trim() || null,
-            uf: document.getElementById('uf').value.trim() || 'MA',
-            tipo_disputa: document.getElementById('tipo_disputa').value,
-            status: document.getElementById('status').value,
-            margem_padrao: parseFloat(document.getElementById('margem_padrao').value) || 0,
-            impostos_padrao: parseFloat(document.getElementById('impostos_padrao').value) || 0,
-            frete_padrao: parseFloat(document.getElementById('frete_padrao').value) || 0,
-            updated_at: new Date().toISOString()
-        };
-        const ds = document.getElementById('data_sessao').value;
-        if (ds) dados.data_sessao = new Date(ds).toISOString();
-
-        try {
-            let res;
-            if (editalAtualId) {
-                res = await fetch(`${CONFIG_URL}/rest/v1/editais?id=eq.${editalAtualId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json', 'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify(dados)
-                });
-            } else {
-                res = await fetch(`${CONFIG_URL}/rest/v1/editais`, {
-                    method: 'POST',
-                    headers: {
-                        'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json', 'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify(dados)
-                });
-            }
-
-            btn.disabled = false;
-            btn.textContent = 'Salvar Edital';
-
-            if (res.ok) {
-                const saved = await res.json();
-                editalAtualId = Array.isArray(saved) ? saved[0].id : saved.id;
-                document.getElementById('edital_id').value = editalAtualId;
-                document.getElementById('cardItens').style.display = 'block';
-                showToast('✅ Edital salvo!', 'success');
-            } else {
-                console.error(await res.json());
-                showToast('Erro ao salvar edital', 'error');
-            }
-        } catch (e) {
-            console.error(e);
-            btn.disabled = false;
-            btn.textContent = 'Salvar Edital';
-            showToast('Erro de conexão', 'error');
-        }
-    }
-
-    async function excluirEdital(id) {
-        if (!confirm('Excluir este edital e todos os itens?')) return;
-        try {
-            await fetch(`${CONFIG_URL}/rest/v1/editais?id=eq.${id}`, {
-                method: 'DELETE',
-                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
-            });
-            showToast('Edital excluído', 'success');
-            carregarEditais();
-        } catch (e) {
-            showToast('Erro ao excluir', 'error');
-        }
-    }
-
-    // ===== ITENS =====
-    async function carregarItens(editalId) {
-        try {
-            const res = await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${editalId}&order=ordem.asc`, {
-                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
-            });
-            itensLocais = await res.json() || [];
-            renderItens();
-        } catch (e) {
-            itensLocais = [];
-            renderItens();
-        }
-    }
-
-    function calcUnitario(item) {
-        const custo = parseFloat(item.preco_custo) || 0;
-        const margem = parseFloat(item.margem_lucro ?? document.getElementById('margem_padrao').value) || 0;
-        const impostos = parseFloat(item.impostos ?? document.getElementById('impostos_padrao').value) || 0;
-        const frete = parseFloat(item.frete_outros ?? document.getElementById('frete_padrao').value) || 0;
-        return +(custo * (1 + (margem + impostos + frete) / 100)).toFixed(4);
-    }
-
-    function renderItens() {
-        const tbody = document.getElementById('listaItens');
-        if (!itensLocais.length) {
-            tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><p>Nenhum item. Use Excel, colar tabela ou "+ Item".</p></div></td></tr>';
-            atualizarTotais();
+        if (!data || data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="empty-icon">📭</div><p>Nenhum edital cadastrado</p></div></td></tr>';
             return;
         }
-        tbody.innerHTML = itensLocais.map((it, i) => {
-            const unit = it.preco_unitario || calcUnitario(it);
-            const qtd = parseFloat(it.quantidade) || 0;
-            const total = +(unit * qtd).toFixed(2);
-            return `<tr class="item-row">
-                <td class="check-cell"><input type="checkbox" ${it.participar !== false ? 'checked' : ''} onchange="updItem(${i},'participar',this.checked)"></td>
-                <td><input value="${it.numero_item || ''}" onchange="updItem(${i},'numero_item',this.value)" style="width:60px"></td>
-                <td><input value="${it.numero_lote || ''}" onchange="updItem(${i},'numero_lote',this.value)" style="width:60px"></td>
-                <td><input value="${(it.descricao || '').replace(/"/g, '&quot;')}" onchange="updItem(${i},'descricao',this.value)"></td>
-                <td><input value="${it.unidade || 'UN'}" onchange="updItem(${i},'unidade',this.value)" style="width:50px"></td>
-                <td><input type="number" step="0.01" value="${it.quantidade || 1}" onchange="updItem(${i},'quantidade',this.value)" style="width:70px"></td>
-                <td><input type="number" step="0.01" value="${it.preco_custo || 0}" onchange="updItem(${i},'preco_custo',this.value); recalc(${i})" style="width:80px"></td>
-                <td><input type="number" step="0.01" value="${it.margem_lucro ?? document.getElementById('margem_padrao').value}" onchange="updItem(${i},'margem_lucro',this.value); recalc(${i})" style="width:60px"></td>
-                <td><input type="number" step="0.01" value="${unit}" onchange="updItem(${i},'preco_unitario',this.value); atualizarTotais()" style="width:80px"></td>
-                <td>R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
-                <td><button class="btn btn-danger btn-sm" onclick="removerItem(${i})">✕</button></td>
-            </tr>`;
-        }).join('');
-        atualizarTotais();
-    }
 
-    function updItem(i, field, value) {
-        if (field === 'participar') itensLocais[i][field] = value;
-        else if (['quantidade','preco_custo','margem_lucro','impostos','frete_outros','preco_unitario'].includes(field))
-            itensLocais[i][field] = parseFloat(value) || 0;
-        else itensLocais[i][field] = value;
-        if (field === 'participar') atualizarTotais();
-    }
+        const counts = {};
+        await Promise.all(data.map(async (e) => {
+            const r = await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${e.id}&select=id`, {
+                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`, 'Prefer': 'count=exact' }
+            });
+            counts[e.id] = r.headers.get('content-range')?.split('/')[1] || '0';
+        }));
 
-    function recalc(i) {
-        itensLocais[i].preco_unitario = calcUnitario(itensLocais[i]);
-        renderItens();
+        tbody.innerHTML = data.map(e => `
+            <tr>
+                <td style="font-weight:500;">${e.numero || '-'}</td>
+                <td>${e.orgao || '-'}</td>
+                <td>${e.uf || '-'}</td>
+                <td>${e.modalidade || '-'}</td>
+                <td><span class="badge ${e.status}">${(e.status || '').replace('_', ' ')}</span></td>
+                <td>${counts[e.id] || 0}</td>
+                <td>
+                    <button class="btn btn-secondary btn-sm" onclick="editarEdital('${e.id}')">Abrir</button>
+                    <button class="btn btn-danger btn-sm" onclick="excluirEdital('${e.id}')">Excluir</button>
+                </td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        console.error(e);
+        document.getElementById('listaEditais').innerHTML = '<tr><td colspan="7">Erro ao carregar</td></tr>';
     }
+}
 
-    function atualizarTotais() {
-        let qtd = 0, soma = 0;
-        itensLocais.forEach(it => {
-            if (it.participar === false) return;
-            qtd++;
-            const unit = parseFloat(it.preco_unitario) || calcUnitario(it);
-            soma += unit * (parseFloat(it.quantidade) || 0);
+async function editarEdital(id) {
+    try {
+        const res = await fetch(`${CONFIG_URL}/rest/v1/editais?id=eq.${id}&select=*`, {
+            headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
         });
-        document.getElementById('totalItens').textContent = qtd;
-        document.getElementById('totalGeral').textContent = 'R$ ' + soma.toLocaleString('pt-BR', {minimumFractionDigits:2});
-    }
-
-    function adicionarItem() {
-        const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
-        itensLocais.push({
-            numero_item: String(itensLocais.length + 1), numero_lote: '', descricao: '',
-            unidade: 'UN', quantidade: 1, preco_custo: 0, margem_lucro: margem,
-            preco_unitario: 0, participar: true, ordem: itensLocais.length
-        });
-        renderItens();
-    }
-
-    function removerItem(i) {
-        itensLocais.splice(i, 1);
-        renderItens();
-    }
-
-    async function salvarItens() {
-        if (!editalAtualId) return showToast('Salve o edital primeiro', 'error');
-        try {
-            await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${editalAtualId}`, {
-                method: 'DELETE',
-                headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
-            });
-
-            if (!itensLocais.length) {
-                showToast('Itens salvos (lista vazia)', 'success');
-                return;
-            }
-
-            const rows = itensLocais.map((it, i) => {
-                const unit = parseFloat(it.preco_unitario) || calcUnitario(it);
-                const qtd = parseFloat(it.quantidade) || 0;
-                return {
-                    edital_id: editalAtualId,
-                    user_id: userData.id,
-                    numero_item: it.numero_item || null,
-                    numero_lote: it.numero_lote || null,
-                    descricao: it.descricao || 'Sem descrição',
-                    unidade: it.unidade || 'UN',
-                    quantidade: qtd,
-                    preco_custo: parseFloat(it.preco_custo) || 0,
-                    margem_lucro: parseFloat(it.margem_lucro) || null,
-                    impostos: parseFloat(it.impostos) || null,
-                    frete_outros: parseFloat(it.frete_outros) || null,
-                    preco_unitario: unit,
-                    preco_total: +(unit * qtd).toFixed(4),
-                    participar: it.participar !== false,
-                    ganhou: it.ganhou === true,
-                    valor_lance_final: it.valor_lance_final || null,
-                    ordem: i
-                };
-            });
-
-            const res = await fetch(`${CONFIG_URL}/rest/v1/edital_itens`, {
-                method: 'POST',
-                headers: {
-                    'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json', 'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify(rows)
-            });
-
-            if (res.ok) showToast('✅ Itens salvos!', 'success');
-            else {
-                console.error(await res.json());
-                showToast('Erro ao salvar itens', 'error');
-            }
-        } catch (e) {
-            console.error(e);
-            showToast('Erro de conexão', 'error');
+        const data = await res.json();
+        if (!data?.[0]) return showToast('Edital não encontrado', 'error');
+        const e = data[0];
+        editalAtualId = e.id;
+        document.getElementById('edital_id').value = e.id;
+        document.getElementById('modalidade').value = e.modalidade || '';
+        document.getElementById('numero').value = e.numero || '';
+        document.getElementById('processo').value = e.processo || '';
+        document.getElementById('orgao').value = e.orgao || '';
+        document.getElementById('cnpj_orgao').value = e.cnpj_orgao || '';
+        document.getElementById('objeto').value = e.objeto || '';
+        document.getElementById('valor_estimado').value = e.valor_estimado || '';
+        document.getElementById('criterio_julgamento').value = e.criterio_julgamento || '';
+        document.getElementById('modo_disputa').value = e.modo_disputa || '';
+        document.getElementById('plataforma').value = e.plataforma || '';
+        document.getElementById('uf').value = e.uf || '';
+        document.getElementById('tipo_disputa').value = e.tipo_disputa || 'item';
+        document.getElementById('status').value = e.status || 'rascunho';
+        document.getElementById('margem_padrao').value = e.margem_padrao ?? 20;
+        document.getElementById('impostos_padrao').value = e.impostos_padrao ?? 0;
+        document.getElementById('frete_padrao').value = e.frete_padrao ?? 0;
+        if (e.data_sessao) {
+            document.getElementById('data_sessao').value = new Date(e.data_sessao).toISOString().slice(0, 16);
         }
-    }
-
-    // ===== COLAR =====
-    function abrirPaste() {
-        if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
-        document.getElementById('modalPaste').classList.add('show');
-    }
-    function fecharPaste() {
-        document.getElementById('modalPaste').classList.remove('show');
-    }
-    function processarPaste() {
-        const texto = document.getElementById('pasteArea').value.trim();
-        if (!texto) return;
-        const linhas = texto.split(/\r?\n/).filter(l => l.trim());
-        const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
-        linhas.forEach(linha => {
-            const cols = linha.split(/\t|;|\|/).map(c => c.trim());
-            if (cols.length < 2) return;
-            let numero_item = '', descricao = '', unidade = 'UN', quantidade = 1;
-            if (cols.length >= 4) {
-                numero_item = cols[0]; descricao = cols[1]; unidade = cols[2] || 'UN'; quantidade = parseFloat(cols[3]) || 1;
-            } else if (cols.length === 3) {
-                descricao = cols[0]; unidade = cols[1] || 'UN'; quantidade = parseFloat(cols[2]) || 1;
-            } else {
-                descricao = cols[0]; quantidade = parseFloat(cols[1]) || 1;
-            }
-            itensLocais.push({
-                numero_item: numero_item || String(itensLocais.length + 1),
-                numero_lote: '', descricao, unidade, quantidade,
-                preco_custo: 0, margem_lucro: margem, preco_unitario: 0,
-                participar: true, ordem: itensLocais.length
-            });
-        });
-        fecharPaste();
         document.getElementById('cardItens').style.display = 'block';
+        abrirFormulario(`Edital ${e.numero || ''}`.trim());
+        await carregarItens(e.id);
+    } catch (err) {
+        console.error(err);
+        showToast('Erro ao abrir edital', 'error');
+    }
+}
+
+async function salvarEdital(event) {
+    event.preventDefault();
+    const btn = document.getElementById('btnSalvarEdital');
+    btn.disabled = true;
+    btn.textContent = 'Salvando...';
+
+    const dados = {
+        user_id: userData.id,
+        modalidade: val('modalidade'),
+        numero: val('numero'),
+        processo: val('processo'),
+        orgao: val('orgao'),
+        cnpj_orgao: val('cnpj_orgao'),
+        objeto: val('objeto'),
+        valor_estimado: parseFloat(document.getElementById('valor_estimado').value) || null,
+        criterio_julgamento: val('criterio_julgamento'),
+        modo_disputa: val('modo_disputa'),
+        plataforma: val('plataforma'),
+        uf: (document.getElementById('uf').value.trim() || null),
+        tipo_disputa: document.getElementById('tipo_disputa').value,
+        status: document.getElementById('status').value,
+        margem_padrao: parseFloat(document.getElementById('margem_padrao').value) || 0,
+        impostos_padrao: parseFloat(document.getElementById('impostos_padrao').value) || 0,
+        frete_padrao: parseFloat(document.getElementById('frete_padrao').value) || 0,
+        updated_at: new Date().toISOString()
+    };
+    const ds = document.getElementById('data_sessao').value;
+    if (ds) dados.data_sessao = new Date(ds).toISOString();
+
+    try {
+        const url = editalAtualId
+            ? `${CONFIG_URL}/rest/v1/editais?id=eq.${editalAtualId}`
+            : `${CONFIG_URL}/rest/v1/editais`;
+        const res = await fetch(url, {
+            method: editalAtualId ? 'PATCH' : 'POST',
+            headers: {
+                'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json', 'Prefer': 'return=representation'
+            },
+            body: JSON.stringify(dados)
+        });
+        btn.disabled = false;
+        btn.textContent = 'Salvar Edital';
+        if (res.ok) {
+            const saved = await res.json();
+            editalAtualId = Array.isArray(saved) ? saved[0].id : saved.id;
+            document.getElementById('edital_id').value = editalAtualId;
+            document.getElementById('cardItens').style.display = 'block';
+            showToast('✅ Edital salvo!', 'success');
+        } else {
+            console.error(await res.json());
+            showToast('Erro ao salvar edital', 'error');
+        }
+    } catch (e) {
+        console.error(e);
+        btn.disabled = false;
+        btn.textContent = 'Salvar Edital';
+        showToast('Erro de conexão', 'error');
+    }
+}
+
+function val(id) {
+    const v = document.getElementById(id).value.trim();
+    return v || null;
+}
+
+async function excluirEdital(id) {
+    if (!confirm('Excluir este edital e todos os itens?')) return;
+    try {
+        await fetch(`${CONFIG_URL}/rest/v1/editais?id=eq.${id}`, {
+            method: 'DELETE',
+            headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+        });
+        showToast('Edital excluído', 'success');
+        carregarEditais();
+    } catch (e) {
+        showToast('Erro ao excluir', 'error');
+    }
+}
+
+/* ===================== ITENS ===================== */
+async function carregarItens(editalId) {
+    try {
+        const res = await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${editalId}&order=ordem.asc`, {
+            headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+        });
+        itensLocais = await res.json() || [];
         renderItens();
-        showToast(`${linhas.length} linha(s) importada(s)`, 'success');
+    } catch (e) {
+        itensLocais = [];
+        renderItens();
     }
+}
 
-    // ===== PLANILHA =====
-    function importarPlanilha(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
+function calcUnitario(item) {
+    const custo = parseFloat(item.preco_custo) || 0;
+    const margem = parseFloat(item.margem_lucro ?? document.getElementById('margem_padrao').value) || 0;
+    const impostos = parseFloat(item.impostos ?? document.getElementById('impostos_padrao').value) || 0;
+    const frete = parseFloat(item.frete_outros ?? document.getElementById('frete_padrao').value) || 0;
+    return +(custo * (1 + (margem + impostos + frete) / 100)).toFixed(4);
+}
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            try {
-                let rows = [];
-                if (file.name.toLowerCase().endsWith('.csv')) {
-                    rows = e.target.result.split(/\r?\n/).filter(l => l.trim()).map(l =>
-                        l.split(/;|,|\t/).map(c => c.trim().replace(/^"|"$/g, ''))
-                    );
-                } else {
-                    const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
-                    rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '' });
-                }
-                if (!rows.length) return showToast('Planilha vazia', 'error');
-
-                const header = rows[0].map(h => String(h).toLowerCase());
-                const hasHeader = header.some(h => h.includes('item') || h.includes('desc') || h.includes('qtd') || h.includes('quant') || h.includes('unid'));
-                const start = hasHeader ? 1 : 0;
-                const idxItem = header.findIndex(h => h.includes('item') || h.includes('nº') || h.includes('num'));
-                const idxDesc = header.findIndex(h => h.includes('desc') || h.includes('especific') || h.includes('objeto'));
-                const idxUn = header.findIndex(h => h.includes('unid') || h === 'un' || h === 'und');
-                const idxQtd = header.findIndex(h => h.includes('qtd') || h.includes('quant'));
-                const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
-                let importados = 0;
-
-                for (let r = start; r < rows.length; r++) {
-                    const cols = rows[r];
-                    if (!cols || !cols.length) continue;
-                    let numero_item = '', descricao = '', unidade = 'UN', quantidade = 1;
-                    if (hasHeader && (idxDesc >= 0 || idxItem >= 0)) {
-                        numero_item = idxItem >= 0 ? String(cols[idxItem] || '') : String(r);
-                        descricao = idxDesc >= 0 ? String(cols[idxDesc] || '') : String(cols[0] || '');
-                        unidade = idxUn >= 0 ? String(cols[idxUn] || 'UN') : 'UN';
-                        quantidade = idxQtd >= 0 ? parseFloat(cols[idxQtd]) || 1 : 1;
-                    } else if (cols.length >= 4) {
-                        numero_item = String(cols[0]); descricao = String(cols[1]);
-                        unidade = String(cols[2] || 'UN'); quantidade = parseFloat(cols[3]) || 1;
-                    } else if (cols.length === 3) {
-                        descricao = String(cols[0]); unidade = String(cols[1] || 'UN'); quantidade = parseFloat(cols[2]) || 1;
-                    } else {
-                        descricao = String(cols[0] || '');
-                        if (!descricao) continue;
-                    }
-                    if (!descricao || descricao.length < 2) continue;
-                    itensLocais.push({
-                        numero_item: numero_item || String(itensLocais.length + 1),
-                        numero_lote: '', descricao, unidade, quantidade,
-                        preco_custo: 0, margem_lucro: margem, preco_unitario: 0,
-                        participar: true, ordem: itensLocais.length
-                    });
-                    importados++;
-                }
-
-                document.getElementById('cardItens').style.display = 'block';
-                renderItens();
-                showToast(`✅ ${importados} item(ns) da planilha`, 'success');
-            } catch (err) {
-                console.error(err);
-                showToast('Falha ao ler planilha. Use colar ou manual.', 'error');
-            }
-            event.target.value = '';
-        };
-        if (file.name.toLowerCase().endsWith('.csv')) reader.readAsText(file);
-        else reader.readAsArrayBuffer(file);
+function renderItens() {
+    const tbody = document.getElementById('listaItens');
+    if (!itensLocais.length) {
+        tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><p>Nenhum item. Use Excel, colar ou "+ Item".</p></div></td></tr>';
+        atualizarTotais();
+        return;
     }
+    tbody.innerHTML = itensLocais.map((it, i) => {
+        const unit = it.preco_unitario || calcUnitario(it);
+        const qtd = parseFloat(it.quantidade) || 0;
+        const total = +(unit * qtd).toFixed(2);
+        return `<tr class="item-row">
+            <td class="check-cell"><input type="checkbox" ${it.participar !== false ? 'checked' : ''} onchange="updItem(${i},'participar',this.checked)"></td>
+            <td><input value="${it.numero_item || ''}" onchange="updItem(${i},'numero_item',this.value)" style="width:60px"></td>
+            <td><input value="${it.numero_lote || ''}" onchange="updItem(${i},'numero_lote',this.value)" style="width:60px"></td>
+            <td><input value="${(it.descricao || '').replace(/"/g, '&quot;')}" onchange="updItem(${i},'descricao',this.value)"></td>
+            <td><input value="${it.unidade || 'UN'}" onchange="updItem(${i},'unidade',this.value)" style="width:50px"></td>
+            <td><input type="number" step="0.01" value="${it.quantidade || 1}" onchange="updItem(${i},'quantidade',this.value)" style="width:70px"></td>
+            <td><input type="number" step="0.01" value="${it.preco_custo || 0}" onchange="updItem(${i},'preco_custo',this.value); recalc(${i})" style="width:80px"></td>
+            <td><input type="number" step="0.01" value="${it.margem_lucro ?? document.getElementById('margem_padrao').value}" onchange="updItem(${i},'margem_lucro',this.value); recalc(${i})" style="width:60px"></td>
+            <td><input type="number" step="0.01" value="${unit}" onchange="updItem(${i},'preco_unitario',this.value); atualizarTotais()" style="width:80px"></td>
+            <td>R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</td>
+            <td><button class="btn btn-danger btn-sm" onclick="removerItem(${i})">✕</button></td>
+        </tr>`;
+    }).join('');
+    atualizarTotais();
+}
 
-    // ===== PNCP =====
-    function abrirPncp() {
-        document.getElementById('pncpResultados').innerHTML = '';
-        document.getElementById('modalPncp').classList.add('show');
+function updItem(i, field, value) {
+    if (field === 'participar') itensLocais[i][field] = value;
+    else if (['quantidade','preco_custo','margem_lucro','impostos','frete_outros','preco_unitario'].includes(field))
+        itensLocais[i][field] = parseFloat(value) || 0;
+    else itensLocais[i][field] = value;
+    if (field === 'participar') atualizarTotais();
+}
+function recalc(i) { itensLocais[i].preco_unitario = calcUnitario(itensLocais[i]); renderItens(); }
+function atualizarTotais() {
+    let qtd = 0, soma = 0;
+    itensLocais.forEach(it => {
+        if (it.participar === false) return;
+        qtd++;
+        const unit = parseFloat(it.preco_unitario) || calcUnitario(it);
+        soma += unit * (parseFloat(it.quantidade) || 0);
+    });
+    document.getElementById('totalItens').textContent = qtd;
+    document.getElementById('totalGeral').textContent = 'R$ ' + soma.toLocaleString('pt-BR', {minimumFractionDigits:2});
+}
+function adicionarItem() {
+    const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
+    itensLocais.push({
+        numero_item: String(itensLocais.length + 1), numero_lote: '', descricao: '',
+        unidade: 'UN', quantidade: 1, preco_custo: 0, margem_lucro: margem,
+        preco_unitario: 0, participar: true, ordem: itensLocais.length
+    });
+    renderItens();
+}
+function removerItem(i) { itensLocais.splice(i, 1); renderItens(); }
+
+async function salvarItens() {
+    if (!editalAtualId) return showToast('Salve o edital primeiro', 'error');
+    try {
+        await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${editalAtualId}`, {
+            method: 'DELETE',
+            headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+        });
+        if (!itensLocais.length) {
+            showToast('Itens salvos (lista vazia)', 'success');
+            return;
+        }
+        const rows = itensLocais.map((it, i) => {
+            const unit = parseFloat(it.preco_unitario) || calcUnitario(it);
+            const qtd = parseFloat(it.quantidade) || 0;
+            return {
+                edital_id: editalAtualId, user_id: userData.id,
+                numero_item: it.numero_item || null, numero_lote: it.numero_lote || null,
+                descricao: it.descricao || 'Sem descrição', unidade: it.unidade || 'UN',
+                quantidade: qtd, preco_custo: parseFloat(it.preco_custo) || 0,
+                margem_lucro: parseFloat(it.margem_lucro) || null,
+                impostos: parseFloat(it.impostos) || null, frete_outros: parseFloat(it.frete_outros) || null,
+                preco_unitario: unit, preco_total: +(unit * qtd).toFixed(4),
+                participar: it.participar !== false, ganhou: it.ganhou === true,
+                valor_lance_final: it.valor_lance_final || null, ordem: i
+            };
+        });
+        const res = await fetch(`${CONFIG_URL}/rest/v1/edital_itens`, {
+            method: 'POST',
+            headers: {
+                'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify(rows)
+        });
+        if (res.ok) showToast('✅ Itens salvos!', 'success');
+        else { console.error(await res.json()); showToast('Erro ao salvar itens', 'error'); }
+    } catch (e) {
+        console.error(e);
+        showToast('Erro de conexão', 'error');
     }
-    function fecharPncp() {
-        document.getElementById('modalPncp').classList.remove('show');
-    }
+}
 
-    async function buscarPncp() {
-        const q = document.getElementById('pncp_q').value.trim();
-        const uf = (document.getElementById('pncp_uf').value.trim() || 'MA').toUpperCase();
-        const box = document.getElementById('pncpResultados');
-        box.innerHTML = 'Buscando...';
+/* ===================== COLAR ===================== */
+function abrirPaste() {
+    if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
+    document.getElementById('modalPaste').classList.add('show');
+}
+function fecharPaste() { document.getElementById('modalPaste').classList.remove('show'); }
+function processarPaste() {
+    const texto = document.getElementById('pasteArea').value.trim();
+    if (!texto) return;
+    const linhas = texto.split(/\r?\n/).filter(l => l.trim());
+    const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
+    linhas.forEach(linha => {
+        const cols = linha.split(/\t|;|\|/).map(c => c.trim());
+        if (cols.length < 2) return;
+        let numero_item = '', descricao = '', unidade = 'UN', quantidade = 1;
+        if (cols.length >= 4) {
+            numero_item = cols[0]; descricao = cols[1]; unidade = cols[2] || 'UN'; quantidade = parseFloat(cols[3]) || 1;
+        } else if (cols.length === 3) {
+            descricao = cols[0]; unidade = cols[1] || 'UN'; quantidade = parseFloat(cols[2]) || 1;
+        } else { descricao = cols[0]; quantidade = parseFloat(cols[1]) || 1; }
+        itensLocais.push({
+            numero_item: numero_item || String(itensLocais.length + 1),
+            numero_lote: '', descricao, unidade, quantidade,
+            preco_custo: 0, margem_lucro: margem, preco_unitario: 0,
+            participar: true, ordem: itensLocais.length
+        });
+    });
+    fecharPaste();
+    document.getElementById('cardItens').style.display = 'block';
+    renderItens();
+    showToast(`${linhas.length} linha(s) importada(s)`, 'success');
+}
 
+/* ===================== PLANILHA ===================== */
+function importarPlanilha(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
         try {
-            const hoje = new Date();
-            const dataFinal = hoje.toISOString().slice(0, 10);
-            const dataInicial = new Date(hoje.getTime() - 120 * 24 * 3600 * 1000).toISOString().slice(0, 10);
-            const url = `https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?dataInicial=${dataInicial}&dataFinal=${dataFinal}&codigoModalidadeContratacao=6&uf=${uf}&pagina=1`;
-
-            const res = await fetch(url);
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            const json = await res.json();
-            let lista = Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
-
-            if (q) {
-                const qq = q.toLowerCase();
-                lista = lista.filter(c =>
-                    (c.objetoCompra || c.objeto || '').toLowerCase().includes(qq) ||
-                    (c.nomeOrgao || c.orgaoEntidade?.razaoSocial || '').toLowerCase().includes(qq)
+            let rows = [];
+            if (file.name.toLowerCase().endsWith('.csv')) {
+                rows = e.target.result.split(/\r?\n/).filter(l => l.trim()).map(l =>
+                    l.split(/;|,|\t/).map(c => c.trim().replace(/^"|"$/g, ''))
                 );
+            } else {
+                const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+                rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '' });
             }
-            lista = lista.slice(0, 15);
+            if (!rows.length) return showToast('Planilha vazia', 'error');
 
-            if (!lista.length) {
-                box.innerHTML = '<p style="color:#64748b;">Nenhum resultado. Tente outra busca ou preencha manual.</p>';
-                return;
+            const header = rows[0].map(h => String(h).toLowerCase());
+            const hasHeader = header.some(h => /item|desc|qtd|quant|unid/.test(h));
+            const start = hasHeader ? 1 : 0;
+            const idxItem = header.findIndex(h => /item|n[ºo°]|num/.test(h));
+            const idxDesc = header.findIndex(h => /desc|especific|objeto/.test(h));
+            const idxUn = header.findIndex(h => /unid|^un$|^und$/.test(h));
+            const idxQtd = header.findIndex(h => /qtd|quant/.test(h));
+            const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
+            let importados = 0;
+
+            for (let r = start; r < rows.length; r++) {
+                const cols = rows[r];
+                if (!cols?.length) continue;
+                let numero_item = '', descricao = '', unidade = 'UN', quantidade = 1;
+                if (hasHeader && (idxDesc >= 0 || idxItem >= 0)) {
+                    numero_item = idxItem >= 0 ? String(cols[idxItem] || '') : String(r);
+                    descricao = idxDesc >= 0 ? String(cols[idxDesc] || '') : String(cols[0] || '');
+                    unidade = idxUn >= 0 ? String(cols[idxUn] || 'UN') : 'UN';
+                    quantidade = idxQtd >= 0 ? parseFloat(cols[idxQtd]) || 1 : 1;
+                } else if (cols.length >= 4) {
+                    numero_item = String(cols[0]); descricao = String(cols[1]);
+                    unidade = String(cols[2] || 'UN'); quantidade = parseFloat(cols[3]) || 1;
+                } else if (cols.length === 3) {
+                    descricao = String(cols[0]); unidade = String(cols[1] || 'UN'); quantidade = parseFloat(cols[2]) || 1;
+                } else {
+                    descricao = String(cols[0] || '');
+                    if (!descricao) continue;
+                }
+                if (!descricao || descricao.length < 2) continue;
+                itensLocais.push({
+                    numero_item: numero_item || String(itensLocais.length + 1),
+                    numero_lote: '', descricao, unidade, quantidade,
+                    preco_custo: 0, margem_lucro: margem, preco_unitario: 0,
+                    participar: true, ordem: itensLocais.length
+                });
+                importados++;
             }
-
-            box.innerHTML = lista.map((c, i) => {
-                const orgao = c.nomeOrgao || c.orgaoEntidade?.razaoSocial || '-';
-                const objeto = (c.objetoCompra || c.objeto || '-').slice(0, 110);
-                const num = c.numeroCompra || c.numeroControlePNCP || '-';
-                return `<div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;background:#f8fafc;" data-idx="${i}">
-                    <strong>${num}</strong><br><span style="color:#64748b;">${orgao}</span><br>${objeto}...
-                </div>`;
-            }).join('');
-
-            window._pncpLista = lista;
-            box.querySelectorAll('[data-idx]').forEach(el => {
-                el.onclick = () => aplicarPncp(window._pncpLista[parseInt(el.dataset.idx, 10)]);
-            });
-        } catch (e) {
-            console.error(e);
-            box.innerHTML = '<p style="color:#dc2626;">Falha na consulta PNCP. Use planilha ou manual.</p>';
-        }
-    }
-
-    function aplicarPncp(c) {
-        if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
-        document.getElementById('orgao').value = c.nomeOrgao || c.orgaoEntidade?.razaoSocial || '';
-        document.getElementById('cnpj_orgao').value = c.niOrgao || c.orgaoEntidade?.cnpj || '';
-        document.getElementById('objeto').value = c.objetoCompra || c.objeto || '';
-        document.getElementById('numero').value = c.numeroCompra || c.numeroControlePNCP || '';
-        document.getElementById('modalidade').value = c.modalidadeNome || 'Pregão Eletrônico';
-        document.getElementById('uf').value = c.uf || document.getElementById('pncp_uf').value || 'MA';
-        if (c.valorTotalEstimado) document.getElementById('valor_estimado').value = c.valorTotalEstimado;
-        if (c.dataAberturaProposta) {
-            try { document.getElementById('data_sessao').value = new Date(c.dataAberturaProposta).toISOString().slice(0, 16); } catch (_) {}
-        }
-        fecharPncp();
-        abrirFormulario('Novo Edital (PNCP)');
-        showToast('Cabeçalho preenchido pelo PNCP. Complete os itens.', 'success');
-    }
-
-    // ===== PDF =====
-    async function importarPdf(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
-
-        showToast('Lendo PDF...', 'info');
-        try {
-            pdfjsLib.GlobalWorkerOptions.workerSrc =
-                'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-            const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
-            const maxPages = Math.min(pdf.numPages, 3);
-            let texto = '';
-            for (let p = 1; p <= maxPages; p++) {
-                const page = await pdf.getPage(p);
-                const content = await page.getTextContent();
-                texto += content.items.map(i => i.str).join(' ') + '\n';
-            }
-
-            const mPregao = texto.match(/PREG[AÃ]O\s+ELETR[OÔ]NICO\s*N?[ºO°]?\s*([\d./]+)/i);
-            if (mPregao) {
-                document.getElementById('modalidade').value = 'Pregão Eletrônico';
-                document.getElementById('numero').value = mPregao[1];
-            }
-            const mProc = texto.match(/Processo\s+(?:Administrativo\s+)?n?[ºo°]?\s*([\d./-]+)/i);
-            if (mProc) document.getElementById('processo').value = mProc[1];
-            const mCnpj = texto.match(/CNPJ\s*n?[ºo°]?\s*([\d./-]+)/i);
-            if (mCnpj) document.getElementById('cnpj_orgao').value = mCnpj[1];
-            const mObj = texto.match(/OBJETO[:\s]+(.{20,300}?)(?:\s+VALOR|\s+DATA|\s+CRITÉRIO|\s+CRIT[EÉ]RIO)/i);
-            if (mObj) document.getElementById('objeto').value = mObj[1].trim();
-            const mValor = texto.match(/R\$\s*([\d.]+,\d{2})/);
-            if (mValor) {
-                document.getElementById('valor_estimado').value = mValor[1].replace(/\./g, '').replace(',', '.');
-            }
-
-            abrirFormulario('Novo Edital (PDF)');
-            showToast('PDF lido parcialmente. Confira o cabeçalho e complete os itens (planilha/colar).', 'success');
-        } catch (e) {
-            console.error(e);
-            showToast('Não foi possível ler o PDF. Use planilha ou manual.', 'error');
+            document.getElementById('cardItens').style.display = 'block';
+            renderItens();
+            showToast(`✅ ${importados} item(ns) da planilha`, 'success');
+        } catch (err) {
+            console.error(err);
+            showToast('Falha ao ler planilha. Use colar ou manual.', 'error');
         }
         event.target.value = '';
+    };
+    if (file.name.toLowerCase().endsWith('.csv')) reader.readAsText(file);
+    else reader.readAsArrayBuffer(file);
+}
+
+/* ===================== PNCP (busca específica, Brasil inteiro) ===================== */
+function abrirPncp() {
+    document.getElementById('pncpResultados').innerHTML = '';
+    document.getElementById('modalPncp').classList.add('show');
+}
+function fecharPncp() { document.getElementById('modalPncp').classList.remove('show'); }
+
+function toAAAAMMDD(isoDate) {
+    return (isoDate || '').replace(/-/g, '');
+}
+
+async function buscarPncp() {
+    const q = document.getElementById('pncp_q').value.trim();
+    const uf = document.getElementById('pncp_uf').value.trim().toUpperCase();
+    const modalidade = document.getElementById('pncp_modalidade').value;
+    const dataIni = toAAAAMMDD(document.getElementById('pncp_data_ini').value);
+    const dataFim = toAAAAMMDD(document.getElementById('pncp_data_fim').value);
+    const cnpj = document.getElementById('pncp_cnpj').value.replace(/\D/g, '');
+    const box = document.getElementById('pncpResultados');
+
+    if (!dataIni || !dataFim) {
+        box.innerHTML = '<p style="color:#dc2626;">Informe data inicial e final.</p>';
+        return;
     }
+
+    box.innerHTML = 'Buscando no PNCP...';
+
+    try {
+        let url = `https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?dataInicial=${dataIni}&dataFinal=${dataFim}&codigoModalidadeContratacao=${modalidade}&pagina=1`;
+        if (uf) url += `&uf=${uf}`;
+        if (cnpj.length === 14) url += `&cnpj=${cnpj}`;
+
+        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+
+        const json = await res.json();
+        let lista = Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
+
+        if (q) {
+            const qq = q.toLowerCase();
+            lista = lista.filter(c => {
+                const obj = (c.objetoCompra || '').toLowerCase();
+                const org = (c.orgaoEntidade?.razaoSocial || '').toLowerCase();
+                return obj.includes(qq) || org.includes(qq);
+            });
+        }
+
+        lista = lista.slice(0, 25);
+
+        if (!lista.length) {
+            box.innerHTML = '<p style="color:#64748b;">Nenhum resultado. Ajuste período, UF, modalidade ou palavra-chave.</p>';
+            return;
+        }
+
+        window._pncpLista = lista;
+        box.innerHTML = lista.map((c, i) => {
+            const orgao = c.orgaoEntidade?.razaoSocial || '-';
+            const ufItem = c.unidadeOrgao?.ufSigla || c.uf || '';
+            const objeto = (c.objetoCompra || '-').slice(0, 130);
+            const num = c.numeroCompra || c.numeroControlePNCP || '-';
+            const valor = c.valorTotalEstimado != null
+                ? 'R$ ' + Number(c.valorTotalEstimado).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+                : '';
+            return `<div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;background:#f8fafc;" data-idx="${i}">
+                <strong>${num}</strong> ${ufItem ? '· ' + ufItem : ''} ${valor}<br>
+                <span style="color:#64748b;">${orgao}</span><br>
+                ${objeto}${objeto.length >= 130 ? '...' : ''}
+            </div>`;
+        }).join('');
+
+        box.querySelectorAll('[data-idx]').forEach(el => {
+            el.onclick = () => aplicarPncp(window._pncpLista[parseInt(el.dataset.idx, 10)]);
+        });
+    } catch (e) {
+        console.error(e);
+        box.innerHTML = '<p style="color:#dc2626;">Falha na API do PNCP. Use Excel ou preenchimento manual.</p>';
+    }
+}
+
+function aplicarPncp(c) {
+    if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
+    document.getElementById('orgao').value = c.orgaoEntidade?.razaoSocial || '';
+    document.getElementById('cnpj_orgao').value = c.orgaoEntidade?.cnpj || '';
+    document.getElementById('objeto').value = c.objetoCompra || '';
+    document.getElementById('numero').value = c.numeroCompra || '';
+    document.getElementById('modalidade').value = document.getElementById('pncp_modalidade').selectedOptions[0]?.text || 'Pregão Eletrônico';
+    document.getElementById('uf').value = c.unidadeOrgao?.ufSigla || c.uf || '';
+    document.getElementById('modo_disputa').value = c.modoDisputaNome || '';
+    if (c.valorTotalEstimado != null) document.getElementById('valor_estimado').value = c.valorTotalEstimado;
+    if (c.dataAberturaProposta) {
+        try {
+            document.getElementById('data_sessao').value = new Date(c.dataAberturaProposta).toISOString().slice(0, 16);
+        } catch (_) {}
+    }
+    fecharPncp();
+    abrirFormulario('Novo Edital (PNCP)');
+    showToast('Cabeçalho preenchido pelo PNCP. Complete os itens.', 'success');
+}
+
+/* ===================== PDF ===================== */
+async function importarPdf(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
+
+    showToast('Lendo PDF...', 'info');
+    try {
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+        const maxPages = Math.min(pdf.numPages, 5);
+        let texto = '';
+        for (let p = 1; p <= maxPages; p++) {
+            const page = await pdf.getPage(p);
+            const content = await page.getTextContent();
+            texto += content.items.map(i => i.str).join(' ') + '\n';
+        }
+        texto = texto.replace(/\s+/g, ' ').trim();
+
+        let achou = 0;
+        let m = texto.match(/PREG[ÃA]O\s+ELETR[ÔO]NICO\s*(?:N[ºO°.]?\s*)?(\d+\s*\/\s*\d{4})/i);
+        if (m) {
+            document.getElementById('modalidade').value = 'Pregão Eletrônico';
+            document.getElementById('numero').value = m[1].replace(/\s/g, '');
+            achou++;
+        }
+        m = texto.match(/Processo\s+(?:Administrativo|Adm\.?)?\s*n?[ºo°.]?\s*([\d.\/-]+)/i);
+        if (m) { document.getElementById('processo').value = m[1].trim(); achou++; }
+        m = texto.match(/(\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2})/);
+        if (m) { document.getElementById('cnpj_orgao').value = m[1]; achou++; }
+        m = texto.match(/(PREFEITURA\s+MUNICIPAL\s+DE\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ\s]{3,40})/i);
+        if (m) { document.getElementById('orgao').value = m[1].trim(); achou++; }
+        m = texto.match(/OBJETO\s*[:\-]?\s*(.{30,400}?)(?=\s+VALOR\s+TOTAL|\s+DATA\s+DA\s+SESS|\s+CRIT[ÉE]RIO|\s+MODO\s+DE\s+DISPUTA)/i);
+        if (m) { document.getElementById('objeto').value = m[1].trim(); achou++; }
+        m = texto.match(/VALOR\s+TOTAL[^\d]*R\$\s*([\d.]+,\d{2})/i) || texto.match(/R\$\s*([\d.]+,\d{2})/);
+        if (m) {
+            document.getElementById('valor_estimado').value = m[1].replace(/\./g, '').replace(',', '.');
+            achou++;
+        }
+        m = texto.match(/(\d{2}\/\d{2}\/\d{4})\s*(?:às|as)?\s*(\d{1,2}:\d{2})?/i);
+        if (m) {
+            const [dd, mm, yyyy] = m[1].split('/');
+            const hora = (m[2] || '09:00').padStart(5, '0');
+            document.getElementById('data_sessao').value = `${yyyy}-${mm}-${dd}T${hora}`;
+            achou++;
+        }
+        if (/Menor\s+pre[çc]o\s+por\s+Lote/i.test(texto)) {
+            document.getElementById('criterio_julgamento').value = 'Menor preço por Lote';
+            document.getElementById('tipo_disputa').value = 'lote';
+            achou++;
+        }
+        if (/\bABERTO\b/i.test(texto)) {
+            document.getElementById('modo_disputa').value = 'Aberto';
+            achou++;
+        }
+
+        abrirFormulario('Novo Edital (PDF)');
+        if (achou > 0) showToast(`PDF: ${achou} campo(s) preenchido(s). Complete os itens.`, 'success');
+        else {
+            showToast('PDF lido, mas não reconheceu campos. Use Excel/colar.', 'error');
+            console.log('Texto PDF:', texto.slice(0, 1000));
+        }
+    } catch (e) {
+        console.error(e);
+        showToast('Erro ao ler PDF. Use Excel ou manual.', 'error');
+    }
+    event.target.value = '';
+}
 </script>
 </body>
 </html>
