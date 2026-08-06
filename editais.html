@@ -339,7 +339,27 @@
         </div>
     </div>
 </div>
-
+<!-- Modal PNCP -->
+    <div id="modalPncp" class="hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:none;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:white;border-radius:16px;padding:24px;max-width:480px;width:100%;">
+        <h3 style="margin-bottom:8px;">Buscar no PNCP</h3>
+        <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Informe o que souber. A busca usa a API pública do governo.</p>
+        <div class="form-group" style="margin-bottom:10px;">
+            <label>Palavra-chave / objeto</label>
+            <input type="text" id="pncp_q" placeholder="Ex: malharia Bacabeira">
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+            <label>UF</label>
+            <input type="text" id="pncp_uf" value="MA" maxlength="2">
+        </div>
+        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px;">
+            <button class="btn btn-secondary" onclick="fecharPncp()">Cancelar</button>
+            <button class="btn btn-primary" onclick="buscarPncp()">Buscar</button>
+        </div>
+        <div id="pncpResultados" style="margin-top:16px;max-height:220px;overflow:auto;font-size:13px;"></div>
+    </div>
+</div>
+    
 <div class="toast" id="toast"></div>
 
 <script>
@@ -776,6 +796,242 @@
         renderItens();
         showToast(`${linhas.length} linha(s) importada(s)`, 'success');
     }
+
+// ===== IMPORTAÇÃO PLANILHA =====
+function importarPlanilha(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        try {
+            let rows = [];
+            if (file.name.toLowerCase().endsWith('.csv')) {
+                const text = e.target.result;
+                rows = text.split(/\r?\n/).filter(l => l.trim()).map(l =>
+                    l.split(/;|,|\t/).map(c => c.trim().replace(/^"|"$/g, ''))
+                );
+            } else {
+                const data = new Uint8Array(e.target.result);
+                const wb = XLSX.read(data, { type: 'array' });
+                const sheet = wb.Sheets[wb.SheetNames[0]];
+                rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+            }
+
+            if (!rows.length) {
+                showToast('Planilha vazia', 'error');
+                return;
+            }
+
+            // Detecta se a 1ª linha é cabeçalho
+            const header = rows[0].map(h => String(h).toLowerCase());
+            const hasHeader = header.some(h =>
+                h.includes('item') || h.includes('desc') || h.includes('qtd') || h.includes('quant') || h.includes('unid')
+            );
+            const start = hasHeader ? 1 : 0;
+
+            const idxItem = header.findIndex(h => h.includes('item') || h.includes('nº') || h.includes('num'));
+            const idxDesc = header.findIndex(h => h.includes('desc') || h.includes('especific') || h.includes('objeto'));
+            const idxUn = header.findIndex(h => h.includes('unid') || h === 'un' || h === 'und');
+            const idxQtd = header.findIndex(h => h.includes('qtd') || h.includes('quant'));
+
+            const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
+            let importados = 0;
+
+            for (let r = start; r < rows.length; r++) {
+                const cols = rows[r];
+                if (!cols || !cols.length) continue;
+
+                let numero_item = '', descricao = '', unidade = 'UN', quantidade = 1;
+
+                if (hasHeader && (idxDesc >= 0 || idxItem >= 0)) {
+                    numero_item = idxItem >= 0 ? String(cols[idxItem] || '') : String(r);
+                    descricao = idxDesc >= 0 ? String(cols[idxDesc] || '') : String(cols[0] || '');
+                    unidade = idxUn >= 0 ? String(cols[idxUn] || 'UN') : 'UN';
+                    quantidade = idxQtd >= 0 ? parseFloat(cols[idxQtd]) || 1 : 1;
+                } else {
+                    // Fallback posicional: Item | Desc | Un | Qtd
+                    if (cols.length >= 4) {
+                        numero_item = String(cols[0]);
+                        descricao = String(cols[1]);
+                        unidade = String(cols[2] || 'UN');
+                        quantidade = parseFloat(cols[3]) || 1;
+                    } else if (cols.length === 3) {
+                        descricao = String(cols[0]);
+                        unidade = String(cols[1] || 'UN');
+                        quantidade = parseFloat(cols[2]) || 1;
+                    } else {
+                        descricao = String(cols[0] || '');
+                        if (!descricao) continue;
+                    }
+                }
+
+                if (!descricao || descricao.length < 2) continue;
+
+                itensLocais.push({
+                    numero_item: numero_item || String(itensLocais.length + 1),
+                    numero_lote: '',
+                    descricao,
+                    unidade: unidade || 'UN',
+                    quantidade,
+                    preco_custo: 0,
+                    margem_lucro: margem,
+                    preco_unitario: 0,
+                    participar: true,
+                    ordem: itensLocais.length
+                });
+                importados++;
+            }
+
+            renderItens();
+            showToast(`✅ ${importados} item(ns) importado(s) da planilha`, 'success');
+            if (editalAtualId) document.getElementById('cardItens').style.display = 'block';
+        } catch (err) {
+            console.error(err);
+            showToast('Não foi possível ler a planilha. Use colar ou manual.', 'error');
+        }
+        event.target.value = '';
+    };
+
+    if (file.name.toLowerCase().endsWith('.csv')) reader.readAsText(file);
+    else reader.readAsArrayBuffer(file);
+}
+
+// ===== PNCP =====
+function abrirPncp() {
+    const m = document.getElementById('modalPncp');
+    m.classList.remove('hidden');
+    m.style.display = 'flex';
+    document.getElementById('pncpResultados').innerHTML = '';
+}
+function fecharPncp() {
+    const m = document.getElementById('modalPncp');
+    m.classList.add('hidden');
+    m.style.display = 'none';
+}
+
+async function buscarPncp() {
+    const q = document.getElementById('pncp_q').value.trim();
+    const uf = document.getElementById('pncp_uf').value.trim().toUpperCase() || 'MA';
+    const box = document.getElementById('pncpResultados');
+    box.innerHTML = 'Buscando...';
+
+    try {
+        // API pública de consulta do PNCP (contratações por publicação)
+        // Documentação: https://pncp.gov.br — endpoint de consulta
+        const hoje = new Date();
+        const dataFinal = hoje.toISOString().slice(0, 10);
+        const dataInicial = new Date(hoje.getTime() - 90 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+
+        const url = `https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?dataInicial=${dataInicial}&dataFinal=${dataFinal}&codigoModalidadeContratacao=6&uf=${uf}&pagina=1`;
+
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('PNCP retornou ' + res.status);
+
+        const json = await res.json();
+        let lista = json.data || json || [];
+        if (!Array.isArray(lista)) lista = [];
+
+        // Filtra por palavra-chave no objeto
+        if (q) {
+            const qq = q.toLowerCase();
+            lista = lista.filter(c =>
+                (c.objetoCompra || c.objeto || '').toLowerCase().includes(qq) ||
+                (c.nomeOrgao || c.orgaoEntidade?.razaoSocial || '').toLowerCase().includes(qq)
+            );
+        }
+
+        lista = lista.slice(0, 15);
+
+        if (!lista.length) {
+            box.innerHTML = '<p style="color:#64748b;">Nenhum resultado. Tente outra palavra ou preencha manual.</p>';
+            return;
+        }
+
+        box.innerHTML = lista.map((c, i) => {
+            const orgao = c.nomeOrgao || c.orgaoEntidade?.razaoSocial || '-';
+            const objeto = (c.objetoCompra || c.objeto || '-').slice(0, 120);
+            const num = c.numeroControlePNCP || c.numeroCompra || '-';
+            return `<div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;" onclick='aplicarPncp(${JSON.stringify(c).replace(/'/g, "&#39;")})'>
+                <strong>${num}</strong><br>
+                <span style="color:#64748b;">${orgao}</span><br>
+                ${objeto}...
+            </div>`;
+        }).join('');
+    } catch (e) {
+        console.error(e);
+        box.innerHTML = '<p style="color:#dc2626;">Falha na consulta PNCP. Use planilha ou manual.</p>';
+    }
+}
+
+function aplicarPncp(c) {
+    document.getElementById('orgao').value = c.nomeOrgao || c.orgaoEntidade?.razaoSocial || '';
+    document.getElementById('cnpj_orgao').value = c.niOrgao || c.orgaoEntidade?.cnpj || '';
+    document.getElementById('objeto').value = c.objetoCompra || c.objeto || '';
+    document.getElementById('numero').value = c.numeroCompra || c.numeroControlePNCP || '';
+    document.getElementById('modalidade').value = c.modalidadeNome || 'Pregão Eletrônico';
+    document.getElementById('uf').value = c.uf || document.getElementById('pncp_uf').value || 'MA';
+    if (c.valorTotalEstimado) document.getElementById('valor_estimado').value = c.valorTotalEstimado;
+    if (c.dataAberturaProposta) {
+        try {
+            document.getElementById('data_sessao').value = new Date(c.dataAberturaProposta).toISOString().slice(0, 16);
+        } catch (_) {}
+    }
+    fecharPncp();
+    showToast('Cabeçalho preenchido pelo PNCP. Confira e complete os itens.', 'success');
+}
+
+// ===== PDF (extração parcial de texto) =====
+async function importarPdf(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    showToast('Lendo PDF...', 'info');
+    try {
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+        const buf = await file.arrayBuffer();
+        const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+        const maxPages = Math.min(pdf.numPages, 3); // só primeiras páginas (cabeçalho)
+        let texto = '';
+
+        for (let p = 1; p <= maxPages; p++) {
+            const page = await pdf.getPage(p);
+            const content = await page.getTextContent();
+            texto += content.items.map(i => i.str).join(' ') + '\n';
+        }
+
+        // Heurísticas simples
+        const mPregao = texto.match(/PREG[AÃ]O\s+ELETR[OÔ]NICO\s*N?[ºO°]?\s*([\d./]+)/i);
+        if (mPregao) {
+            document.getElementById('modalidade').value = 'Pregão Eletrônico';
+            document.getElementById('numero').value = mPregao[1];
+        }
+
+        const mProc = texto.match(/Processo\s+(?:Administrativo\s+)?n?[ºo°]?\s*([\d./-]+)/i);
+        if (mProc) document.getElementById('processo').value = mProc[1];
+
+        const mCnpj = texto.match(/CNPJ\s*n?[ºo°]?\s*([\d./-]+)/i);
+        if (mCnpj) document.getElementById('cnpj_orgao').value = mCnpj[1];
+
+        const mObj = texto.match(/OBJETO[:\s]+(.{20,300}?)(?:\s+VALOR|\s+DATA|\s+CRITÉRIO)/i);
+        if (mObj) document.getElementById('objeto').value = mObj[1].trim();
+
+        const mValor = texto.match(/R\$\s*([\d.]+,\d{2})/);
+        if (mValor) {
+            const v = mValor[1].replace(/\./g, '').replace(',', '.');
+            document.getElementById('valor_estimado').value = v;
+        }
+
+        showToast('PDF lido parcialmente. Confira o cabeçalho e complete os itens (planilha/colar).', 'success');
+    } catch (e) {
+        console.error(e);
+        showToast('Não foi possível ler o PDF. Use planilha ou manual.', 'error');
+    }
+    event.target.value = '';
+}
+    
 </script>
 </body>
 </html>
