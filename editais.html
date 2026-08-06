@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #1e293b; min-height: 100vh; }
@@ -26,12 +25,10 @@
         .user-area { display: flex; align-items: center; gap: 12px; font-size: 13px; }
         .btn-nav {
             background: transparent; border: 1px solid #e2e8f0; padding: 7px 14px; border-radius: 8px;
-            cursor: pointer; font-size: 13px; font-weight: 500; font-family: inherit; text-decoration: none;
+            cursor: pointer; font-size: 13px; font-weight: 500; font-family: inherit; text-decoration: none; color: #64748b;
         }
+        .btn-nav:hover { background: #f8fafc; }
         .btn-voltar { color: #3b82f6; }
-        .btn-voltar:hover { background: #eff6ff; }
-        .btn-sair { color: #64748b; }
-        .btn-sair:hover { background: #fef2f2; color: #dc2626; }
         .container { max-width: 1100px; margin: 0 auto; padding: 28px 20px 60px; }
         .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
         .page-header h1 { font-size: 24px; color: #0f172a; font-weight: 700; }
@@ -97,7 +94,7 @@
             background: #f8fafc; border-radius: 10px; margin-top: 14px; font-size: 13px;
         }
         .totais-bar strong { color: #1e3a8a; font-size: 15px; }
-        .import-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+        .import-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
         .import-btn {
             background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
             padding: 14px 12px; text-align: center; cursor: pointer; font-size: 13px;
@@ -110,10 +107,9 @@
         }
         .modal-overlay.show { display: flex; }
         .modal-box {
-            background: white; border-radius: 16px; padding: 24px; max-width: 560px; width: 100%;
-            max-height: 92vh; overflow-y: auto;
+            background: white; border-radius: 16px; padding: 24px; max-width: 520px; width: 100%;
         }
-        .hint { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+        .hint { font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.45; }
         @media (max-width: 700px) {
             .form-grid { grid-template-columns: 1fr; }
             .container { padding: 20px 14px 50px; }
@@ -131,37 +127,20 @@
     <div class="user-area">
         <span id="emailUsuario">...</span>
         <a href="painel.html" class="btn-nav btn-voltar">Dashboard</a>
-        <button class="btn-nav btn-sair" onclick="fazerLogout()">Sair</button>
+        <button class="btn-nav" onclick="fazerLogout()">Sair</button>
     </div>
 </header>
 
 <div class="container">
 
-    <!-- ===== LISTA ===== -->
+    <!-- LISTA -->
     <div id="viewLista">
         <div class="page-header">
             <div>
                 <h1>Meus Editais</h1>
-                <p>Cadastre editais de todo o Brasil, itens e precificação.</p>
+                <p>Cadastre o edital, importe os itens e prepare a precificação.</p>
             </div>
             <button class="btn btn-primary" onclick="novoEdital()">+ Novo Edital</button>
-        </div>
-
-        <div class="card">
-            <h2>⚡ Importação rápida</h2>
-            <p style="font-size:13px;color:#64748b;margin-bottom:14px;">
-                Ordem sugerida: <strong>Excel</strong> → <strong>PNCP</strong> → <strong>PDF</strong> → manual/colar.
-            </p>
-            <div class="import-grid">
-                <label class="import-btn">📊 Excel / CSV
-                    <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="importarPlanilha(event)">
-                </label>
-                <button type="button" class="import-btn" onclick="abrirPncp()">🔎 Buscar no PNCP</button>
-                <label class="import-btn">📄 PDF do Edital
-                    <input type="file" accept=".pdf" hidden onchange="importarPdf(event)">
-                </label>
-                <button type="button" class="import-btn" onclick="novoEdital(); abrirPaste();">📋 Colar tabela</button>
-            </div>
         </div>
 
         <div class="card">
@@ -186,28 +165,14 @@
         </div>
     </div>
 
-    <!-- ===== FORMULÁRIO ===== -->
+    <!-- FORMULÁRIO -->
     <div id="viewForm" class="hidden">
         <div class="page-header">
             <div>
                 <h1 id="formTitulo">Novo Edital</h1>
-                <p>Cabeçalho do edital + itens/lotes.</p>
+                <p>Preencha o cabeçalho e os itens (manual, Excel ou colar).</p>
             </div>
             <button class="btn btn-secondary" onclick="voltarLista()">← Voltar</button>
-        </div>
-
-        <div class="card">
-            <h2>⚡ Complementar importação</h2>
-            <div class="import-grid">
-                <label class="import-btn">📊 Excel / CSV
-                    <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="importarPlanilha(event)">
-                </label>
-                <button type="button" class="import-btn" onclick="abrirPncp()">🔎 PNCP</button>
-                <label class="import-btn">📄 PDF
-                    <input type="file" accept=".pdf" hidden onchange="importarPdf(event)">
-                </label>
-                <button type="button" class="import-btn" onclick="abrirPaste()">📋 Colar tabela</button>
-            </div>
         </div>
 
         <div class="card">
@@ -253,7 +218,7 @@
                     </div>
                     <div class="form-group">
                         <label>Critério de Julgamento</label>
-                        <input type="text" id="criterio_julgamento" placeholder="Ex: Menor preço por item/lote">
+                        <input type="text" id="criterio_julgamento" placeholder="Ex: Menor preço por lote">
                     </div>
                     <div class="form-group">
                         <label>Modo de Disputa</label>
@@ -299,14 +264,25 @@
             </form>
         </div>
 
-        <div class="card" id="cardItens" style="display:none;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+        <!-- ITENS — sempre visível no formulário -->
+        <div class="card" id="cardItens">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
                 <h2 style="margin:0;">📦 Itens / Lotes</h2>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
+                        📊 Excel / CSV
+                        <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="importarPlanilha(event)">
+                    </label>
                     <button type="button" class="btn btn-secondary btn-sm" onclick="abrirPaste()">📋 Colar tabela</button>
                     <button type="button" class="btn btn-primary btn-sm" onclick="adicionarItem()">+ Item</button>
                 </div>
             </div>
+
+            <p class="hint">
+                Preencha manualmente com <strong>+ Item</strong>, importe planilha ou cole a tabela do Termo de Referência.
+                Depois clique em <strong>Salvar Edital</strong> e em seguida <strong>Salvar Itens</strong>.
+            </p>
+
             <div class="table-wrapper">
                 <table>
                     <thead>
@@ -327,10 +303,12 @@
                     <tbody id="listaItens"></tbody>
                 </table>
             </div>
+
             <div class="totais-bar">
                 <div>Itens participando: <strong id="totalItens">0</strong></div>
                 <div>Total estimado: <strong id="totalGeral">R$ 0,00</strong></div>
             </div>
+
             <div class="actions-row">
                 <button type="button" class="btn btn-primary" onclick="salvarItens()">Salvar Itens</button>
             </div>
@@ -342,61 +320,14 @@
 <div class="modal-overlay" id="modalPaste">
     <div class="modal-box">
         <h3 style="margin-bottom:8px;">Colar tabela de itens</h3>
-        <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Formato: Item | Descrição | Unidade | Quantidade (Tab ou ;)</p>
-        <textarea id="pasteArea" style="width:100%;min-height:140px;padding:12px;border:2px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px;"></textarea>
+        <p style="font-size:13px;color:#64748b;margin-bottom:12px;">
+            Formato: <strong>Item | Descrição | Unidade | Quantidade</strong> (separado por Tab ou ;)
+        </p>
+        <textarea id="pasteArea" style="width:100%;min-height:150px;padding:12px;border:2px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px;" placeholder="1&#9;Camiseta malha PV&#9;UN&#9;100&#10;2&#9;Calça tactel&#9;UN&#9;50"></textarea>
         <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
             <button class="btn btn-secondary" onclick="fecharPaste()">Cancelar</button>
             <button class="btn btn-primary" onclick="processarPaste()">Importar</button>
         </div>
-    </div>
-</div>
-
-<!-- Modal PNCP — busca específica -->
-<div class="modal-overlay" id="modalPncp">
-    <div class="modal-box">
-        <h3 style="margin-bottom:6px;">Buscar contratação no PNCP</h3>
-        <p style="font-size:13px;color:#64748b;margin-bottom:14px;">
-            Preencha o máximo possível para refinar. Cobertura: Brasil inteiro.
-        </p>
-        <div class="form-grid">
-            <div class="form-group full">
-                <label>Palavra-chave no objeto</label>
-                <input type="text" id="pncp_q" placeholder="Ex: malharia, limpeza, software...">
-            </div>
-            <div class="form-group">
-                <label>UF (opcional)</label>
-                <input type="text" id="pncp_uf" maxlength="2" placeholder="Ex: SP">
-                <span class="hint">Vazio = todas as UFs</span>
-            </div>
-            <div class="form-group">
-                <label>Modalidade</label>
-                <select id="pncp_modalidade">
-                    <option value="6">Pregão Eletrônico</option>
-                    <option value="8">Dispensa</option>
-                    <option value="9">Inexigibilidade</option>
-                    <option value="4">Concorrência</option>
-                    <option value="5">Concurso</option>
-                    <option value="7">Pregão Presencial</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Data inicial</label>
-                <input type="date" id="pncp_data_ini">
-            </div>
-            <div class="form-group">
-                <label>Data final</label>
-                <input type="date" id="pncp_data_fim">
-            </div>
-            <div class="form-group full">
-                <label>CNPJ do órgão (opcional)</label>
-                <input type="text" id="pncp_cnpj" placeholder="Somente números ou formatado">
-            </div>
-        </div>
-        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
-            <button class="btn btn-secondary" onclick="fecharPncp()">Cancelar</button>
-            <button class="btn btn-primary" onclick="buscarPncp()">Buscar</button>
-        </div>
-        <div id="pncpResultados" style="margin-top:16px;max-height:260px;overflow:auto;font-size:13px;"></div>
     </div>
 </div>
 
@@ -418,24 +349,24 @@ if (!token || !userStr) {
     userData = JSON.parse(userStr);
     document.getElementById('emailUsuario').textContent = userData.email || '...';
     carregarEditais();
-    // Datas padrão PNCP: últimos 30 dias (sem forçar UF)
-    const hoje = new Date();
-    const ini = new Date(hoje.getTime() - 30 * 24 * 3600 * 1000);
-    document.getElementById('pncp_data_fim').value = hoje.toISOString().slice(0, 10);
-    document.getElementById('pncp_data_ini').value = ini.toISOString().slice(0, 10);
 }
 
 function showToast(msg, tipo) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.className = 'toast ' + tipo + ' show';
-    setTimeout(() => t.classList.remove('show'), 4500);
+    setTimeout(() => t.classList.remove('show'), 4000);
 }
 
 function fazerLogout() {
     localStorage.removeItem('supabase_token');
     localStorage.removeItem('supabase_user');
     window.location.href = "index.html";
+}
+
+function val(id) {
+    const v = document.getElementById(id).value.trim();
+    return v || null;
 }
 
 function abrirFormulario(titulo) {
@@ -459,12 +390,11 @@ function novoEdital() {
     document.getElementById('margem_padrao').value = 20;
     document.getElementById('impostos_padrao').value = 0;
     document.getElementById('frete_padrao').value = 0;
-    document.getElementById('cardItens').style.display = 'none';
     abrirFormulario('Novo Edital');
     renderItens();
 }
 
-/* ===================== LISTA / CRUD EDITAL ===================== */
+/* ===== LISTA ===== */
 async function carregarEditais() {
     try {
         const res = await fetch(`${CONFIG_URL}/rest/v1/editais?select=id,numero,orgao,uf,modalidade,status&order=created_at.desc`, {
@@ -513,6 +443,7 @@ async function editarEdital(id) {
         });
         const data = await res.json();
         if (!data?.[0]) return showToast('Edital não encontrado', 'error');
+
         const e = data[0];
         editalAtualId = e.id;
         document.getElementById('edital_id').value = e.id;
@@ -535,7 +466,7 @@ async function editarEdital(id) {
         if (e.data_sessao) {
             document.getElementById('data_sessao').value = new Date(e.data_sessao).toISOString().slice(0, 16);
         }
-        document.getElementById('cardItens').style.display = 'block';
+
         abrirFormulario(`Edital ${e.numero || ''}`.trim());
         await carregarItens(e.id);
     } catch (err) {
@@ -562,7 +493,7 @@ async function salvarEdital(event) {
         criterio_julgamento: val('criterio_julgamento'),
         modo_disputa: val('modo_disputa'),
         plataforma: val('plataforma'),
-        uf: (document.getElementById('uf').value.trim() || null),
+        uf: document.getElementById('uf').value.trim() || null,
         tipo_disputa: document.getElementById('tipo_disputa').value,
         status: document.getElementById('status').value,
         margem_padrao: parseFloat(document.getElementById('margem_padrao').value) || 0,
@@ -580,18 +511,20 @@ async function salvarEdital(event) {
         const res = await fetch(url, {
             method: editalAtualId ? 'PATCH' : 'POST',
             headers: {
-                'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json', 'Prefer': 'return=representation'
+                'apikey': CONFIG_KEY,
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=representation'
             },
             body: JSON.stringify(dados)
         });
         btn.disabled = false;
         btn.textContent = 'Salvar Edital';
+
         if (res.ok) {
             const saved = await res.json();
             editalAtualId = Array.isArray(saved) ? saved[0].id : saved.id;
             document.getElementById('edital_id').value = editalAtualId;
-            document.getElementById('cardItens').style.display = 'block';
             showToast('✅ Edital salvo!', 'success');
         } else {
             console.error(await res.json());
@@ -603,11 +536,6 @@ async function salvarEdital(event) {
         btn.textContent = 'Salvar Edital';
         showToast('Erro de conexão', 'error');
     }
-}
-
-function val(id) {
-    const v = document.getElementById(id).value.trim();
-    return v || null;
 }
 
 async function excluirEdital(id) {
@@ -624,7 +552,7 @@ async function excluirEdital(id) {
     }
 }
 
-/* ===================== ITENS ===================== */
+/* ===== ITENS ===== */
 async function carregarItens(editalId) {
     try {
         const res = await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${editalId}&order=ordem.asc`, {
@@ -649,10 +577,11 @@ function calcUnitario(item) {
 function renderItens() {
     const tbody = document.getElementById('listaItens');
     if (!itensLocais.length) {
-        tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><p>Nenhum item. Use Excel, colar ou "+ Item".</p></div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11"><div class="empty-state"><p>Nenhum item. Use + Item, Excel ou Colar tabela.</p></div></td></tr>';
         atualizarTotais();
         return;
     }
+
     tbody.innerHTML = itensLocais.map((it, i) => {
         const unit = it.preco_unitario || calcUnitario(it);
         const qtd = parseFloat(it.quantidade) || 0;
@@ -681,7 +610,12 @@ function updItem(i, field, value) {
     else itensLocais[i][field] = value;
     if (field === 'participar') atualizarTotais();
 }
-function recalc(i) { itensLocais[i].preco_unitario = calcUnitario(itensLocais[i]); renderItens(); }
+
+function recalc(i) {
+    itensLocais[i].preco_unitario = calcUnitario(itensLocais[i]);
+    renderItens();
+}
+
 function atualizarTotais() {
     let qtd = 0, soma = 0;
     itensLocais.forEach(it => {
@@ -693,70 +627,102 @@ function atualizarTotais() {
     document.getElementById('totalItens').textContent = qtd;
     document.getElementById('totalGeral').textContent = 'R$ ' + soma.toLocaleString('pt-BR', {minimumFractionDigits:2});
 }
+
 function adicionarItem() {
     const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
     itensLocais.push({
-        numero_item: String(itensLocais.length + 1), numero_lote: '', descricao: '',
-        unidade: 'UN', quantidade: 1, preco_custo: 0, margem_lucro: margem,
-        preco_unitario: 0, participar: true, ordem: itensLocais.length
+        numero_item: String(itensLocais.length + 1),
+        numero_lote: '',
+        descricao: '',
+        unidade: 'UN',
+        quantidade: 1,
+        preco_custo: 0,
+        margem_lucro: margem,
+        preco_unitario: 0,
+        participar: true,
+        ordem: itensLocais.length
     });
     renderItens();
 }
-function removerItem(i) { itensLocais.splice(i, 1); renderItens(); }
+
+function removerItem(i) {
+    itensLocais.splice(i, 1);
+    renderItens();
+}
 
 async function salvarItens() {
     if (!editalAtualId) return showToast('Salve o edital primeiro', 'error');
+
     try {
         await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${editalAtualId}`, {
             method: 'DELETE',
             headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
         });
+
         if (!itensLocais.length) {
             showToast('Itens salvos (lista vazia)', 'success');
             return;
         }
+
         const rows = itensLocais.map((it, i) => {
             const unit = parseFloat(it.preco_unitario) || calcUnitario(it);
             const qtd = parseFloat(it.quantidade) || 0;
             return {
-                edital_id: editalAtualId, user_id: userData.id,
-                numero_item: it.numero_item || null, numero_lote: it.numero_lote || null,
-                descricao: it.descricao || 'Sem descrição', unidade: it.unidade || 'UN',
-                quantidade: qtd, preco_custo: parseFloat(it.preco_custo) || 0,
+                edital_id: editalAtualId,
+                user_id: userData.id,
+                numero_item: it.numero_item || null,
+                numero_lote: it.numero_lote || null,
+                descricao: it.descricao || 'Sem descrição',
+                unidade: it.unidade || 'UN',
+                quantidade: qtd,
+                preco_custo: parseFloat(it.preco_custo) || 0,
                 margem_lucro: parseFloat(it.margem_lucro) || null,
-                impostos: parseFloat(it.impostos) || null, frete_outros: parseFloat(it.frete_outros) || null,
-                preco_unitario: unit, preco_total: +(unit * qtd).toFixed(4),
-                participar: it.participar !== false, ganhou: it.ganhou === true,
-                valor_lance_final: it.valor_lance_final || null, ordem: i
+                impostos: parseFloat(it.impostos) || null,
+                frete_outros: parseFloat(it.frete_outros) || null,
+                preco_unitario: unit,
+                preco_total: +(unit * qtd).toFixed(4),
+                participar: it.participar !== false,
+                ganhou: it.ganhou === true,
+                valor_lance_final: it.valor_lance_final || null,
+                ordem: i
             };
         });
+
         const res = await fetch(`${CONFIG_URL}/rest/v1/edital_itens`, {
             method: 'POST',
             headers: {
-                'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json', 'Prefer': 'return=minimal'
+                'apikey': CONFIG_KEY,
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal'
             },
             body: JSON.stringify(rows)
         });
+
         if (res.ok) showToast('✅ Itens salvos!', 'success');
-        else { console.error(await res.json()); showToast('Erro ao salvar itens', 'error'); }
+        else {
+            console.error(await res.json());
+            showToast('Erro ao salvar itens', 'error');
+        }
     } catch (e) {
         console.error(e);
         showToast('Erro de conexão', 'error');
     }
 }
 
-/* ===================== COLAR ===================== */
+/* ===== COLAR ===== */
 function abrirPaste() {
-    if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
     document.getElementById('modalPaste').classList.add('show');
 }
-function fecharPaste() { document.getElementById('modalPaste').classList.remove('show'); }
+function fecharPaste() {
+    document.getElementById('modalPaste').classList.remove('show');
+}
 function processarPaste() {
     const texto = document.getElementById('pasteArea').value.trim();
     if (!texto) return;
     const linhas = texto.split(/\r?\n/).filter(l => l.trim());
     const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
+
     linhas.forEach(linha => {
         const cols = linha.split(/\t|;|\|/).map(c => c.trim());
         if (cols.length < 2) return;
@@ -765,7 +731,9 @@ function processarPaste() {
             numero_item = cols[0]; descricao = cols[1]; unidade = cols[2] || 'UN'; quantidade = parseFloat(cols[3]) || 1;
         } else if (cols.length === 3) {
             descricao = cols[0]; unidade = cols[1] || 'UN'; quantidade = parseFloat(cols[2]) || 1;
-        } else { descricao = cols[0]; quantidade = parseFloat(cols[1]) || 1; }
+        } else {
+            descricao = cols[0]; quantidade = parseFloat(cols[1]) || 1;
+        }
         itensLocais.push({
             numero_item: numero_item || String(itensLocais.length + 1),
             numero_lote: '', descricao, unidade, quantidade,
@@ -773,17 +741,17 @@ function processarPaste() {
             participar: true, ordem: itensLocais.length
         });
     });
+
     fecharPaste();
-    document.getElementById('cardItens').style.display = 'block';
+    document.getElementById('pasteArea').value = '';
     renderItens();
     showToast(`${linhas.length} linha(s) importada(s)`, 'success');
 }
 
-/* ===================== PLANILHA ===================== */
+/* ===== EXCEL / CSV ===== */
 function importarPlanilha(event) {
     const file = event.target.files[0];
     if (!file) return;
-    if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
 
     const reader = new FileReader();
     reader.onload = function (e) {
@@ -813,6 +781,7 @@ function importarPlanilha(event) {
                 const cols = rows[r];
                 if (!cols?.length) continue;
                 let numero_item = '', descricao = '', unidade = 'UN', quantidade = 1;
+
                 if (hasHeader && (idxDesc >= 0 || idxItem >= 0)) {
                     numero_item = idxItem >= 0 ? String(cols[idxItem] || '') : String(r);
                     descricao = idxDesc >= 0 ? String(cols[idxDesc] || '') : String(cols[0] || '');
@@ -828,6 +797,7 @@ function importarPlanilha(event) {
                     if (!descricao) continue;
                 }
                 if (!descricao || descricao.length < 2) continue;
+
                 itensLocais.push({
                     numero_item: numero_item || String(itensLocais.length + 1),
                     numero_lote: '', descricao, unidade, quantidade,
@@ -836,187 +806,18 @@ function importarPlanilha(event) {
                 });
                 importados++;
             }
-            document.getElementById('cardItens').style.display = 'block';
+
             renderItens();
-            showToast(`✅ ${importados} item(ns) da planilha`, 'success');
+            showToast(`✅ ${importados} item(ns) importado(s)`, 'success');
         } catch (err) {
             console.error(err);
-            showToast('Falha ao ler planilha. Use colar ou manual.', 'error');
+            showToast('Falha ao ler planilha. Use colar ou + Item.', 'error');
         }
         event.target.value = '';
     };
+
     if (file.name.toLowerCase().endsWith('.csv')) reader.readAsText(file);
     else reader.readAsArrayBuffer(file);
-}
-
-/* ===================== PNCP (busca específica, Brasil inteiro) ===================== */
-function abrirPncp() {
-    document.getElementById('pncpResultados').innerHTML = '';
-    document.getElementById('modalPncp').classList.add('show');
-}
-function fecharPncp() { document.getElementById('modalPncp').classList.remove('show'); }
-
-function toAAAAMMDD(isoDate) {
-    return (isoDate || '').replace(/-/g, '');
-}
-
-async function buscarPncp() {
-    const q = document.getElementById('pncp_q').value.trim();
-    const uf = document.getElementById('pncp_uf').value.trim().toUpperCase();
-    const modalidade = document.getElementById('pncp_modalidade').value;
-    const dataIni = toAAAAMMDD(document.getElementById('pncp_data_ini').value);
-    const dataFim = toAAAAMMDD(document.getElementById('pncp_data_fim').value);
-    const cnpj = document.getElementById('pncp_cnpj').value.replace(/\D/g, '');
-    const box = document.getElementById('pncpResultados');
-
-    if (!dataIni || !dataFim) {
-        box.innerHTML = '<p style="color:#dc2626;">Informe data inicial e final.</p>';
-        return;
-    }
-
-    box.innerHTML = 'Buscando no PNCP...';
-
-    try {
-        let url = `https://pncp.gov.br/api/consulta/v1/contratacoes/publicacao?dataInicial=${dataIni}&dataFinal=${dataFim}&codigoModalidadeContratacao=${modalidade}&pagina=1`;
-        if (uf) url += `&uf=${uf}`;
-        if (cnpj.length === 14) url += `&cnpj=${cnpj}`;
-
-        const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-
-        const json = await res.json();
-        let lista = Array.isArray(json.data) ? json.data : (Array.isArray(json) ? json : []);
-
-        if (q) {
-            const qq = q.toLowerCase();
-            lista = lista.filter(c => {
-                const obj = (c.objetoCompra || '').toLowerCase();
-                const org = (c.orgaoEntidade?.razaoSocial || '').toLowerCase();
-                return obj.includes(qq) || org.includes(qq);
-            });
-        }
-
-        lista = lista.slice(0, 25);
-
-        if (!lista.length) {
-            box.innerHTML = '<p style="color:#64748b;">Nenhum resultado. Ajuste período, UF, modalidade ou palavra-chave.</p>';
-            return;
-        }
-
-        window._pncpLista = lista;
-        box.innerHTML = lista.map((c, i) => {
-            const orgao = c.orgaoEntidade?.razaoSocial || '-';
-            const ufItem = c.unidadeOrgao?.ufSigla || c.uf || '';
-            const objeto = (c.objetoCompra || '-').slice(0, 130);
-            const num = c.numeroCompra || c.numeroControlePNCP || '-';
-            const valor = c.valorTotalEstimado != null
-                ? 'R$ ' + Number(c.valorTotalEstimado).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
-                : '';
-            return `<div style="border:1px solid #e2e8f0;border-radius:8px;padding:10px;margin-bottom:8px;cursor:pointer;background:#f8fafc;" data-idx="${i}">
-                <strong>${num}</strong> ${ufItem ? '· ' + ufItem : ''} ${valor}<br>
-                <span style="color:#64748b;">${orgao}</span><br>
-                ${objeto}${objeto.length >= 130 ? '...' : ''}
-            </div>`;
-        }).join('');
-
-        box.querySelectorAll('[data-idx]').forEach(el => {
-            el.onclick = () => aplicarPncp(window._pncpLista[parseInt(el.dataset.idx, 10)]);
-        });
-    } catch (e) {
-        console.error(e);
-        box.innerHTML = '<p style="color:#dc2626;">Falha na API do PNCP. Use Excel ou preenchimento manual.</p>';
-    }
-}
-
-function aplicarPncp(c) {
-    if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
-    document.getElementById('orgao').value = c.orgaoEntidade?.razaoSocial || '';
-    document.getElementById('cnpj_orgao').value = c.orgaoEntidade?.cnpj || '';
-    document.getElementById('objeto').value = c.objetoCompra || '';
-    document.getElementById('numero').value = c.numeroCompra || '';
-    document.getElementById('modalidade').value = document.getElementById('pncp_modalidade').selectedOptions[0]?.text || 'Pregão Eletrônico';
-    document.getElementById('uf').value = c.unidadeOrgao?.ufSigla || c.uf || '';
-    document.getElementById('modo_disputa').value = c.modoDisputaNome || '';
-    if (c.valorTotalEstimado != null) document.getElementById('valor_estimado').value = c.valorTotalEstimado;
-    if (c.dataAberturaProposta) {
-        try {
-            document.getElementById('data_sessao').value = new Date(c.dataAberturaProposta).toISOString().slice(0, 16);
-        } catch (_) {}
-    }
-    fecharPncp();
-    abrirFormulario('Novo Edital (PNCP)');
-    showToast('Cabeçalho preenchido pelo PNCP. Complete os itens.', 'success');
-}
-
-/* ===================== PDF ===================== */
-async function importarPdf(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
-
-    showToast('Lendo PDF...', 'info');
-    try {
-        pdfjsLib.GlobalWorkerOptions.workerSrc =
-            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
-        const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
-        const maxPages = Math.min(pdf.numPages, 5);
-        let texto = '';
-        for (let p = 1; p <= maxPages; p++) {
-            const page = await pdf.getPage(p);
-            const content = await page.getTextContent();
-            texto += content.items.map(i => i.str).join(' ') + '\n';
-        }
-        texto = texto.replace(/\s+/g, ' ').trim();
-
-        let achou = 0;
-        let m = texto.match(/PREG[ÃA]O\s+ELETR[ÔO]NICO\s*(?:N[ºO°.]?\s*)?(\d+\s*\/\s*\d{4})/i);
-        if (m) {
-            document.getElementById('modalidade').value = 'Pregão Eletrônico';
-            document.getElementById('numero').value = m[1].replace(/\s/g, '');
-            achou++;
-        }
-        m = texto.match(/Processo\s+(?:Administrativo|Adm\.?)?\s*n?[ºo°.]?\s*([\d.\/-]+)/i);
-        if (m) { document.getElementById('processo').value = m[1].trim(); achou++; }
-        m = texto.match(/(\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2})/);
-        if (m) { document.getElementById('cnpj_orgao').value = m[1]; achou++; }
-        m = texto.match(/(PREFEITURA\s+MUNICIPAL\s+DE\s+[A-ZÁÉÍÓÚÂÊÔÃÕÇ\s]{3,40})/i);
-        if (m) { document.getElementById('orgao').value = m[1].trim(); achou++; }
-        m = texto.match(/OBJETO\s*[:\-]?\s*(.{30,400}?)(?=\s+VALOR\s+TOTAL|\s+DATA\s+DA\s+SESS|\s+CRIT[ÉE]RIO|\s+MODO\s+DE\s+DISPUTA)/i);
-        if (m) { document.getElementById('objeto').value = m[1].trim(); achou++; }
-        m = texto.match(/VALOR\s+TOTAL[^\d]*R\$\s*([\d.]+,\d{2})/i) || texto.match(/R\$\s*([\d.]+,\d{2})/);
-        if (m) {
-            document.getElementById('valor_estimado').value = m[1].replace(/\./g, '').replace(',', '.');
-            achou++;
-        }
-        m = texto.match(/(\d{2}\/\d{2}\/\d{4})\s*(?:às|as)?\s*(\d{1,2}:\d{2})?/i);
-        if (m) {
-            const [dd, mm, yyyy] = m[1].split('/');
-            const hora = (m[2] || '09:00').padStart(5, '0');
-            document.getElementById('data_sessao').value = `${yyyy}-${mm}-${dd}T${hora}`;
-            achou++;
-        }
-        if (/Menor\s+pre[çc]o\s+por\s+Lote/i.test(texto)) {
-            document.getElementById('criterio_julgamento').value = 'Menor preço por Lote';
-            document.getElementById('tipo_disputa').value = 'lote';
-            achou++;
-        }
-        if (/\bABERTO\b/i.test(texto)) {
-            document.getElementById('modo_disputa').value = 'Aberto';
-            achou++;
-        }
-
-        abrirFormulario('Novo Edital (PDF)');
-        if (achou > 0) showToast(`PDF: ${achou} campo(s) preenchido(s). Complete os itens.`, 'success');
-        else {
-            showToast('PDF lido, mas não reconheceu campos. Use Excel/colar.', 'error');
-            console.log('Texto PDF:', texto.slice(0, 1000));
-        }
-    } catch (e) {
-        console.error(e);
-        showToast('Erro ao ler PDF. Use Excel ou manual.', 'error');
-    }
-    event.target.value = '';
 }
 </script>
 </body>
