@@ -7,7 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #f1f5f9; color: #1e293b; min-height: 100vh; }
@@ -72,7 +72,6 @@
         input:focus, select:focus, textarea:focus {
             outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); background: white;
         }
-        input:disabled { background: #f1f5f9; color: #94a3b8; }
         textarea { min-height: 70px; resize: vertical; }
         .empty-state { text-align: center; padding: 36px 20px; color: #94a3b8; }
         .toast {
@@ -134,7 +133,7 @@
         <div class="page-header">
             <div>
                 <h1>Meus Editais</h1>
-                <p>Cadastre o edital, importe os produtos e orce item a item.</p>
+                <p>Cadastre o edital, importe produtos e orce item a item.</p>
             </div>
             <button class="btn btn-primary" onclick="novoEdital()">+ Novo Edital</button>
         </div>
@@ -164,7 +163,7 @@
         <div class="page-header">
             <div>
                 <h1 id="formTitulo">Novo Edital</h1>
-                <p>Cabeçalho + produtos (custo individual; disputa por item ou por lote).</p>
+                <p>Cabeçalho + produtos. Revise sempre os dados da IA antes de salvar.</p>
             </div>
             <button class="btn btn-secondary" onclick="voltarLista()">← Voltar</button>
         </div>
@@ -263,21 +262,20 @@
                 <h2 style="margin:0;">📦 Produtos</h2>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                     <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
+                        📄 Extrair PDF (IA)
+                        <input type="file" accept=".pdf" hidden onchange="extrairPdfIa(event)">
+                    </label>
+                    <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
                         📊 Excel / CSV
                         <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="importarPlanilha(event)">
                     </label>
                     <button type="button" class="btn btn-secondary btn-sm" onclick="abrirPaste()">📋 Colar</button>
                     <button type="button" class="btn btn-primary btn-sm" onclick="adicionarItem()">+ Produto</button>
-                    <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
-    📄 Extrair PDF (IA)
-    <input type="file" accept=".pdf" hidden onchange="extrairPdfIa(event)">
-</label>
                 </div>
             </div>
             <p class="hint">
-                <strong>Custo</strong> é sempre por produto (sua pesquisa). 
-                Se a disputa for <strong>por lote</strong>, os produtos do mesmo lote são somados para o lance.
-                Planilha aceita: LOTE, DESCRIÇÃO, QUANTIDADE, VALOR UNITÁRIO.
+                <strong>Custo</strong> é sempre por produto. Em disputa <strong>por lote</strong>, a soma agrupa os produtos do mesmo lote.
+                Planilha: LOTE, DESCRIÇÃO, QUANTIDADE, VALOR UNITÁRIO. PDF: revise tudo que a IA preencher.
             </p>
 
             <div class="table-wrapper">
@@ -335,6 +333,7 @@
 <script>
 const CONFIG_URL = "https://ltjxofcbogdynbkssqlr.supabase.co";
 const CONFIG_KEY = "sb_publishable_bdvQu1yCW8Oa_s6z8XVXug_ByArUwt-";
+const FUNCTION_URL = `${CONFIG_URL}/functions/v1/extrair-edital`;
 
 const token = localStorage.getItem('supabase_token');
 const userStr = localStorage.getItem('supabase_user');
@@ -354,7 +353,7 @@ function showToast(msg, tipo) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.className = 'toast ' + tipo + ' show';
-    setTimeout(() => t.classList.remove('show'), 4000);
+    setTimeout(() => t.classList.remove('show'), 4500);
 }
 function fazerLogout() {
     localStorage.removeItem('supabase_token');
@@ -372,7 +371,7 @@ function parseNum(v) {
     if (v === null || v === undefined || v === '') return null;
     if (typeof v === 'number') return v;
     const s = String(v).replace(/\s/g, '').replace(/R\$/i, '');
-    if (/[a-zA-Z]/.test(s)) return null; // "Sigiloso" etc.
+    if (/[a-zA-Z]/.test(s)) return null;
     if (s.includes(',') && s.includes('.')) return parseFloat(s.replace(/\./g, '').replace(',', '.')) || null;
     if (s.includes(',')) return parseFloat(s.replace(',', '.')) || null;
     return parseFloat(s) || null;
@@ -403,146 +402,7 @@ function novoEdital() {
     renderItens();
 }
 
-
-
-const FUNCTION_URL = `${CONFIG_URL}/functions/v1/extrair-edital`;
-
-async function extrairTextoPdf(file) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-        "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
-
-    const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
-    const maxPages = Math.min(pdf.numPages, 8);
-    let texto = "";
-
-    for (let p = 1; p <= maxPages; p++) {
-        const page = await pdf.getPage(p);
-        const content = await page.getTextContent();
-        const pageText = content.items.map((i) => i.str).join(" ");
-        texto += pageText + "\n";
-    }
-
-    texto = texto.replace(/\s+/g, " ").trim();
-
-    // Se quase não há texto → OCR (Tesseract) nas primeiras páginas
-    if (texto.length < 200) {
-        showToast("PDF parece escaneado. Rodando OCR (pode demorar)...", "info");
-        texto = "";
-        for (let p = 1; p <= Math.min(pdf.numPages, 3); p++) {
-            const page = await pdf.getPage(p);
-            const viewport = page.getViewport({ scale: 1.5 });
-            const canvas = document.createElement("canvas");
-            const ctx = canvas.getContext("2d");
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            await page.render({ canvasContext: ctx, viewport }).promise;
-            const result = await Tesseract.recognize(canvas, "por");
-            texto += (result?.data?.text || "") + "\n";
-        }
-        texto = texto.replace(/\s+/g, " ").trim();
-    }
-
-    return texto;
-}
-
-async function extrairPdfIa(event) {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (document.getElementById("viewForm").classList.contains("hidden")) {
-        novoEdital();
-    }
-
-    showToast("Lendo PDF...", "info");
-
-    try {
-        const texto = await extrairTextoPdf(file);
-        if (!texto || texto.length < 40) {
-            showToast("Não foi possível ler texto do PDF. Use Excel ou manual.", "error");
-            event.target.value = "";
-            return;
-        }
-
-        showToast("Enviando para IA (Gemini)...", "info");
-
-        const res = await fetch(FUNCTION_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`,
-                "apikey": CONFIG_KEY,
-            },
-            body: JSON.stringify({ texto, pdfNome: file.name }),
-        });
-
-        const json = await res.json();
-        if (!res.ok || !json.success) {
-            console.error(json);
-            showToast(json.error || "Falha na extração IA", "error");
-            event.target.value = "";
-            return;
-        }
-
-        aplicarDadosIa(json.dados, file.name);
-        showToast("Dados extraídos. Revise antes de salvar!", "success");
-    } catch (e) {
-        console.error(e);
-        showToast("Erro ao processar PDF", "error");
-    }
-
-    event.target.value = "";
-}
-
-function aplicarDadosIa(d, pdfNome) {
-    if (!d) return;
-
-    if (d.modalidade) document.getElementById("modalidade").value = d.modalidade;
-    if (d.numero) document.getElementById("numero").value = d.numero;
-    if (d.processo) document.getElementById("processo").value = d.processo;
-    if (d.orgao) document.getElementById("orgao").value = d.orgao;
-    if (d.cnpj_orgao) document.getElementById("cnpj_orgao").value = d.cnpj_orgao;
-    if (d.uf) document.getElementById("uf").value = d.uf;
-    if (d.objeto) document.getElementById("objeto").value = d.objeto;
-    if (d.valor_estimado != null) document.getElementById("valor_estimado").value = d.valor_estimado;
-    if (d.criterio_julgamento) document.getElementById("criterio_julgamento").value = d.criterio_julgamento;
-    if (d.tipo_disputa === "lote" || d.tipo_disputa === "item") {
-        document.getElementById("tipo_disputa").value = d.tipo_disputa;
-    }
-    if (d.data_sessao) {
-        try {
-            const dt = new Date(d.data_sessao);
-            if (!isNaN(dt)) document.getElementById("data_sessao").value = dt.toISOString().slice(0, 16);
-        } catch (_) {}
-    }
-
-    // Itens (se a IA trouxe)
-    if (Array.isArray(d.itens) && d.itens.length) {
-        const margem = parseFloat(document.getElementById("margem_padrao").value) || 20;
-        d.itens.forEach((it) => {
-            if (!it.descricao) return;
-            itensLocais.push({
-                numero_lote: it.numero_lote || "",
-                numero_item: it.numero_item || String(itensLocais.length + 1),
-                descricao: it.descricao,
-                unidade: it.unidade || "UN",
-                quantidade: parseFloat(it.quantidade) || 1,
-                valor_referencia: it.valor_referencia != null ? parseFloat(it.valor_referencia) : null,
-                preco_custo: 0,
-                margem_lucro: margem,
-                preco_unitario: 0,
-                participar: true,
-                ordem: itensLocais.length,
-            });
-        });
-        renderItens();
-    }
-
-    // nome do arquivo (se tiver os campos no form no futuro)
-    // document.getElementById("pdf_nome").value = pdfNome;
-}
-
-    
-/* ===== LISTA ===== */
+/* ===== LISTA / CRUD ===== */
 async function carregarEditais() {
     try {
         const res = await fetch(`${CONFIG_URL}/rest/v1/editais?select=id,numero,orgao,uf,modalidade,status&order=created_at.desc`, {
@@ -701,18 +561,14 @@ function calcUnitario(item) {
 
 function renderItens() {
     const tbody = document.getElementById('listaItens');
-    const porLote = isPorLote();
-
     if (!itensLocais.length) {
-        tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state">Nenhum produto. Use + Produto, Excel ou Colar.</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state">Nenhum produto. Use PDF (IA), Excel, Colar ou + Produto.</div></td></tr>';
         document.getElementById('resumoLotes').innerHTML = '';
         atualizarTotais();
         return;
     }
 
     tbody.innerHTML = itensLocais.map((it, i) => {
-        const unit = (it.preco_unitario && parseFloat(it.preco_custo)) ? calcUnitario(it) : (parseFloat(it.preco_unitario) || calcUnitario(it));
-        // se tem custo, recalcula; se usuário editou unitário sem custo, mantém
         const unitFinal = parseFloat(it.preco_custo) > 0 ? calcUnitario(it) : (parseFloat(it.preco_unitario) || 0);
         const qtd = parseFloat(it.quantidade) || 0;
         const total = +(unitFinal * qtd).toFixed(2);
@@ -720,13 +576,13 @@ function renderItens() {
 
         return `<tr class="item-row">
             <td class="check-cell"><input type="checkbox" ${it.participar !== false ? 'checked' : ''} onchange="updItem(${i},'participar',this.checked)"></td>
-            <td><input value="${it.numero_lote || ''}" onchange="updItem(${i},'numero_lote',this.value); renderItens()" style="width:55px" title="Número do lote"></td>
-            <td><input value="${it.numero_item || ''}" onchange="updItem(${i},'numero_item',this.value)" style="width:55px" title="Nº item (opcional)"></td>
+            <td><input value="${it.numero_lote || ''}" onchange="updItem(${i},'numero_lote',this.value); renderItens()" style="width:55px"></td>
+            <td><input value="${it.numero_item || ''}" onchange="updItem(${i},'numero_item',this.value)" style="width:55px"></td>
             <td><input value="${(it.descricao || '').replace(/"/g, '&quot;')}" onchange="updItem(${i},'descricao',this.value)"></td>
             <td><input value="${it.unidade || 'UN'}" onchange="updItem(${i},'unidade',this.value)" style="width:48px"></td>
             <td><input type="number" step="0.01" value="${it.quantidade || 1}" onchange="updItem(${i},'quantidade',this.value); renderItens()" style="width:70px"></td>
-            <td><input type="number" step="0.01" value="${ref}" onchange="updItem(${i},'valor_referencia',this.value)" style="width:75px" title="Valor unitário de referência do edital"></td>
-            <td><input type="number" step="0.01" value="${it.preco_custo || 0}" onchange="updItem(${i},'preco_custo',this.value); recalc(${i})" style="width:75px" title="Seu custo de pesquisa"></td>
+            <td><input type="number" step="0.01" value="${ref}" onchange="updItem(${i},'valor_referencia',this.value)" style="width:75px"></td>
+            <td><input type="number" step="0.01" value="${it.preco_custo || 0}" onchange="updItem(${i},'preco_custo',this.value); recalc(${i})" style="width:75px"></td>
             <td><input type="number" step="0.01" value="${it.margem_lucro ?? document.getElementById('margem_padrao').value}" onchange="updItem(${i},'margem_lucro',this.value); recalc(${i})" style="width:58px"></td>
             <td><input type="number" step="0.01" value="${unitFinal}" onchange="updItem(${i},'preco_unitario',this.value); renderItens()" style="width:75px"></td>
             <td style="white-space:nowrap;font-weight:500;">${money(total)}</td>
@@ -758,10 +614,7 @@ function renderResumoLotes() {
         if (!isNaN(na) && !isNaN(nb)) return na - nb;
         return String(a).localeCompare(String(b));
     });
-    if (!keys.length) {
-        box.innerHTML = '';
-        return;
-    }
+    if (!keys.length) { box.innerHTML = ''; return; }
     let html = '<div class="lote-box"><h3>Soma por lote (produtos marcados)</h3>';
     let geral = 0;
     keys.forEach(k => {
@@ -782,12 +635,10 @@ function updItem(i, field, value) {
         atualizarTotais();
     }
 }
-
 function recalc(i) {
     itensLocais[i].preco_unitario = calcUnitario(itensLocais[i]);
     renderItens();
 }
-
 function atualizarTotais() {
     let qtd = 0, soma = 0;
     itensLocais.forEach(it => {
@@ -799,26 +650,18 @@ function atualizarTotais() {
     document.getElementById('totalItens').textContent = qtd;
     document.getElementById('totalGeral').textContent = money(soma);
 }
-
 function adicionarItem() {
     const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
     const n = itensLocais.length + 1;
     itensLocais.push({
         numero_lote: isPorLote() ? String(n) : '',
         numero_item: String(n),
-        descricao: '',
-        unidade: 'UN',
-        quantidade: 1,
-        valor_referencia: null,
-        preco_custo: 0,
-        margem_lucro: margem,
-        preco_unitario: 0,
-        participar: true,
-        ordem: itensLocais.length
+        descricao: '', unidade: 'UN', quantidade: 1,
+        valor_referencia: null, preco_custo: 0, margem_lucro: margem,
+        preco_unitario: 0, participar: true, ordem: itensLocais.length
     });
     renderItens();
 }
-
 function removerItem(i) {
     itensLocais.splice(i, 1);
     renderItens();
@@ -839,24 +682,16 @@ async function salvarItens() {
             const unit = parseFloat(it.preco_custo) > 0 ? calcUnitario(it) : (parseFloat(it.preco_unitario) || 0);
             const qtd = parseFloat(it.quantidade) || 0;
             return {
-                edital_id: editalAtualId,
-                user_id: userData.id,
-                numero_item: it.numero_item || null,
-                numero_lote: it.numero_lote || null,
-                descricao: it.descricao || 'Sem descrição',
-                unidade: it.unidade || 'UN',
-                quantidade: qtd,
-                preco_custo: parseFloat(it.preco_custo) || 0,
+                edital_id: editalAtualId, user_id: userData.id,
+                numero_item: it.numero_item || null, numero_lote: it.numero_lote || null,
+                descricao: it.descricao || 'Sem descrição', unidade: it.unidade || 'UN',
+                quantidade: qtd, preco_custo: parseFloat(it.preco_custo) || 0,
                 margem_lucro: parseFloat(it.margem_lucro) || null,
-                impostos: parseFloat(it.impostos) || null,
-                frete_outros: parseFloat(it.frete_outros) || null,
+                impostos: parseFloat(it.impostos) || null, frete_outros: parseFloat(it.frete_outros) || null,
                 valor_referencia: it.valor_referencia != null ? parseFloat(it.valor_referencia) : null,
-                preco_unitario: unit,
-                preco_total: +(unit * qtd).toFixed(4),
-                participar: it.participar !== false,
-                ganhou: it.ganhou === true,
-                valor_lance_final: it.valor_lance_final || null,
-                ordem: i
+                preco_unitario: unit, preco_total: +(unit * qtd).toFixed(4),
+                participar: it.participar !== false, ganhou: it.ganhou === true,
+                valor_lance_final: it.valor_lance_final || null, ordem: i
             };
         });
         const res = await fetch(`${CONFIG_URL}/rest/v1/edital_itens`, {
@@ -878,6 +713,120 @@ async function salvarItens() {
     }
 }
 
+/* ===== PDF + OCR + GEMINI ===== */
+async function extrairTextoPdf(file) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+        'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
+    const maxPages = Math.min(pdf.numPages, 8);
+    let texto = '';
+
+    for (let p = 1; p <= maxPages; p++) {
+        const page = await pdf.getPage(p);
+        const content = await page.getTextContent();
+        texto += content.items.map(i => i.str).join(' ') + '\n';
+    }
+    texto = texto.replace(/\s+/g, ' ').trim();
+
+    if (texto.length < 200) {
+        showToast('PDF escaneado. OCR em andamento (pode demorar)...', 'info');
+        texto = '';
+        for (let p = 1; p <= Math.min(pdf.numPages, 3); p++) {
+            const page = await pdf.getPage(p);
+            const viewport = page.getViewport({ scale: 1.5 });
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            const result = await Tesseract.recognize(canvas, 'por');
+            texto += (result?.data?.text || '') + '\n';
+        }
+        texto = texto.replace(/\s+/g, ' ').trim();
+    }
+    return texto;
+}
+
+async function extrairPdfIa(event) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
+
+    showToast('Lendo PDF...', 'info');
+    try {
+        const texto = await extrairTextoPdf(file);
+        if (!texto || texto.length < 40) {
+            showToast('Não foi possível ler o PDF. Use Excel ou manual.', 'error');
+            event.target.value = '';
+            return;
+        }
+
+        showToast('Enviando para IA (Gemini)...', 'info');
+        const res = await fetch(FUNCTION_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+                'apikey': CONFIG_KEY
+            },
+            body: JSON.stringify({ texto, pdfNome: file.name })
+        });
+        const json = await res.json();
+        if (!res.ok || !json.success) {
+            console.error(json);
+            showToast(json.error || 'Falha na extração IA', 'error');
+            event.target.value = '';
+            return;
+        }
+        aplicarDadosIa(json.dados);
+        showToast('Dados extraídos. Revise antes de salvar!', 'success');
+    } catch (e) {
+        console.error(e);
+        showToast('Erro ao processar PDF', 'error');
+    }
+    event.target.value = '';
+}
+
+function aplicarDadosIa(d) {
+    if (!d) return;
+    if (d.modalidade) document.getElementById('modalidade').value = d.modalidade;
+    if (d.numero) document.getElementById('numero').value = d.numero;
+    if (d.processo) document.getElementById('processo').value = d.processo;
+    if (d.orgao) document.getElementById('orgao').value = d.orgao;
+    if (d.cnpj_orgao) document.getElementById('cnpj_orgao').value = d.cnpj_orgao;
+    if (d.uf) document.getElementById('uf').value = d.uf;
+    if (d.objeto) document.getElementById('objeto').value = d.objeto;
+    if (d.valor_estimado != null) document.getElementById('valor_estimado').value = d.valor_estimado;
+    if (d.criterio_julgamento) document.getElementById('criterio_julgamento').value = d.criterio_julgamento;
+    if (d.tipo_disputa === 'lote' || d.tipo_disputa === 'item') {
+        document.getElementById('tipo_disputa').value = d.tipo_disputa;
+    }
+    if (d.data_sessao) {
+        try {
+            const dt = new Date(d.data_sessao);
+            if (!isNaN(dt)) document.getElementById('data_sessao').value = dt.toISOString().slice(0, 16);
+        } catch (_) {}
+    }
+    if (Array.isArray(d.itens) && d.itens.length) {
+        const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
+        d.itens.forEach(it => {
+            if (!it.descricao) return;
+            itensLocais.push({
+                numero_lote: it.numero_lote || '',
+                numero_item: it.numero_item || String(itensLocais.length + 1),
+                descricao: it.descricao,
+                unidade: it.unidade || 'UN',
+                quantidade: parseFloat(it.quantidade) || 1,
+                valor_referencia: it.valor_referencia != null ? parseFloat(it.valor_referencia) : null,
+                preco_custo: 0, margem_lucro: margem, preco_unitario: 0,
+                participar: true, ordem: itensLocais.length
+            });
+        });
+        renderItens();
+    }
+}
+
 /* ===== COLAR ===== */
 function abrirPaste() { document.getElementById('modalPaste').classList.add('show'); }
 function fecharPaste() { document.getElementById('modalPaste').classList.remove('show'); }
@@ -889,7 +838,6 @@ function processarPaste() {
     linhas.forEach(linha => {
         const cols = linha.split(/\t|;|\|/).map(c => c.trim());
         if (cols.length < 2) return;
-        // Lote | Desc | Un | Qtd | Ref
         let numero_lote = '', descricao = '', unidade = 'UN', quantidade = 1, valor_referencia = null;
         if (cols.length >= 5) {
             numero_lote = cols[0]; descricao = cols[1]; unidade = cols[2] || 'UN';
@@ -915,11 +863,10 @@ function processarPaste() {
     showToast(`${linhas.length} linha(s) importada(s)`, 'success');
 }
 
-/* ===== EXCEL — alinhado ao modelo LOTE / DESCRIÇÃO / QUANTIDADE / VALOR UNITÁRIO ===== */
+/* ===== EXCEL ===== */
 function importarPlanilha(event) {
     const file = event.target.files[0];
     if (!file) return;
-
     const reader = new FileReader();
     reader.onload = function (e) {
         try {
@@ -938,63 +885,42 @@ function importarPlanilha(event) {
             const header = rows[0].map(norm);
             const hasHeader = header.some(h => /lote|desc|qtd|quant|valor|unit|item/.test(h));
             const start = hasHeader ? 1 : 0;
-
             const idxLote = header.findIndex(h => /^lote$|n[oº]?\s*lote|numero\s*lote/.test(h));
             const idxDesc = header.findIndex(h => /desc|especific|objeto|produto/.test(h));
             const idxQtd  = header.findIndex(h => /quantidade|qtd|quant/.test(h));
             const idxUn   = header.findIndex(h => /^un$|^und$|unidade/.test(h));
-            // VALOR UNITÁRIO = referência do edital (não o código)
-            const idxRef  = header.findIndex(h =>
-                /valor\s*unitario|vlr?\s*unit|preco\s*unitario|valor\s*unit/.test(h)
-            );
+            const idxRef  = header.findIndex(h => /valor\s*unitario|vlr?\s*unit|preco\s*unitario|valor\s*unit/.test(h));
 
             if (idxLote >= 0) document.getElementById('tipo_disputa').value = 'lote';
-
             const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
             let importados = 0;
 
             for (let r = start; r < rows.length; r++) {
                 const cols = rows[r];
                 if (!cols?.length) continue;
-
                 let numero_lote = '', descricao = '', unidade = 'UN', quantidade = 1, valor_referencia = null;
-
                 if (hasHeader) {
                     numero_lote = idxLote >= 0 ? String(cols[idxLote] ?? '').trim() : '';
                     descricao = idxDesc >= 0 ? String(cols[idxDesc] ?? '').trim() : String(cols[1] ?? cols[0] ?? '').trim();
                     unidade = idxUn >= 0 ? String(cols[idxUn] ?? 'UN').trim() || 'UN' : 'UN';
                     quantidade = idxQtd >= 0 ? (parseNum(cols[idxQtd]) || 1) : 1;
                     valor_referencia = idxRef >= 0 ? parseNum(cols[idxRef]) : null;
+                } else if (cols.length >= 4) {
+                    numero_lote = String(cols[0]); descricao = String(cols[1]);
+                    quantidade = parseNum(cols[2]) || 1; valor_referencia = parseNum(cols[3]);
                 } else {
-                    // posicional: Lote | Desc | Qtd | Valor unit
-                    if (cols.length >= 4) {
-                        numero_lote = String(cols[0]); descricao = String(cols[1]);
-                        quantidade = parseNum(cols[2]) || 1; valor_referencia = parseNum(cols[3]);
-                    } else if (cols.length >= 3) {
-                        descricao = String(cols[0]); quantidade = parseNum(cols[1]) || 1; valor_referencia = parseNum(cols[2]);
-                    } else {
-                        descricao = String(cols[0] || '');
-                    }
+                    descricao = String(cols[0] || '');
+                    if (!descricao) continue;
                 }
-
                 if (!descricao || descricao.length < 2) continue;
-
                 itensLocais.push({
-                    numero_lote,
-                    numero_item: String(itensLocais.length + 1),
-                    descricao,
-                    unidade,
-                    quantidade,
-                    valor_referencia,
-                    preco_custo: 0,
-                    margem_lucro: margem,
-                    preco_unitario: 0,
-                    participar: true,
-                    ordem: itensLocais.length
+                    numero_lote, numero_item: String(itensLocais.length + 1),
+                    descricao, unidade, quantidade, valor_referencia,
+                    preco_custo: 0, margem_lucro: margem, preco_unitario: 0,
+                    participar: true, ordem: itensLocais.length
                 });
                 importados++;
             }
-
             renderItens();
             showToast(`✅ ${importados} produto(s) importado(s)`, 'success');
         } catch (err) {
@@ -1003,11 +929,9 @@ function importarPlanilha(event) {
         }
         event.target.value = '';
     };
-
     if (file.name.toLowerCase().endsWith('.csv')) reader.readAsText(file);
     else reader.readAsArrayBuffer(file);
 }
-    
 </script>
 </body>
 </html>
