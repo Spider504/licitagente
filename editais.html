@@ -90,9 +90,7 @@
             width: 100%; padding: 6px 8px; font-size: 12px; border: 1px solid #e5e7eb;
             border-radius: 6px; background: #fff; font-family: inherit;
         }
-        .item-row textarea {
-            min-height: 52px; max-height: 120px; resize: vertical; line-height: 1.35;
-        }
+        .item-row textarea { min-height: 52px; max-height: 120px; resize: vertical; line-height: 1.35; }
         .desc-cell { min-width: 280px; max-width: 420px; }
         .desc-wrap { display: flex; gap: 6px; align-items: flex-start; }
         .desc-wrap textarea { flex: 1; }
@@ -178,7 +176,7 @@
         <div class="page-header">
             <div>
                 <h1 id="formTitulo">Novo Edital</h1>
-                <p>Aviso/Edital (IA) no cabeçalho · TR/Planilha nos produtos. Revise antes de salvar.</p>
+                <p>Aviso/Edital (IA) = só cabeçalho · TR/Excel = produtos. Revise antes de salvar.</p>
             </div>
             <button class="btn btn-secondary" onclick="voltarLista()">← Voltar</button>
         </div>
@@ -289,8 +287,8 @@
                 </div>
             </div>
             <p class="hint">
-                <strong>Custo</strong> é sempre por produto. Em <strong>Por Lote / Grupo</strong>, a soma agrupa o mesmo lote.
-                Descrição: use o campo largo ou o botão <strong>✎</strong> para ver o texto completo.
+                <strong>Aviso/Edital (IA)</strong> preenche só o cabeçalho. Produtos vêm de <strong>TR/Excel</strong>, Colar ou + Produto.
+                Em <strong>Por Lote/Grupo</strong>, a soma agrupa o mesmo lote. Use <strong>✎</strong> para ver a descrição completa.
             </p>
             <div class="table-wrapper">
                 <table>
@@ -325,7 +323,6 @@
     </div>
 </div>
 
-<!-- Modal Colar -->
 <div class="modal-overlay" id="modalPaste">
     <div class="modal-box">
         <h3 style="margin-bottom:8px;">Colar tabela</h3>
@@ -340,7 +337,6 @@
     </div>
 </div>
 
-<!-- Modal Descrição completa -->
 <div class="modal-overlay" id="modalDesc">
     <div class="modal-box wide">
         <h3 style="margin-bottom:8px;">Descrição do produto</h3>
@@ -431,7 +427,6 @@ function novoEdital() {
     renderItens();
 }
 
-/* ===== LISTA / CRUD ===== */
 async function carregarEditais() {
     try {
         const res = await fetch(`${CONFIG_URL}/rest/v1/editais?select=id,numero,orgao,uf,modalidade,status&order=created_at.desc`, {
@@ -564,7 +559,6 @@ async function excluirEdital(id) {
     }
 }
 
-/* ===== ITENS ===== */
 async function carregarItens(editalId) {
     try {
         const res = await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${editalId}&order=ordem.asc`, {
@@ -590,7 +584,7 @@ function calcUnitario(item) {
 function renderItens() {
     const tbody = document.getElementById('listaItens');
     if (!itensLocais.length) {
-        tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state">Nenhum produto. Use Aviso (IA), TR/Excel, Colar ou + Produto.</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state">Nenhum produto. Use TR/Excel, Colar ou + Produto.</div></td></tr>';
         document.getElementById('resumoLotes').innerHTML = '';
         atualizarTotais();
         return;
@@ -760,7 +754,7 @@ async function salvarItens() {
     }
 }
 
-/* ===== PDF + OCR + IA ===== */
+/* ===== PDF: só CABEÇALHO ===== */
 async function extrairTextoPdf(file) {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
         'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -796,18 +790,16 @@ async function extrairPdfIa(event) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
-    showToast('Lendo PDF...', 'info');
+    showToast('Lendo PDF (só cabeçalho)...', 'info');
     try {
         let texto = await extrairTextoPdf(file);
         if (!texto || texto.length < 40) {
-            showToast('Não foi possível ler o PDF. Use Excel ou manual.', 'error');
+            showToast('Não foi possível ler o PDF.', 'error');
             event.target.value = '';
             return;
         }
-        if (texto.length > 8000) {
-            texto = texto.slice(0, 8000);
-            showToast('Texto longo: enviando só o início...', 'info');
-        }
+        if (texto.length > 8000) texto = texto.slice(0, 8000);
+
         showToast('Enviando para IA...', 'info');
         let res = await fetch(FUNCTION_URL, {
             method: 'POST',
@@ -832,14 +824,14 @@ async function extrairPdfIa(event) {
         const json = await res.json().catch(() => ({}));
         if (!res.ok || !json.success) {
             console.error(json);
-            if (res.status === 401) showToast('Sessão inválida. Saia e entre de novo, ou desligue Verify JWT.', 'error');
-            else if (res.status === 413) showToast('Texto ainda grande. Use Excel para os itens.', 'error');
+            if (res.status === 401) showToast('Sessão inválida. Saia e entre de novo.', 'error');
             else showToast(json.error || 'Falha na extração IA', 'error');
             event.target.value = '';
             return;
         }
-        aplicarDadosIa(json.dados);
-        showToast('Dados extraídos. Revise antes de salvar!', 'success');
+        // IMPORTANTE: só cabeçalho — não mexe na tabela
+        aplicarDadosIa(json.dados, { soCabecalho: true });
+        showToast('Cabeçalho preenchido. Produtos: use TR/Excel.', 'success');
     } catch (e) {
         console.error(e);
         showToast('Erro ao processar PDF', 'error');
@@ -847,7 +839,7 @@ async function extrairPdfIa(event) {
     event.target.value = '';
 }
 
-function aplicarDadosIa(d) {
+function aplicarDadosIa(d, opcoes = {}) {
     if (!d) return;
     if (d.modalidade) document.getElementById('modalidade').value = d.modalidade;
     if (d.numero) document.getElementById('numero').value = d.numero;
@@ -867,6 +859,10 @@ function aplicarDadosIa(d) {
             if (!isNaN(dt)) document.getElementById('data_sessao').value = dt.toISOString().slice(0, 16);
         } catch (_) {}
     }
+
+    // Aviso/Edital: para aqui (não preenche produtos)
+    if (opcoes.soCabecalho) return;
+
     if (Array.isArray(d.itens) && d.itens.length) {
         const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
         d.itens.forEach(it => {
@@ -886,7 +882,6 @@ function aplicarDadosIa(d) {
     }
 }
 
-/* ===== COLAR ===== */
 function abrirPaste() { document.getElementById('modalPaste').classList.add('show'); }
 function fecharPaste() { document.getElementById('modalPaste').classList.remove('show'); }
 function processarPaste() {
@@ -922,7 +917,6 @@ function processarPaste() {
     showToast(`${linhas.length} linha(s) importada(s)`, 'success');
 }
 
-/* ===== EXCEL (Grupo = Lote) ===== */
 function importarPlanilha(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -971,7 +965,6 @@ function importarPlanilha(event) {
                     if (!descricao) continue;
                 }
                 if (!descricao || descricao.length < 2) continue;
-                // ignora linha de TOTAL
                 if (/^total$/i.test(descricao.trim())) continue;
                 itensLocais.push({
                     numero_lote,
