@@ -30,7 +30,7 @@
         }
         .btn-nav:hover { background: #f8fafc; }
         .btn-voltar { color: #3b82f6; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 28px 20px 60px; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 28px 20px 60px; }
         .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
         .page-header h1 { font-size: 24px; color: #0f172a; font-weight: 700; }
         .page-header p { color: #64748b; font-size: 14px; margin-top: 4px; }
@@ -57,9 +57,9 @@
         .badge.perdido { background: #fee2e2; color: #991b1b; }
         .badge.arquivado { background: #f1f5f9; color: #94a3b8; }
         .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #e2e8f0; }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 980px; }
         th { background: #f8fafc; padding: 10px 12px; text-align: left; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
-        td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; color: #374151; vertical-align: middle; }
+        td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; color: #374151; vertical-align: top; }
         tr:hover td { background: #f8fafc; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
         .form-group { display: flex; flex-direction: column; }
@@ -86,7 +86,21 @@
         .toast.info { background: #2563eb; }
         .hidden { display: none !important; }
         .actions-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
-        .item-row input { width: 100%; padding: 6px 8px; font-size: 12px; border: 1px solid #e5e7eb; border-radius: 6px; background: #fff; }
+        .item-row input, .item-row textarea {
+            width: 100%; padding: 6px 8px; font-size: 12px; border: 1px solid #e5e7eb;
+            border-radius: 6px; background: #fff; font-family: inherit;
+        }
+        .item-row textarea {
+            min-height: 52px; max-height: 120px; resize: vertical; line-height: 1.35;
+        }
+        .desc-cell { min-width: 280px; max-width: 420px; }
+        .desc-wrap { display: flex; gap: 6px; align-items: flex-start; }
+        .desc-wrap textarea { flex: 1; }
+        .btn-icon {
+            border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 6px;
+            width: 30px; height: 30px; cursor: pointer; font-size: 13px; flex-shrink: 0;
+        }
+        .btn-icon:hover { background: #eff6ff; border-color: #bfdbfe; }
         .check-cell { text-align: center; width: 36px; }
         .totais-bar {
             display: flex; gap: 20px; flex-wrap: wrap; padding: 14px 16px;
@@ -106,10 +120,12 @@
             z-index: 10000; align-items: center; justify-content: center; padding: 20px;
         }
         .modal-overlay.show { display: flex; }
-        .modal-box { background: white; border-radius: 16px; padding: 24px; max-width: 520px; width: 100%; }
+        .modal-box { background: white; border-radius: 16px; padding: 24px; max-width: 640px; width: 100%; }
+        .modal-box.wide { max-width: 720px; }
         @media (max-width: 700px) {
             .form-grid { grid-template-columns: 1fr; }
             .container { padding: 20px 14px 50px; }
+            .desc-cell { min-width: 220px; }
         }
     </style>
 </head>
@@ -128,7 +144,6 @@
 </header>
 
 <div class="container">
-
     <div id="viewLista">
         <div class="page-header">
             <div>
@@ -163,19 +178,19 @@
         <div class="page-header">
             <div>
                 <h1 id="formTitulo">Novo Edital</h1>
-                <p>Cabeçalho + produtos. Revise sempre os dados da IA antes de salvar.</p>
+                <p>Aviso/Edital (IA) no cabeçalho · TR/Planilha nos produtos. Revise antes de salvar.</p>
             </div>
             <button class="btn btn-secondary" onclick="voltarLista()">← Voltar</button>
         </div>
 
         <div class="card">
-            <h2>📄 Dados do Edital</h2>
+            <h2>📄 Dados do Edital (Aviso / Edital)</h2>
             <form id="formEdital" onsubmit="salvarEdital(event)">
                 <input type="hidden" id="edital_id">
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Modalidade</label>
-                        <input type="text" id="modalidade" placeholder="Ex: Pregão Eletrônico">
+                        <input type="text" id="modalidade" placeholder="Ex: Dispensa Eletrônica, Pregão">
                     </div>
                     <div class="form-group">
                         <label>Número</label>
@@ -187,7 +202,7 @@
                     </div>
                     <div class="form-group">
                         <label>UF</label>
-                        <input type="text" id="uf" maxlength="2" placeholder="SP, RJ, BA...">
+                        <input type="text" id="uf" maxlength="2" placeholder="SP, RJ, MA...">
                     </div>
                     <div class="form-group full">
                         <label>Órgão / Contratante</label>
@@ -219,13 +234,13 @@
                     </div>
                     <div class="form-group">
                         <label>Plataforma</label>
-                        <input type="text" id="plataforma">
+                        <input type="text" id="plataforma" placeholder="Compras.gov.br">
                     </div>
                     <div class="form-group">
                         <label>Tipo de Disputa</label>
                         <select id="tipo_disputa" onchange="renderItens()">
                             <option value="item">Por Item</option>
-                            <option value="lote">Por Lote</option>
+                            <option value="lote">Por Lote / Grupo</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -259,14 +274,14 @@
 
         <div class="card" id="cardItens">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
-                <h2 style="margin:0;">📦 Produtos</h2>
+                <h2 style="margin:0;">📦 Produtos (TR / Planilha)</h2>
                 <div style="display:flex;gap:8px;flex-wrap:wrap;">
                     <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
-                        📄 Extrair PDF (IA)
+                        📄 Aviso / Edital (IA)
                         <input type="file" accept=".pdf" hidden onchange="extrairPdfIa(event)">
                     </label>
                     <label class="btn btn-secondary btn-sm" style="cursor:pointer;">
-                        📊 Excel / CSV
+                        📊 TR / Excel
                         <input type="file" accept=".xlsx,.xls,.csv" hidden onchange="importarPlanilha(event)">
                     </label>
                     <button type="button" class="btn btn-secondary btn-sm" onclick="abrirPaste()">📋 Colar</button>
@@ -274,8 +289,8 @@
                 </div>
             </div>
             <p class="hint">
-                <strong>Custo</strong> é sempre por produto. Em disputa <strong>por lote</strong>, a soma agrupa os produtos do mesmo lote.
-                Planilha: LOTE, DESCRIÇÃO, QUANTIDADE, VALOR UNITÁRIO. PDF: revise tudo que a IA preencher.
+                <strong>Custo</strong> é sempre por produto. Em <strong>Por Lote / Grupo</strong>, a soma agrupa o mesmo lote.
+                Descrição: use o campo largo ou o botão <strong>✎</strong> para ver o texto completo.
             </p>
             <div class="table-wrapper">
                 <table>
@@ -310,6 +325,7 @@
     </div>
 </div>
 
+<!-- Modal Colar -->
 <div class="modal-overlay" id="modalPaste">
     <div class="modal-box">
         <h3 style="margin-bottom:8px;">Colar tabela</h3>
@@ -320,6 +336,19 @@
         <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
             <button class="btn btn-secondary" onclick="fecharPaste()">Cancelar</button>
             <button class="btn btn-primary" onclick="processarPaste()">Importar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Descrição completa -->
+<div class="modal-overlay" id="modalDesc">
+    <div class="modal-box wide">
+        <h3 style="margin-bottom:8px;">Descrição do produto</h3>
+        <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Edite o texto completo e clique em Aplicar.</p>
+        <textarea id="descArea" style="width:100%;min-height:220px;padding:12px;border:2px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:14px;line-height:1.45;"></textarea>
+        <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
+            <button class="btn btn-secondary" onclick="fecharDesc()">Cancelar</button>
+            <button class="btn btn-primary" onclick="aplicarDesc()">Aplicar</button>
         </div>
     </div>
 </div>
@@ -336,6 +365,7 @@ const userStr = localStorage.getItem('supabase_user');
 let userData = null;
 let itensLocais = [];
 let editalAtualId = null;
+let descEditIndex = null;
 
 if (!token || !userStr) {
     window.location.href = "index.html";
@@ -351,22 +381,18 @@ function showToast(msg, tipo) {
     t.className = 'toast ' + tipo + ' show';
     setTimeout(() => t.classList.remove('show'), 4500);
 }
-
 function fazerLogout() {
     localStorage.removeItem('supabase_token');
     localStorage.removeItem('supabase_user');
     window.location.href = "index.html";
 }
-
 function val(id) {
     const v = document.getElementById(id).value.trim();
     return v || null;
 }
-
 function isPorLote() {
     return document.getElementById('tipo_disputa').value === 'lote';
 }
-
 function parseNum(v) {
     if (v === null || v === undefined || v === '') return null;
     if (typeof v === 'number') return v;
@@ -376,9 +402,11 @@ function parseNum(v) {
     if (s.includes(',')) return parseFloat(s.replace(',', '.')) || null;
     return parseFloat(s) || null;
 }
-
 function money(n) {
     return 'R$ ' + (Number(n) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+}
+function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 }
 
 function abrirFormulario(titulo) {
@@ -386,13 +414,11 @@ function abrirFormulario(titulo) {
     document.getElementById('viewForm').classList.remove('hidden');
     document.getElementById('formTitulo').textContent = titulo || 'Novo Edital';
 }
-
 function voltarLista() {
     document.getElementById('viewForm').classList.add('hidden');
     document.getElementById('viewLista').classList.remove('hidden');
     carregarEditais();
 }
-
 function novoEdital() {
     editalAtualId = null;
     itensLocais = [];
@@ -564,7 +590,7 @@ function calcUnitario(item) {
 function renderItens() {
     const tbody = document.getElementById('listaItens');
     if (!itensLocais.length) {
-        tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state">Nenhum produto. Use PDF (IA), Excel, Colar ou + Produto.</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state">Nenhum produto. Use Aviso (IA), TR/Excel, Colar ou + Produto.</div></td></tr>';
         document.getElementById('resumoLotes').innerHTML = '';
         atualizarTotais();
         return;
@@ -574,12 +600,18 @@ function renderItens() {
         const qtd = parseFloat(it.quantidade) || 0;
         const total = +(unitFinal * qtd).toFixed(2);
         const ref = it.valor_referencia != null && it.valor_referencia !== '' ? it.valor_referencia : '';
+        const desc = it.descricao || '';
         return `<tr class="item-row">
             <td class="check-cell"><input type="checkbox" ${it.participar !== false ? 'checked' : ''} onchange="updItem(${i},'participar',this.checked)"></td>
-            <td><input value="${it.numero_lote || ''}" onchange="updItem(${i},'numero_lote',this.value); renderItens()" style="width:55px"></td>
-            <td><input value="${it.numero_item || ''}" onchange="updItem(${i},'numero_item',this.value)" style="width:55px"></td>
-            <td><input value="${(it.descricao || '').replace(/"/g, '&quot;')}" onchange="updItem(${i},'descricao',this.value)"></td>
-            <td><input value="${it.unidade || 'UN'}" onchange="updItem(${i},'unidade',this.value)" style="width:48px"></td>
+            <td><input value="${esc(it.numero_lote || '')}" onchange="updItem(${i},'numero_lote',this.value); renderItens()" style="width:55px"></td>
+            <td><input value="${esc(it.numero_item || '')}" onchange="updItem(${i},'numero_item',this.value)" style="width:55px"></td>
+            <td class="desc-cell">
+                <div class="desc-wrap">
+                    <textarea title="${esc(desc)}" onchange="updItem(${i},'descricao',this.value)">${esc(desc).replace(/&quot;/g,'"').replace(/&lt;/g,'<').replace(/&amp;/g,'&')}</textarea>
+                    <button type="button" class="btn-icon" title="Ver / editar completo" onclick="abrirDesc(${i})">✎</button>
+                </div>
+            </td>
+            <td><input value="${esc(it.unidade || 'UN')}" onchange="updItem(${i},'unidade',this.value)" style="width:48px"></td>
             <td><input type="number" step="0.01" value="${it.quantidade || 1}" onchange="updItem(${i},'quantidade',this.value); renderItens()" style="width:70px"></td>
             <td><input type="number" step="0.01" value="${ref}" onchange="updItem(${i},'valor_referencia',this.value)" style="width:75px"></td>
             <td><input type="number" step="0.01" value="${it.preco_custo || 0}" onchange="updItem(${i},'preco_custo',this.value); recalc(${i})" style="width:75px"></td>
@@ -591,6 +623,22 @@ function renderItens() {
     }).join('');
     renderResumoLotes();
     atualizarTotais();
+}
+
+function abrirDesc(i) {
+    descEditIndex = i;
+    document.getElementById('descArea').value = itensLocais[i].descricao || '';
+    document.getElementById('modalDesc').classList.add('show');
+}
+function fecharDesc() {
+    descEditIndex = null;
+    document.getElementById('modalDesc').classList.remove('show');
+}
+function aplicarDesc() {
+    if (descEditIndex == null) return;
+    itensLocais[descEditIndex].descricao = document.getElementById('descArea').value;
+    fecharDesc();
+    renderItens();
 }
 
 function renderResumoLotes() {
@@ -614,7 +662,7 @@ function renderResumoLotes() {
         return String(a).localeCompare(String(b));
     });
     if (!keys.length) { box.innerHTML = ''; return; }
-    let html = '<div class="lote-box"><h3>Soma por lote (produtos marcados)</h3>';
+    let html = '<div class="lote-box"><h3>Soma por lote / grupo (produtos marcados)</h3>';
     let geral = 0;
     keys.forEach(k => {
         geral += mapa[k];
@@ -634,12 +682,10 @@ function updItem(i, field, value) {
         atualizarTotais();
     }
 }
-
 function recalc(i) {
     itensLocais[i].preco_unitario = calcUnitario(itensLocais[i]);
     renderItens();
 }
-
 function atualizarTotais() {
     let qtd = 0, soma = 0;
     itensLocais.forEach(it => {
@@ -651,7 +697,6 @@ function atualizarTotais() {
     document.getElementById('totalItens').textContent = qtd;
     document.getElementById('totalGeral').textContent = money(soma);
 }
-
 function adicionarItem() {
     const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
     const n = itensLocais.length + 1;
@@ -664,7 +709,6 @@ function adicionarItem() {
     });
     renderItens();
 }
-
 function removerItem(i) {
     itensLocais.splice(i, 1);
     renderItens();
@@ -752,7 +796,6 @@ async function extrairPdfIa(event) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
-
     showToast('Lendo PDF...', 'info');
     try {
         let texto = await extrairTextoPdf(file);
@@ -761,15 +804,11 @@ async function extrairPdfIa(event) {
             event.target.value = '';
             return;
         }
-
-        // evita 413 na Groq
         if (texto.length > 8000) {
             texto = texto.slice(0, 8000);
-            showToast('Texto longo: enviando só o início do edital...', 'info');
+            showToast('Texto longo: enviando só o início...', 'info');
         }
-
         showToast('Enviando para IA...', 'info');
-
         let res = await fetch(FUNCTION_URL, {
             method: 'POST',
             headers: {
@@ -779,8 +818,6 @@ async function extrairPdfIa(event) {
             },
             body: JSON.stringify({ texto, pdfNome: file.name })
         });
-
-        // fallback se JWT inválido (Verify JWT OFF + publishable key)
         if (res.status === 401) {
             res = await fetch(FUNCTION_URL, {
                 method: 'POST',
@@ -792,22 +829,15 @@ async function extrairPdfIa(event) {
                 body: JSON.stringify({ texto, pdfNome: file.name })
             });
         }
-
         const json = await res.json().catch(() => ({}));
-
         if (!res.ok || !json.success) {
             console.error(json);
-            if (res.status === 401) {
-                showToast('Sessão inválida. Saia e entre de novo, ou desligue Verify JWT na function.', 'error');
-            } else if (res.status === 413) {
-                showToast('Texto ainda grande. Use Excel para os itens.', 'error');
-            } else {
-                showToast(json.error || 'Falha na extração IA', 'error');
-            }
+            if (res.status === 401) showToast('Sessão inválida. Saia e entre de novo, ou desligue Verify JWT.', 'error');
+            else if (res.status === 413) showToast('Texto ainda grande. Use Excel para os itens.', 'error');
+            else showToast(json.error || 'Falha na extração IA', 'error');
             event.target.value = '';
             return;
         }
-
         aplicarDadosIa(json.dados);
         showToast('Dados extraídos. Revise antes de salvar!', 'success');
     } catch (e) {
@@ -892,7 +922,7 @@ function processarPaste() {
     showToast(`${linhas.length} linha(s) importada(s)`, 'success');
 }
 
-/* ===== EXCEL ===== */
+/* ===== EXCEL (Grupo = Lote) ===== */
 function importarPlanilha(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -911,22 +941,24 @@ function importarPlanilha(event) {
             if (!rows.length) return showToast('Planilha vazia', 'error');
             const norm = (h) => String(h).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
             const header = rows[0].map(norm);
-            const hasHeader = header.some(h => /lote|desc|qtd|quant|valor|unit|item/.test(h));
+            const hasHeader = header.some(h => /lote|grupo|desc|qtd|quant|valor|unit|item|especific/.test(h));
             const start = hasHeader ? 1 : 0;
-            const idxLote = header.findIndex(h => /^lote$|n[oº]?\s*lote|numero\s*lote/.test(h));
+            const idxLote = header.findIndex(h => /^lote$|^grupo$|n[oº]?\s*lote|numero\s*lote|grupo/.test(h));
+            const idxItem = header.findIndex(h => /^item$|n[oº]?\s*item|numero\s*item/.test(h));
             const idxDesc = header.findIndex(h => /desc|especific|objeto|produto/.test(h));
-            const idxQtd = header.findIndex(h => /quantidade|qtd|quant/.test(h));
-            const idxUn = header.findIndex(h => /^un$|^und$|unidade/.test(h));
-            const idxRef = header.findIndex(h => /valor\s*unitario|vlr?\s*unit|preco\s*unitario|valor\s*unit/.test(h));
+            const idxQtd  = header.findIndex(h => /quantidade|qtd|quant/.test(h));
+            const idxUn   = header.findIndex(h => /^un$|^und$|unidade|medida/.test(h));
+            const idxRef  = header.findIndex(h => /valor\s*unitario|vlr?\s*unit|preco\s*unitario|valor\s*unit/.test(h));
             if (idxLote >= 0) document.getElementById('tipo_disputa').value = 'lote';
             const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
             let importados = 0;
             for (let r = start; r < rows.length; r++) {
                 const cols = rows[r];
                 if (!cols?.length) continue;
-                let numero_lote = '', descricao = '', unidade = 'UN', quantidade = 1, valor_referencia = null;
+                let numero_lote = '', numero_item = '', descricao = '', unidade = 'UN', quantidade = 1, valor_referencia = null;
                 if (hasHeader) {
                     numero_lote = idxLote >= 0 ? String(cols[idxLote] ?? '').trim() : '';
+                    numero_item = idxItem >= 0 ? String(cols[idxItem] ?? '').trim() : '';
                     descricao = idxDesc >= 0 ? String(cols[idxDesc] ?? '').trim() : String(cols[1] ?? cols[0] ?? '').trim();
                     unidade = idxUn >= 0 ? String(cols[idxUn] ?? 'UN').trim() || 'UN' : 'UN';
                     quantidade = idxQtd >= 0 ? (parseNum(cols[idxQtd]) || 1) : 1;
@@ -939,8 +971,11 @@ function importarPlanilha(event) {
                     if (!descricao) continue;
                 }
                 if (!descricao || descricao.length < 2) continue;
+                // ignora linha de TOTAL
+                if (/^total$/i.test(descricao.trim())) continue;
                 itensLocais.push({
-                    numero_lote, numero_item: String(itensLocais.length + 1),
+                    numero_lote,
+                    numero_item: numero_item || String(itensLocais.length + 1),
                     descricao, unidade, quantidade, valor_referencia,
                     preco_custo: 0, margem_lucro: margem, preco_unitario: 0,
                     participar: true, ordem: itensLocais.length
