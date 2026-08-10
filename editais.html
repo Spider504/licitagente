@@ -277,7 +277,6 @@
                 <strong>Custo</strong> é sempre por produto. Em disputa <strong>por lote</strong>, a soma agrupa os produtos do mesmo lote.
                 Planilha: LOTE, DESCRIÇÃO, QUANTIDADE, VALOR UNITÁRIO. PDF: revise tudo que a IA preencher.
             </p>
-
             <div class="table-wrapper">
                 <table>
                     <thead>
@@ -299,14 +298,11 @@
                     <tbody id="listaItens"></tbody>
                 </table>
             </div>
-
             <div id="resumoLotes"></div>
-
             <div class="totais-bar">
                 <div>Produtos participando: <strong id="totalItens">0</strong></div>
                 <div>Total estimado: <strong id="totalGeral">R$ 0,00</strong></div>
             </div>
-
             <div class="actions-row">
                 <button type="button" class="btn btn-primary" onclick="salvarItens()">Salvar Itens</button>
             </div>
@@ -355,18 +351,22 @@ function showToast(msg, tipo) {
     t.className = 'toast ' + tipo + ' show';
     setTimeout(() => t.classList.remove('show'), 4500);
 }
+
 function fazerLogout() {
     localStorage.removeItem('supabase_token');
     localStorage.removeItem('supabase_user');
     window.location.href = "index.html";
 }
+
 function val(id) {
     const v = document.getElementById(id).value.trim();
     return v || null;
 }
+
 function isPorLote() {
     return document.getElementById('tipo_disputa').value === 'lote';
 }
+
 function parseNum(v) {
     if (v === null || v === undefined || v === '') return null;
     if (typeof v === 'number') return v;
@@ -376,6 +376,7 @@ function parseNum(v) {
     if (s.includes(',')) return parseFloat(s.replace(',', '.')) || null;
     return parseFloat(s) || null;
 }
+
 function money(n) {
     return 'R$ ' + (Number(n) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 }
@@ -385,11 +386,13 @@ function abrirFormulario(titulo) {
     document.getElementById('viewForm').classList.remove('hidden');
     document.getElementById('formTitulo').textContent = titulo || 'Novo Edital';
 }
+
 function voltarLista() {
     document.getElementById('viewForm').classList.add('hidden');
     document.getElementById('viewLista').classList.remove('hidden');
     carregarEditais();
 }
+
 function novoEdital() {
     editalAtualId = null;
     itensLocais = [];
@@ -490,7 +493,6 @@ async function salvarEdital(event) {
     };
     const ds = document.getElementById('data_sessao').value;
     if (ds) dados.data_sessao = new Date(ds).toISOString();
-
     try {
         const url = editalAtualId
             ? `${CONFIG_URL}/rest/v1/editais?id=eq.${editalAtualId}`
@@ -567,13 +569,11 @@ function renderItens() {
         atualizarTotais();
         return;
     }
-
     tbody.innerHTML = itensLocais.map((it, i) => {
         const unitFinal = parseFloat(it.preco_custo) > 0 ? calcUnitario(it) : (parseFloat(it.preco_unitario) || 0);
         const qtd = parseFloat(it.quantidade) || 0;
         const total = +(unitFinal * qtd).toFixed(2);
         const ref = it.valor_referencia != null && it.valor_referencia !== '' ? it.valor_referencia : '';
-
         return `<tr class="item-row">
             <td class="check-cell"><input type="checkbox" ${it.participar !== false ? 'checked' : ''} onchange="updItem(${i},'participar',this.checked)"></td>
             <td><input value="${it.numero_lote || ''}" onchange="updItem(${i},'numero_lote',this.value); renderItens()" style="width:55px"></td>
@@ -589,7 +589,6 @@ function renderItens() {
             <td><button class="btn btn-danger btn-sm" onclick="removerItem(${i})">✕</button></td>
         </tr>`;
     }).join('');
-
     renderResumoLotes();
     atualizarTotais();
 }
@@ -635,10 +634,12 @@ function updItem(i, field, value) {
         atualizarTotais();
     }
 }
+
 function recalc(i) {
     itensLocais[i].preco_unitario = calcUnitario(itensLocais[i]);
     renderItens();
 }
+
 function atualizarTotais() {
     let qtd = 0, soma = 0;
     itensLocais.forEach(it => {
@@ -650,6 +651,7 @@ function atualizarTotais() {
     document.getElementById('totalItens').textContent = qtd;
     document.getElementById('totalGeral').textContent = money(soma);
 }
+
 function adicionarItem() {
     const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
     const n = itensLocais.length + 1;
@@ -662,6 +664,7 @@ function adicionarItem() {
     });
     renderItens();
 }
+
 function removerItem(i) {
     itensLocais.splice(i, 1);
     renderItens();
@@ -713,22 +716,19 @@ async function salvarItens() {
     }
 }
 
-/* ===== PDF + OCR + GEMINI ===== */
+/* ===== PDF + OCR + IA ===== */
 async function extrairTextoPdf(file) {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
         'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-
     const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
     const maxPages = Math.min(pdf.numPages, 8);
     let texto = '';
-
     for (let p = 1; p <= maxPages; p++) {
         const page = await pdf.getPage(p);
         const content = await page.getTextContent();
         texto += content.items.map(i => i.str).join(' ') + '\n';
     }
     texto = texto.replace(/\s+/g, ' ').trim();
-
     if (texto.length < 200) {
         showToast('PDF escaneado. OCR em andamento (pode demorar)...', 'info');
         texto = '';
@@ -755,15 +755,22 @@ async function extrairPdfIa(event) {
 
     showToast('Lendo PDF...', 'info');
     try {
-        const texto = await extrairTextoPdf(file);
+        let texto = await extrairTextoPdf(file);
         if (!texto || texto.length < 40) {
             showToast('Não foi possível ler o PDF. Use Excel ou manual.', 'error');
             event.target.value = '';
             return;
         }
 
-        showToast('Enviando para IA (Gemini)...', 'info');
-        const res = await fetch(FUNCTION_URL, {
+        // evita 413 na Groq
+        if (texto.length > 8000) {
+            texto = texto.slice(0, 8000);
+            showToast('Texto longo: enviando só o início do edital...', 'info');
+        }
+
+        showToast('Enviando para IA...', 'info');
+
+        let res = await fetch(FUNCTION_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -772,13 +779,35 @@ async function extrairPdfIa(event) {
             },
             body: JSON.stringify({ texto, pdfNome: file.name })
         });
-        const json = await res.json();
+
+        // fallback se JWT inválido (Verify JWT OFF + publishable key)
+        if (res.status === 401) {
+            res = await fetch(FUNCTION_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${CONFIG_KEY}`,
+                    'apikey': CONFIG_KEY
+                },
+                body: JSON.stringify({ texto, pdfNome: file.name })
+            });
+        }
+
+        const json = await res.json().catch(() => ({}));
+
         if (!res.ok || !json.success) {
             console.error(json);
-            showToast(json.error || 'Falha na extração IA', 'error');
+            if (res.status === 401) {
+                showToast('Sessão inválida. Saia e entre de novo, ou desligue Verify JWT na function.', 'error');
+            } else if (res.status === 413) {
+                showToast('Texto ainda grande. Use Excel para os itens.', 'error');
+            } else {
+                showToast(json.error || 'Falha na extração IA', 'error');
+            }
             event.target.value = '';
             return;
         }
+
         aplicarDadosIa(json.dados);
         showToast('Dados extraídos. Revise antes de salvar!', 'success');
     } catch (e) {
@@ -880,21 +909,18 @@ function importarPlanilha(event) {
                 rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '' });
             }
             if (!rows.length) return showToast('Planilha vazia', 'error');
-
             const norm = (h) => String(h).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
             const header = rows[0].map(norm);
             const hasHeader = header.some(h => /lote|desc|qtd|quant|valor|unit|item/.test(h));
             const start = hasHeader ? 1 : 0;
             const idxLote = header.findIndex(h => /^lote$|n[oº]?\s*lote|numero\s*lote/.test(h));
             const idxDesc = header.findIndex(h => /desc|especific|objeto|produto/.test(h));
-            const idxQtd  = header.findIndex(h => /quantidade|qtd|quant/.test(h));
-            const idxUn   = header.findIndex(h => /^un$|^und$|unidade/.test(h));
-            const idxRef  = header.findIndex(h => /valor\s*unitario|vlr?\s*unit|preco\s*unitario|valor\s*unit/.test(h));
-
+            const idxQtd = header.findIndex(h => /quantidade|qtd|quant/.test(h));
+            const idxUn = header.findIndex(h => /^un$|^und$|unidade/.test(h));
+            const idxRef = header.findIndex(h => /valor\s*unitario|vlr?\s*unit|preco\s*unitario|valor\s*unit/.test(h));
             if (idxLote >= 0) document.getElementById('tipo_disputa').value = 'lote';
             const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
             let importados = 0;
-
             for (let r = start; r < rows.length; r++) {
                 const cols = rows[r];
                 if (!cols?.length) continue;
