@@ -101,10 +101,10 @@
         .btn-icon:hover { background: #eff6ff; border-color: #bfdbfe; }
         .check-cell { text-align: center; width: 36px; }
         .totais-bar {
-            display: flex; gap: 20px; flex-wrap: wrap; padding: 14px 16px;
+            display: flex; gap: 18px; flex-wrap: wrap; padding: 14px 16px;
             background: #f8fafc; border-radius: 10px; margin-top: 14px; font-size: 13px;
         }
-        .totais-bar strong { color: #1e3a8a; font-size: 15px; }
+        .totais-bar strong { color: #1e3a8a; font-size: 14px; }
         .lote-box {
             margin-top: 12px; padding: 12px 14px; background: #eff6ff; border: 1px solid #bfdbfe;
             border-radius: 10px; font-size: 13px;
@@ -284,11 +284,12 @@
                     </label>
                     <button type="button" class="btn btn-secondary btn-sm" onclick="abrirPaste()">📋 Colar</button>
                     <button type="button" class="btn btn-primary btn-sm" onclick="adicionarItem()">+ Produto</button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="limparItens()">🗑 Limpar todos</button>
                 </div>
             </div>
             <p class="hint">
-                <strong>Aviso/Edital (IA)</strong> preenche só o cabeçalho (revise data e objeto).
-                Produtos: <strong>TR/Excel</strong>, Colar ou + Produto. Em lote/grupo, a soma agrupa o mesmo lote. Use <strong>✎</strong> na descrição.
+                <strong>Aviso/Edital (IA)</strong> = só cabeçalho. Produtos: <strong>TR/Excel</strong>, Colar ou + Produto.
+                Totais: referência do edital, custo, venda e lucro. Use <strong>✎</strong> na descrição.
             </p>
             <div class="table-wrapper">
                 <table>
@@ -313,8 +314,11 @@
             </div>
             <div id="resumoLotes"></div>
             <div class="totais-bar">
-                <div>Produtos participando: <strong id="totalItens">0</strong></div>
-                <div>Total estimado: <strong id="totalGeral">R$ 0,00</strong></div>
+                <div>Produtos: <strong id="totalItens">0</strong></div>
+                <div>Total referência (edital): <strong id="totalRef">R$ 0,00</strong></div>
+                <div>Total custo: <strong id="totalCusto">R$ 0,00</strong></div>
+                <div>Total venda: <strong id="totalGeral">R$ 0,00</strong></div>
+                <div>Total lucro: <strong id="totalLucro">R$ 0,00</strong></div>
             </div>
             <div class="actions-row">
                 <button type="button" class="btn btn-primary" onclick="salvarItens()">Salvar Itens</button>
@@ -405,12 +409,10 @@ function esc(s) {
     return String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 }
 
-/** Data sem UTC — evita 03:00 e dia invertido */
 function preencherDataSessao(valor) {
     if (!valor) return;
     let dia, mes, ano, hora = '08', min = '00';
     const s = String(valor).trim();
-
     let m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{1,2}):(\d{2}))?/);
     if (m) {
         dia = m[1]; mes = m[2]; ano = m[3];
@@ -628,7 +630,7 @@ function renderItens() {
             </td>
             <td><input value="${esc(it.unidade || 'UN')}" onchange="updItem(${i},'unidade',this.value)" style="width:48px"></td>
             <td><input type="number" step="0.01" value="${it.quantidade || 1}" onchange="updItem(${i},'quantidade',this.value); renderItens()" style="width:70px"></td>
-            <td><input type="number" step="0.01" value="${ref}" onchange="updItem(${i},'valor_referencia',this.value)" style="width:75px"></td>
+            <td><input type="number" step="0.01" value="${ref}" onchange="updItem(${i},'valor_referencia',this.value); atualizarTotais()" style="width:75px"></td>
             <td><input type="number" step="0.01" value="${it.preco_custo || 0}" onchange="updItem(${i},'preco_custo',this.value); recalc(${i})" style="width:75px"></td>
             <td><input type="number" step="0.01" value="${it.margem_lucro ?? document.getElementById('margem_padrao').value}" onchange="updItem(${i},'margem_lucro',this.value); recalc(${i})" style="width:58px"></td>
             <td><input type="number" step="0.01" value="${unitFinal}" onchange="updItem(${i},'preco_unitario',this.value); renderItens()" style="width:75px"></td>
@@ -695,17 +697,28 @@ function recalc(i) {
     itensLocais[i].preco_unitario = calcUnitario(itensLocais[i]);
     renderItens();
 }
+
 function atualizarTotais() {
-    let qtd = 0, soma = 0;
+    let qtd = 0, somaRef = 0, somaCusto = 0, somaVenda = 0;
     itensLocais.forEach(it => {
         if (it.participar === false) return;
         qtd++;
-        const unit = parseFloat(it.preco_custo) > 0 ? calcUnitario(it) : (parseFloat(it.preco_unitario) || 0);
-        soma += unit * (parseFloat(it.quantidade) || 0);
+        const quantidade = parseFloat(it.quantidade) || 0;
+        const ref = parseFloat(it.valor_referencia) || 0;
+        const custo = parseFloat(it.preco_custo) || 0;
+        const unitVenda = custo > 0 ? calcUnitario(it) : (parseFloat(it.preco_unitario) || 0);
+        somaRef += ref * quantidade;
+        somaCusto += custo * quantidade;
+        somaVenda += unitVenda * quantidade;
     });
+    const lucro = somaVenda - somaCusto;
     document.getElementById('totalItens').textContent = qtd;
-    document.getElementById('totalGeral').textContent = money(soma);
+    document.getElementById('totalRef').textContent = money(somaRef);
+    document.getElementById('totalCusto').textContent = money(somaCusto);
+    document.getElementById('totalGeral').textContent = money(somaVenda);
+    document.getElementById('totalLucro').textContent = money(lucro);
 }
+
 function adicionarItem() {
     const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
     const n = itensLocais.length + 1;
@@ -721,6 +734,16 @@ function adicionarItem() {
 function removerItem(i) {
     itensLocais.splice(i, 1);
     renderItens();
+}
+function limparItens() {
+    if (!itensLocais.length) {
+        showToast('A tabela já está vazia', 'info');
+        return;
+    }
+    if (!confirm('Apagar todos os produtos da tabela?')) return;
+    itensLocais = [];
+    renderItens();
+    showToast('Todos os produtos foram removidos', 'success');
 }
 
 async function salvarItens() {
@@ -813,7 +836,6 @@ async function extrairPdfIa(event) {
             return;
         }
         if (texto.length > 8000) texto = texto.slice(0, 8000);
-
         showToast('Enviando para IA...', 'info');
         let res = await fetch(FUNCTION_URL, {
             method: 'POST',
@@ -867,10 +889,7 @@ function aplicarDadosIa(d, opcoes = {}) {
         document.getElementById('tipo_disputa').value = d.tipo_disputa;
     }
     if (d.data_sessao) preencherDataSessao(d.data_sessao);
-
-    // Aviso/Edital: não preenche produtos
     if (opcoes.soCabecalho) return;
-
     if (Array.isArray(d.itens) && d.itens.length) {
         const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
         d.itens.forEach(it => {
