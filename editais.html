@@ -176,7 +176,7 @@
         <div class="page-header">
             <div>
                 <h1 id="formTitulo">Novo Edital</h1>
-                <p>Aviso/Edital (IA) = só cabeçalho · TR/Excel = produtos. Revise antes de salvar.</p>
+                <p>Aviso/Edital (IA) = só cabeçalho · TR/Excel = produtos. Revise data e objeto antes de salvar.</p>
             </div>
             <button class="btn btn-secondary" onclick="voltarLista()">← Voltar</button>
         </div>
@@ -287,8 +287,8 @@
                 </div>
             </div>
             <p class="hint">
-                <strong>Aviso/Edital (IA)</strong> preenche só o cabeçalho. Produtos vêm de <strong>TR/Excel</strong>, Colar ou + Produto.
-                Em <strong>Por Lote/Grupo</strong>, a soma agrupa o mesmo lote. Use <strong>✎</strong> para ver a descrição completa.
+                <strong>Aviso/Edital (IA)</strong> preenche só o cabeçalho (revise data e objeto).
+                Produtos: <strong>TR/Excel</strong>, Colar ou + Produto. Em lote/grupo, a soma agrupa o mesmo lote. Use <strong>✎</strong> na descrição.
             </p>
             <div class="table-wrapper">
                 <table>
@@ -405,6 +405,27 @@ function esc(s) {
     return String(s || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
 }
 
+/** Data sem UTC — evita 03:00 e dia invertido */
+function preencherDataSessao(valor) {
+    if (!valor) return;
+    let dia, mes, ano, hora = '08', min = '00';
+    const s = String(valor).trim();
+
+    let m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})(?:[ T](\d{1,2}):(\d{2}))?/);
+    if (m) {
+        dia = m[1]; mes = m[2]; ano = m[3];
+        if (m[4] != null) { hora = String(m[4]).padStart(2, '0'); min = m[5]; }
+    } else {
+        m = s.match(/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{1,2}):(\d{2}))?/);
+        if (m) {
+            ano = m[1]; mes = m[2]; dia = m[3];
+            if (m[4] != null) { hora = String(m[4]).padStart(2, '0'); min = m[5]; }
+        }
+    }
+    if (!dia || !mes || !ano) return;
+    document.getElementById('data_sessao').value = `${ano}-${mes}-${dia}T${hora}:${min}`;
+}
+
 function abrirFormulario(titulo) {
     document.getElementById('viewLista').classList.add('hidden');
     document.getElementById('viewForm').classList.remove('hidden');
@@ -484,7 +505,7 @@ async function editarEdital(id) {
         document.getElementById('margem_padrao').value = e.margem_padrao ?? 20;
         document.getElementById('impostos_padrao').value = e.impostos_padrao ?? 0;
         document.getElementById('frete_padrao').value = e.frete_padrao ?? 0;
-        if (e.data_sessao) document.getElementById('data_sessao').value = new Date(e.data_sessao).toISOString().slice(0, 16);
+        if (e.data_sessao) preencherDataSessao(e.data_sessao);
         abrirFormulario(`Edital ${e.numero || ''}`.trim());
         await carregarItens(e.id);
     } catch (err) {
@@ -637,10 +658,7 @@ function aplicarDesc() {
 
 function renderResumoLotes() {
     const box = document.getElementById('resumoLotes');
-    if (!isPorLote()) {
-        box.innerHTML = '';
-        return;
-    }
+    if (!isPorLote()) { box.innerHTML = ''; return; }
     const mapa = {};
     itensLocais.forEach(it => {
         if (it.participar === false) return;
@@ -671,10 +689,7 @@ function updItem(i, field, value) {
     else if (['quantidade','preco_custo','margem_lucro','impostos','frete_outros','preco_unitario','valor_referencia'].includes(field))
         itensLocais[i][field] = value === '' || value === null ? null : (parseFloat(value) || 0);
     else itensLocais[i][field] = value;
-    if (field === 'participar') {
-        renderResumoLotes();
-        atualizarTotais();
-    }
+    if (field === 'participar') { renderResumoLotes(); atualizarTotais(); }
 }
 function recalc(i) {
     itensLocais[i].preco_unitario = calcUnitario(itensLocais[i]);
@@ -754,7 +769,6 @@ async function salvarItens() {
     }
 }
 
-/* ===== PDF: só CABEÇALHO ===== */
 async function extrairTextoPdf(file) {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
         'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
@@ -768,7 +782,7 @@ async function extrairTextoPdf(file) {
     }
     texto = texto.replace(/\s+/g, ' ').trim();
     if (texto.length < 200) {
-        showToast('PDF escaneado. OCR em andamento (pode demorar)...', 'info');
+        showToast('PDF escaneado. OCR em andamento...', 'info');
         texto = '';
         for (let p = 1; p <= Math.min(pdf.numPages, 3); p++) {
             const page = await pdf.getPage(p);
@@ -829,9 +843,8 @@ async function extrairPdfIa(event) {
             event.target.value = '';
             return;
         }
-        // IMPORTANTE: só cabeçalho — não mexe na tabela
         aplicarDadosIa(json.dados, { soCabecalho: true });
-        showToast('Cabeçalho preenchido. Produtos: use TR/Excel.', 'success');
+        showToast('Cabeçalho preenchido. Revise data e objeto. Produtos: TR/Excel.', 'success');
     } catch (e) {
         console.error(e);
         showToast('Erro ao processar PDF', 'error');
@@ -853,14 +866,9 @@ function aplicarDadosIa(d, opcoes = {}) {
     if (d.tipo_disputa === 'lote' || d.tipo_disputa === 'item') {
         document.getElementById('tipo_disputa').value = d.tipo_disputa;
     }
-    if (d.data_sessao) {
-        try {
-            const dt = new Date(d.data_sessao);
-            if (!isNaN(dt)) document.getElementById('data_sessao').value = dt.toISOString().slice(0, 16);
-        } catch (_) {}
-    }
+    if (d.data_sessao) preencherDataSessao(d.data_sessao);
 
-    // Aviso/Edital: para aqui (não preenche produtos)
+    // Aviso/Edital: não preenche produtos
     if (opcoes.soCabecalho) return;
 
     if (Array.isArray(d.itens) && d.itens.length) {
