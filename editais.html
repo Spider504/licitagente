@@ -76,7 +76,7 @@
         .toast {
             position: fixed; top: 20px; right: 20px; padding: 14px 20px; border-radius: 10px;
             font-size: 13px; font-weight: 500; color: white; z-index: 9999;
-            transform: translateX(120%); transition: transform 0.3s ease; max-width: 380px;
+            transform: translateX(120%); transition: transform 0.3s ease; max-width: 400px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.2);
         }
         .toast.show { transform: translateX(0); }
@@ -143,7 +143,7 @@
         <div class="page-header">
             <div>
                 <h1>Meus Editais</h1>
-                <p>Cabeçalho pelo PNCP · itens pelo PDF (LlamaParse) ou Excel.</p>
+                <p>PNCP (cabeçalho) · PDF TR via LlamaParse Extract (itens) · Excel plano B</p>
             </div>
             <button class="btn btn-primary" onclick="novoEdital()">+ Novo Edital</button>
         </div>
@@ -173,25 +173,23 @@
         <div class="page-header">
             <div>
                 <h1 id="formTitulo">Novo Edital</h1>
-                <p>1) PNCP (ID/link) → cabeçalho · 2) PDF TR → itens · 3) Revisar e salvar</p>
+                <p>1) PNCP → cabeçalho · 2) PDF TR (LlamaParse) → itens · 3) Revisar e salvar</p>
             </div>
             <button class="btn btn-secondary" onclick="voltarLista()">← Voltar</button>
         </div>
 
-        <!-- PNCP cabeçalho -->
         <div class="card">
             <h2>🔎 PNCP — Cabeçalho</h2>
-            <p class="hint">Cole o <strong>ID da contratação</strong> ou o <strong>link</strong> da página no pncp.gov.br (Brasil inteiro).</p>
+            <p class="hint">ID ou link do pncp.gov.br. Se a function <code>buscar-pncp</code> não existir, preencha manual.</p>
             <div class="form-group full">
                 <label>ID PNCP ou link</label>
-                <input type="text" id="pncp_entrada" placeholder="Ex: 12345678000199-1-15/2026 ou https://pncp.gov.br/...">
+                <input type="text" id="pncp_entrada" placeholder="Ex: https://pncp.gov.br/app/editais/...">
             </div>
             <div class="actions-row">
                 <button type="button" class="btn btn-primary" id="btnPncp" onclick="preencherCabecalhoPncp()">Preencher cabeçalho</button>
             </div>
         </div>
 
-        <!-- Dados do edital -->
         <div class="card">
             <h2>📄 Dados do Edital</h2>
             <form id="formEdital" onsubmit="salvarEdital(event)">
@@ -199,7 +197,7 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Modalidade</label>
-                        <input type="text" id="modalidade" placeholder="Pregão, Dispensa...">
+                        <input type="text" id="modalidade">
                     </div>
                     <div class="form-group">
                         <label>Número</label>
@@ -211,7 +209,7 @@
                     </div>
                     <div class="form-group">
                         <label>UF</label>
-                        <input type="text" id="uf" maxlength="2" placeholder="SP, MA...">
+                        <input type="text" id="uf" maxlength="2">
                     </div>
                     <div class="form-group full">
                         <label>Órgão</label>
@@ -281,7 +279,6 @@
             </form>
         </div>
 
-        <!-- Produtos -->
         <div class="card" id="cardItens">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
                 <h2 style="margin:0;">📦 Produtos</h2>
@@ -300,8 +297,8 @@
                 </div>
             </div>
             <p class="hint">
-                Preferência: <strong>PDF TR</strong> via LlamaParse. Excel/Colar = plano B.
-                Aguarde 30–90s na extração. Sempre revise antes de salvar.
+                <strong>PDF TR</strong> usa LlamaParse Extract (JSON). Pode levar 1–2 min.
+                Excel/Colar = plano B. Sempre revise antes de salvar.
             </p>
             <div class="table-wrapper">
                 <table>
@@ -342,7 +339,7 @@
 <div class="modal-overlay" id="modalPaste">
     <div class="modal-box">
         <h3 style="margin-bottom:8px;">Colar tabela</h3>
-        <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Lote | Descrição | Un | Qtd | Valor ref. (Tab ou ;)</p>
+        <p style="font-size:13px;color:#64748b;margin-bottom:12px;">Lote | Descrição | Un | Qtd | Valor ref.</p>
         <textarea id="pasteArea" style="width:100%;min-height:140px;padding:12px;border:2px solid #e5e7eb;border-radius:8px;font-family:inherit;font-size:13px;"></textarea>
         <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
             <button class="btn btn-secondary" onclick="fecharPaste()">Cancelar</button>
@@ -389,7 +386,7 @@ function showToast(msg, tipo) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.className = 'toast ' + tipo + ' show';
-    setTimeout(() => t.classList.remove('show'), 5000);
+    setTimeout(() => t.classList.remove('show'), 5500);
 }
 function fazerLogout() {
     localStorage.removeItem('supabase_token');
@@ -406,8 +403,7 @@ function isPorLote() {
 function parseNum(v) {
     if (v === null || v === undefined || v === '') return null;
     if (typeof v === 'number') return v;
-    const s = String(v).replace(/\s/g, '').replace(/R\$/i, '');
-    if (/[a-zA-Z]/.test(s) && !/,/.test(s) && !/\d/.test(s)) return null;
+    let s = String(v).replace(/\s/g, '').replace(/R\$/i, '');
     if (s.includes(',') && s.includes('.')) return parseFloat(s.replace(/\./g, '').replace(',', '.')) || null;
     if (s.includes(',')) return parseFloat(s.replace(',', '.')) || null;
     return parseFloat(s) || null;
@@ -425,7 +421,6 @@ function calcUnitario(it) {
     const frete = parseFloat(it.frete_outros) || parseFloat(document.getElementById('frete_padrao').value) || 0;
     return +(custo * (1 + margem / 100) * (1 + imp / 100) * (1 + frete / 100)).toFixed(4);
 }
-
 function preencherDataSessao(valor) {
     if (!valor) return;
     let dia, mes, ano, hora = '08', min = '00';
@@ -468,119 +463,134 @@ function novoEdital() {
     renderItens();
 }
 
-/* ========== PNCP cabeçalho ========== */
+async function apiFetch(url, options = {}) {
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+        'apikey': CONFIG_KEY,
+        ...(options.headers || {})
+    };
+    let res = await fetch(url, { ...options, headers });
+    if (res.status === 401) {
+        headers.Authorization = `Bearer ${CONFIG_KEY}`;
+        res = await fetch(url, { ...options, headers });
+    }
+    return res;
+}
+
+/* ========== PNCP ========== */
 async function preencherCabecalhoPncp() {
     const entrada = document.getElementById('pncp_entrada').value.trim();
-    if (!entrada) {
-        showToast('Cole o ID PNCP ou o link', 'error');
-        return;
-    }
+    if (!entrada) return showToast('Cole o ID ou link PNCP', 'error');
     const btn = document.getElementById('btnPncp');
     if (btn) { btn.disabled = true; btn.textContent = 'Consultando...'; }
-
     try {
-        let res = await fetch(FUNCTION_PNCP, {
+        const res = await apiFetch(FUNCTION_PNCP, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-                'apikey': CONFIG_KEY
-            },
             body: JSON.stringify({ entrada })
         });
-        let json = await res.json().catch(() => ({}));
-        if (res.status === 401) {
-            res = await fetch(FUNCTION_PNCP, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${CONFIG_KEY}`,
-                    'apikey': CONFIG_KEY
-                },
-                body: JSON.stringify({ entrada })
-            });
-            json = await res.json().catch(() => ({}));
-        }
+        const json = await res.json().catch(() => ({}));
         if (!res.ok || !json.success) {
             console.error(json);
-            showToast(json.error || 'PNCP não encontrado (function buscar-pncp?)', 'error');
+            showToast(json.error || 'PNCP indisponível — preencha manual', 'error');
             return;
         }
-        aplicarDadosPncp(json.dados);
-        showToast('Cabeçalho preenchido. Revise e salve.', 'success');
+        aplicarCabecalho(json.dados, true);
+        showToast('Cabeçalho PNCP aplicado. Revise.', 'success');
     } catch (e) {
         console.error(e);
-        showToast('Erro de conexão PNCP. Se a function não existir, preencha manual.', 'error');
+        showToast('Function buscar-pncp ausente ou CORS — use manual', 'error');
     } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Preencher cabeçalho'; }
     }
 }
 
-function aplicarDadosPncp(d) {
+function aplicarCabecalho(d, forcar) {
     if (!d) return;
-    if (d.modalidade) document.getElementById('modalidade').value = d.modalidade;
-    if (d.numero) document.getElementById('numero').value = d.numero;
-    if (d.processo) document.getElementById('processo').value = d.processo;
-    if (d.orgao) document.getElementById('orgao').value = d.orgao;
-    if (d.cnpj_orgao) document.getElementById('cnpj_orgao').value = d.cnpj_orgao;
-    if (d.uf) document.getElementById('uf').value = d.uf;
-    if (d.objeto) document.getElementById('objeto').value = d.objeto;
+    const set = (id, v) => {
+        if (v == null || v === '') return;
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (forcar || !el.value) el.value = v;
+    };
+    set('modalidade', d.modalidade);
+    set('numero', d.numero);
+    set('processo', d.processo);
+    set('orgao', d.orgao);
+    set('cnpj_orgao', d.cnpj_orgao);
+    set('uf', d.uf);
+    set('objeto', d.objeto);
+    set('criterio_julgamento', d.criterio_julgamento);
+    set('modo_disputa', d.modo_disputa);
+    set('plataforma', d.plataforma || 'PNCP');
     if (d.valor_estimado != null && d.valor_estimado !== '') {
-        document.getElementById('valor_estimado').value = d.valor_estimado;
+        if (forcar || !document.getElementById('valor_estimado').value)
+            document.getElementById('valor_estimado').value = d.valor_estimado;
     }
-    if (d.criterio_julgamento) document.getElementById('criterio_julgamento').value = d.criterio_julgamento;
-    if (d.modo_disputa) document.getElementById('modo_disputa').value = d.modo_disputa;
-    document.getElementById('plataforma').value = d.plataforma || 'PNCP';
+    if (d.tipo_disputa === 'lote' || d.tipo_disputa === 'item')
+        document.getElementById('tipo_disputa').value = d.tipo_disputa;
     if (d.data_sessao) preencherDataSessao(d.data_sessao);
 }
 
-/* ========== LlamaParse itens PDF ========== */
+/* ========== LlamaParse Extract → JSON ========== */
 async function extrairItensPdf(event) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
 
-    showToast('LlamaParse agentic lendo o PDF... (30–90s)', 'info');
+    showToast('LlamaParse Extract (agentic)... aguarde 1–2 min', 'info');
 
     try {
         const base64 = await fileToBase64(file);
-        let res = await fetch(FUNCTION_ITENS_PDF, {
+        const res = await apiFetch(FUNCTION_ITENS_PDF, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-                'apikey': CONFIG_KEY
-            },
             body: JSON.stringify({ pdfBase64: base64, pdfNome: file.name })
         });
-        let json = await res.json().catch(() => ({}));
-
-        if (res.status === 401) {
-            res = await fetch(FUNCTION_ITENS_PDF, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${CONFIG_KEY}`,
-                    'apikey': CONFIG_KEY
-                },
-                body: JSON.stringify({ pdfBase64: base64, pdfNome: file.name })
-            });
-            json = await res.json().catch(() => ({}));
-        }
+        const json = await res.json().catch(() => ({}));
 
         if (!res.ok || !json.success) {
             console.error(json);
-            showToast(json.error || 'Falha na extração PDF', 'error');
+            showToast(json.error || 'Falha Extract', 'error');
             event.target.value = '';
             return;
         }
 
-        const qtd = importarItensDoMarkdown(json.markdown || '');
-        if (qtd > 0) {
-            showToast(`✅ ${qtd} item(ns) do PDF. Revise e salve.`, 'success');
+        const d = json.dados || {};
+        // preenche vazios do cabeçalho com o que o TR trouxe
+        aplicarCabecalho(d, false);
+
+        const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
+        const lista = Array.isArray(d.itens) ? d.itens : [];
+        let importados = 0;
+
+        lista.forEach((it) => {
+            const descricao = String(it.descricao || '').trim();
+            if (descricao.length < 2) return;
+            itensLocais.push({
+                numero_lote: it.lote != null ? String(it.lote) : '',
+                numero_item: it.item != null ? String(it.item) : String(itensLocais.length + 1),
+                descricao,
+                unidade: it.unidade || 'UN',
+                quantidade: it.quantidade != null ? Number(it.quantidade) : 1,
+                valor_referencia: it.valor_unitario_referencia != null
+                    ? Number(it.valor_unitario_referencia)
+                    : null,
+                preco_custo: 0,
+                margem_lucro: margem,
+                preco_unitario: 0,
+                participar: true,
+                ordem: itensLocais.length
+            });
+            importados++;
+        });
+
+        if (importados > 0) {
+            if (lista.some(x => x.lote)) document.getElementById('tipo_disputa').value = 'lote';
+            renderItens();
+            showToast(`✅ ${importados} item(ns) via LlamaParse Extract`, 'success');
         } else {
-            console.log('Preview markdown:', json.preview || (json.markdown || '').slice(0, 800));
-            showToast('PDF lido, tabela não mapeada auto. Veja F12 console.', 'info');
+            console.log('Extract resposta:', json);
+            showToast('Extract OK, itens vazios. Veja F12.', 'info');
         }
     } catch (e) {
         console.error(e);
@@ -601,78 +611,7 @@ function fileToBase64(file) {
     });
 }
 
-function importarItensDoMarkdown(md) {
-    if (!md) return 0;
-    const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
-    let importados = 0;
-    const linhas = md.split(/\r?\n/);
-    let headerCols = null;
-
-    for (let i = 0; i < linhas.length; i++) {
-        const line = linhas[i].trim();
-        if (!line.includes('|')) continue;
-
-        const cells = line.split('|').map(c => c.trim()).filter((c, idx, arr) =>
-            !(idx === 0 && c === '') && !(idx === arr.length - 1 && c === '')
-        );
-        if (cells.length < 2) continue;
-        if (cells.every(c => /^:?-+:?$/.test(c))) continue;
-
-        const low = cells.map(c => c.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
-        const pareceHeader = low.some(c => /lote|item|desc|qtd|quant|unid|valor|preco|especific/.test(c));
-
-        if (pareceHeader) {
-            headerCols = low;
-            if (low.some(c => /lote|grupo/.test(c))) document.getElementById('tipo_disputa').value = 'lote';
-            continue;
-        }
-
-        let numero_lote = '', numero_item = '', descricao = '', unidade = 'UN', quantidade = 1, valor_referencia = null;
-
-        if (headerCols) {
-            const get = (names) => {
-                for (const n of names) {
-                    const idx = headerCols.findIndex(h => h.includes(n));
-                    if (idx >= 0 && cells[idx] != null) return cells[idx];
-                }
-                return '';
-            };
-            descricao = get(['desc', 'especific', 'objeto', 'produto', 'material']) || cells[1] || cells[0];
-            numero_lote = get(['lote', 'grupo']);
-            numero_item = get(['item']);
-            unidade = get(['unid', 'un', 'medida']) || 'UN';
-            quantidade = parseNum(get(['qtd', 'quant'])) || 1;
-            valor_referencia = parseNum(get(['valor unit', 'vlr unit', 'preco unit', 'unitario', 'referencia', 'valor', 'preco']));
-        } else if (cells.length >= 4) {
-            numero_lote = cells[0];
-            descricao = cells[1];
-            unidade = cells[2] || 'UN';
-            quantidade = parseNum(cells[3]) || 1;
-            valor_referencia = cells[4] != null ? parseNum(cells[4]) : null;
-        } else continue;
-
-        if (!descricao || descricao.length < 2 || /^total$/i.test(descricao.trim())) continue;
-
-        itensLocais.push({
-            numero_lote: numero_lote || '',
-            numero_item: numero_item || String(itensLocais.length + 1),
-            descricao: descricao.trim(),
-            unidade: unidade || 'UN',
-            quantidade,
-            valor_referencia,
-            preco_custo: 0,
-            margem_lucro: margem,
-            preco_unitario: 0,
-            participar: true,
-            ordem: itensLocais.length
-        });
-        importados++;
-    }
-    if (importados > 0) renderItens();
-    return importados;
-}
-
-/* ========== CRUD ========== */
+/* ========== Lista / CRUD ========== */
 async function carregarEditais() {
     try {
         const res = await fetch(`${CONFIG_URL}/rest/v1/editais?select=id,numero,orgao,uf,modalidade,status&order=created_at.desc`, {
@@ -823,18 +762,15 @@ async function salvarEdital(event) {
 async function excluirEdital(id) {
     if (!confirm('Excluir este edital e seus itens?')) return;
     await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${id}`, {
-        method: 'DELETE',
-        headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+        method: 'DELETE', headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
     });
     await fetch(`${CONFIG_URL}/rest/v1/editais?id=eq.${id}`, {
-        method: 'DELETE',
-        headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+        method: 'DELETE', headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
     });
     showToast('Excluído', 'success');
     carregarEditais();
 }
 
-/* ========== Tabela itens ========== */
 function renderItens() {
     const tbody = document.getElementById('listaItens');
     if (!itensLocais.length) {
@@ -895,8 +831,7 @@ function renderResumoLotes() {
         if (it.participar === false) return;
         const lote = String(it.numero_lote || '—');
         const unit = parseFloat(it.preco_custo) > 0 ? calcUnitario(it) : (parseFloat(it.preco_unitario) || 0);
-        const total = unit * (parseFloat(it.quantidade) || 0);
-        mapa[lote] = (mapa[lote] || 0) + total;
+        mapa[lote] = (mapa[lote] || 0) + unit * (parseFloat(it.quantidade) || 0);
     });
     const keys = Object.keys(mapa).sort((a, b) => {
         const na = parseFloat(a), nb = parseFloat(b);
@@ -972,8 +907,7 @@ async function salvarItens() {
     if (!editalAtualId) return showToast('Salve o edital primeiro', 'error');
     try {
         await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${editalAtualId}`, {
-            method: 'DELETE',
-            headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
+            method: 'DELETE', headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
         });
         if (!itensLocais.length) {
             showToast('Itens salvos (vazio)', 'success');
