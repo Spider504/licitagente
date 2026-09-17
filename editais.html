@@ -55,6 +55,7 @@
         .badge.vencido { background: #d1fae5; color: #065f46; }
         .badge.perdido { background: #fee2e2; color: #991b1b; }
         .badge.arquivado { background: #f1f5f9; color: #94a3b8; }
+        .badge.aberta { background: #d1fae5; color: #065f46; }
         .table-wrapper { overflow-x: auto; border-radius: 10px; border: 1px solid #e2e8f0; }
         table { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 960px; }
         th { background: #f8fafc; padding: 10px 12px; text-align: left; font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0; white-space: nowrap; }
@@ -111,15 +112,39 @@
         .lote-line { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #dbeafe; }
         .lote-line:last-child { border-bottom: none; font-weight: 700; }
         .hint { font-size: 12px; color: #64748b; margin-bottom: 12px; line-height: 1.45; }
+        .search-row {
+            display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-bottom: 12px;
+        }
+        .filters-row {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px;
+        }
+        .pncp-card {
+            border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px;
+            margin-bottom: 12px; cursor: pointer; transition: all 0.15s; background: #fff;
+        }
+        .pncp-card:hover { border-color: #93c5fd; box-shadow: 0 4px 12px rgba(37,99,235,0.08); }
+        .pncp-card h3 { font-size: 14px; color: #0f172a; margin-bottom: 6px; line-height: 1.35; }
+        .pncp-meta { font-size: 12px; color: #64748b; display: flex; flex-wrap: wrap; gap: 8px 14px; margin-top: 8px; }
+        .pncp-meta strong { color: #1e3a8a; }
+        .pncp-orgao { font-size: 12px; font-weight: 600; color: #334155; margin-bottom: 4px; }
+        .result-count { font-size: 13px; color: #64748b; margin-bottom: 12px; }
         .modal-overlay {
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5);
             z-index: 10000; align-items: center; justify-content: center; padding: 20px;
         }
         .modal-overlay.show { display: flex; }
-        .modal-box { background: white; border-radius: 16px; padding: 24px; max-width: 640px; width: 100%; }
+        .modal-box { background: white; border-radius: 16px; padding: 24px; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; }
         .modal-box.wide { max-width: 720px; }
-        @media (max-width: 700px) {
-            .form-grid { grid-template-columns: 1fr; }
+        .detail-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0;
+            font-size: 13px;
+        }
+        .detail-grid .full { grid-column: 1 / -1; }
+        .detail-label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; margin-bottom: 2px; }
+        .detail-value { color: #0f172a; line-height: 1.4; }
+        @media (max-width: 800px) {
+            .form-grid, .filters-row, .detail-grid { grid-template-columns: 1fr; }
+            .search-row { grid-template-columns: 1fr; }
             .container { padding: 20px 14px 50px; }
         }
     </style>
@@ -143,7 +168,7 @@
         <div class="page-header">
             <div>
                 <h1>Meus Editais</h1>
-                <p>PNCP (cabeçalho) · PDF TR via LlamaParse Extract (itens) · Excel plano B</p>
+                <p>Busque no PNCP · importe cabeçalho · extraia itens do PDF</p>
             </div>
             <button class="btn btn-primary" onclick="novoEdital()">+ Novo Edital</button>
         </div>
@@ -173,27 +198,72 @@
         <div class="page-header">
             <div>
                 <h1 id="formTitulo">Novo Edital</h1>
-                <p>1) PNCP → cabeçalho · 2) PDF TR (LlamaParse) → itens · 3) Revisar e salvar</p>
+                <p>1) Buscar PNCP · 2) Ver detalhe / edital · 3) Usar no formulário · 4) Itens (PDF)</p>
             </div>
             <button class="btn btn-secondary" onclick="voltarLista()">← Voltar</button>
         </div>
 
+        <!-- BUSCA PNCP -->
         <div class="card">
-            <h2>🔎 PNCP — Cabeçalho</h2>
-            <p class="hint">ID ou link do pncp.gov.br. Se a function <code>buscar-pncp</code> não existir, preencha manual.</p>
-            <div class="form-group full">
-                <label>ID PNCP ou link</label>
-                <input type="text" id="pncp_entrada" placeholder="Ex: https://pncp.gov.br/app/editais/...">
+            <h2>🔎 Buscar licitações (PNCP)</h2>
+            <p class="hint">
+                Dados oficiais do Portal Nacional. Clique no resultado para ver objeto, datas e link do edital.
+                Palavra-chave filtra o objeto na lista retornada pela API.
+            </p>
+            <div class="search-row">
+                <input type="text" id="busca_palavra" placeholder="Palavra-chave (ex: teclado) ou cole o link/ID PNCP">
+                <button type="button" class="btn btn-primary" id="btnBuscarPncp" onclick="executarBuscaPncp()">Pesquisar</button>
             </div>
-            <div class="actions-row">
-                <button type="button" class="btn btn-primary" id="btnPncp" onclick="preencherCabecalhoPncp()">Preencher cabeçalho</button>
+            <div class="filters-row">
+                <div class="form-group">
+                    <label>UF</label>
+                    <select id="busca_uf">
+                        <option value="">Todos os estados</option>
+                        <option>AC</option><option>AL</option><option>AP</option><option>AM</option>
+                        <option>BA</option><option>CE</option><option>DF</option><option>ES</option>
+                        <option>GO</option><option>MA</option><option>MT</option><option>MS</option>
+                        <option>MG</option><option>PA</option><option>PB</option><option>PR</option>
+                        <option>PE</option><option>PI</option><option>RJ</option><option>RN</option>
+                        <option>RS</option><option>RO</option><option>RR</option><option>SC</option>
+                        <option>SP</option><option>SE</option><option>TO</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Modalidade</label>
+                    <select id="busca_modalidade">
+                        <option value="">Todas (quando a API permitir)</option>
+                        <option value="6">Pregão Eletrônico</option>
+                        <option value="8">Dispensa de Licitação</option>
+                        <option value="9">Inexigibilidade</option>
+                        <option value="4">Concorrência Eletrônica</option>
+                        <option value="7">Pregão Presencial</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Situação</label>
+                    <select id="busca_abertas">
+                        <option value="1">Propostas abertas</option>
+                        <option value="0">Publicadas (últimos 30 dias)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <label style="display:flex;align-items:center;gap:8px;font-weight:500;cursor:pointer;">
+                        <input type="checkbox" id="busca_e_link" style="width:auto">
+                        Tratar campo como link/ID
+                    </label>
+                </div>
             </div>
+            <div id="buscaResultadoInfo" class="result-count hidden"></div>
+            <div id="buscaResultados"></div>
         </div>
 
+        <!-- DADOS DO EDITAL -->
         <div class="card">
             <h2>📄 Dados do Edital</h2>
             <form id="formEdital" onsubmit="salvarEdital(event)">
                 <input type="hidden" id="edital_id">
+                <input type="hidden" id="link_pncp">
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Modalidade</label>
@@ -220,7 +290,7 @@
                         <input type="text" id="cnpj_orgao">
                     </div>
                     <div class="form-group">
-                        <label>Data da Sessão</label>
+                        <label>Data da Sessão / Abertura</label>
                         <input type="datetime-local" id="data_sessao">
                     </div>
                     <div class="form-group full">
@@ -275,10 +345,12 @@
                 </div>
                 <div class="actions-row">
                     <button type="submit" class="btn btn-primary" id="btnSalvarEdital">Salvar Edital</button>
+                    <a id="btnAbrirPncpForm" class="btn btn-secondary hidden" href="#" target="_blank" rel="noopener">🔗 Abrir no PNCP</a>
                 </div>
             </form>
         </div>
 
+        <!-- PRODUTOS -->
         <div class="card" id="cardItens">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
                 <h2 style="margin:0;">📦 Produtos</h2>
@@ -296,10 +368,7 @@
                     <button type="button" class="btn btn-danger btn-sm" onclick="limparItens()">🗑 Limpar</button>
                 </div>
             </div>
-            <p class="hint">
-                <strong>PDF TR</strong> usa LlamaParse Extract (JSON). Pode levar 1–2 min.
-                Excel/Colar = plano B. Sempre revise antes de salvar.
-            </p>
+            <p class="hint">Itens: PDF via LlamaParse, Excel ou manual. Sempre revise antes de salvar.</p>
             <div class="table-wrapper">
                 <table>
                     <thead>
@@ -332,6 +401,20 @@
             <div class="actions-row">
                 <button type="button" class="btn btn-primary" onclick="salvarItens()">Salvar Itens</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal detalhe PNCP -->
+<div class="modal-overlay" id="modalPncpDetalhe">
+    <div class="modal-box wide">
+        <h3 style="margin-bottom:4px;" id="detTitulo">Detalhe da licitação</h3>
+        <p style="font-size:12px;color:#64748b;margin-bottom:12px;" id="detSub"></p>
+        <div class="detail-grid" id="detGrid"></div>
+        <div class="actions-row" style="margin-top:8px;">
+            <button type="button" class="btn btn-primary" onclick="usarLicitacaoSelecionada()">Usar no meu edital</button>
+            <a class="btn btn-secondary" id="detLinkPncp" href="#" target="_blank" rel="noopener">🔗 Abrir / baixar no PNCP</a>
+            <button type="button" class="btn btn-secondary" onclick="fecharDetalhePncp()">Fechar</button>
         </div>
     </div>
 </div>
@@ -373,6 +456,8 @@ let userData = null;
 let itensLocais = [];
 let editalAtualId = null;
 let descEditIndex = null;
+let pncpSelecionado = null;
+let pncpListaCache = [];
 
 if (!token || !userStr) {
     window.location.href = "index.html";
@@ -421,6 +506,17 @@ function calcUnitario(it) {
     const frete = parseFloat(it.frete_outros) || parseFloat(document.getElementById('frete_padrao').value) || 0;
     return +(custo * (1 + margem / 100) * (1 + imp / 100) * (1 + frete / 100)).toFixed(4);
 }
+function fmtData(v) {
+    if (!v) return '—';
+    const s = String(v);
+    const m = s.match(/(\d{4})-(\d{2})-(\d{2})[T ]?(\d{2})?:?(\d{2})?/);
+    if (m) {
+        let out = `${m[3]}/${m[2]}/${m[1]}`;
+        if (m[4]) out += ` ${m[4]}:${m[5] || '00'}`;
+        return out;
+    }
+    return s;
+}
 function preencherDataSessao(valor) {
     if (!valor) return;
     let dia, mes, ano, hora = '08', min = '00';
@@ -453,9 +549,14 @@ function voltarLista() {
 function novoEdital() {
     editalAtualId = null;
     itensLocais = [];
+    pncpSelecionado = null;
     document.getElementById('formEdital').reset();
     document.getElementById('edital_id').value = '';
-    document.getElementById('pncp_entrada').value = '';
+    document.getElementById('link_pncp').value = '';
+    document.getElementById('busca_palavra').value = '';
+    document.getElementById('buscaResultados').innerHTML = '';
+    document.getElementById('buscaResultadoInfo').classList.add('hidden');
+    document.getElementById('btnAbrirPncpForm').classList.add('hidden');
     document.getElementById('margem_padrao').value = 20;
     document.getElementById('impostos_padrao').value = 0;
     document.getElementById('frete_padrao').value = 0;
@@ -478,34 +579,153 @@ async function apiFetch(url, options = {}) {
     return res;
 }
 
-/* ========== PNCP ========== */
-async function preencherCabecalhoPncp() {
-    const entrada = document.getElementById('pncp_entrada').value.trim();
-    if (!entrada) return showToast('Cole o ID ou link PNCP', 'error');
-    const btn = document.getElementById('btnPncp');
-    if (btn) { btn.disabled = true; btn.textContent = 'Consultando...'; }
+/* ========== BUSCA PNCP ========== */
+async function executarBuscaPncp() {
+    const campo = document.getElementById('busca_palavra').value.trim();
+    const forcarLink = document.getElementById('busca_e_link').checked;
+    const pareceLink = /pncp\.gov\.br/i.test(campo) || /\d{14}.+\d{4}/.test(campo);
+
+    const btn = document.getElementById('btnBuscarPncp');
+    btn.disabled = true;
+    btn.textContent = 'Buscando...';
+
     try {
-        const res = await apiFetch(FUNCTION_PNCP, {
-            method: 'POST',
-            body: JSON.stringify({ entrada })
-        });
-        const json = await res.json().catch(() => ({}));
-        if (!res.ok || !json.success) {
-            console.error(json);
-            showToast(json.error || 'PNCP indisponível — preencha manual', 'error');
-            return;
+        if (forcarLink || pareceLink) {
+            if (!campo) {
+                showToast('Cole o link ou ID PNCP', 'error');
+                return;
+            }
+            const res = await apiFetch(FUNCTION_PNCP, {
+                method: 'POST',
+                body: JSON.stringify({ entrada: campo })
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!json.success) {
+                console.error(json);
+                showToast(json.error || 'Não encontrado no PNCP', 'error');
+                document.getElementById('buscaResultados').innerHTML = '';
+                return;
+            }
+            pncpListaCache = [json.dados];
+            renderResultadosPncp([json.dados], 1);
+            abrirDetalhePncp(json.dados);
+            showToast('Contratação localizada no PNCP', 'success');
+        } else {
+            const body = {
+                palavra: campo,
+                uf: document.getElementById('busca_uf').value || undefined,
+                modalidadeId: document.getElementById('busca_modalidade').value
+                    ? Number(document.getElementById('busca_modalidade').value)
+                    : undefined,
+                soAbertas: document.getElementById('busca_abertas').value === '1',
+                pagina: 1,
+                tamanho: 20
+            };
+            const res = await apiFetch(FUNCTION_PNCP, {
+                method: 'POST',
+                body: JSON.stringify(body)
+            });
+            const json = await res.json().catch(() => ({}));
+            if (!json.success) {
+                console.error(json);
+                showToast(json.error || 'Falha na busca PNCP', 'error');
+                return;
+            }
+            pncpListaCache = json.items || [];
+            renderResultadosPncp(pncpListaCache, json.totalFiltrado ?? pncpListaCache.length, json.total);
+            if (!pncpListaCache.length) {
+                showToast('Nenhum resultado. Tente outra palavra, UF ou modalidade.', 'info');
+            } else {
+                showToast(`${pncpListaCache.length} resultado(s) (filtro local por palavra)`, 'success');
+            }
         }
-        aplicarCabecalho(json.dados, true);
-        showToast('Cabeçalho PNCP aplicado. Revise.', 'success');
     } catch (e) {
         console.error(e);
-        showToast('Function buscar-pncp ausente ou CORS — use manual', 'error');
+        showToast('Erro de conexão com buscar-pncp', 'error');
     } finally {
-        if (btn) { btn.disabled = false; btn.textContent = 'Preencher cabeçalho'; }
+        btn.disabled = false;
+        btn.textContent = 'Pesquisar';
     }
 }
 
-function aplicarCabecalho(d, forcar) {
+function renderResultadosPncp(items, filtrado, totalApi) {
+    const info = document.getElementById('buscaResultadoInfo');
+    const box = document.getElementById('buscaResultados');
+    info.classList.remove('hidden');
+    info.textContent = totalApi != null
+        ? `Resultados exibidos: ${filtrado} (página API ~${totalApi} registros brutos)`
+        : `Resultados: ${filtrado}`;
+
+    if (!items.length) {
+        box.innerHTML = '<div class="empty-state">Nenhuma licitação nesta consulta</div>';
+        return;
+    }
+
+    box.innerHTML = items.map((it, idx) => `
+        <div class="pncp-card" onclick="abrirDetalhePncp(pncpListaCache[${idx}])">
+            <div class="pncp-orgao">${esc(it.orgao || 'Órgão não informado')} ${it.uf ? '· ' + esc(it.uf) : ''}</div>
+            <h3>${esc(it.objeto || 'Sem objeto')}</h3>
+            <div class="pncp-meta">
+                <span><strong>${it.valor_estimado != null ? money(it.valor_estimado) : '—'}</strong></span>
+                <span>${esc(it.modalidade || '—')}</span>
+                <span>${esc(it.numero || '—')}</span>
+                <span>Pub.: ${fmtData(it.data_publicacao)}</span>
+                <span class="badge aberta">PNCP</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function abrirDetalhePncp(it) {
+    if (!it) return;
+    pncpSelecionado = it;
+    document.getElementById('detTitulo').textContent = it.orgao || 'Licitação PNCP';
+    document.getElementById('detSub').textContent = [it.numero, it.modalidade, it.uf].filter(Boolean).join(' · ');
+
+    const rows = [
+        ['Objeto', it.objeto || '—', true],
+        ['Valor estimado', it.valor_estimado != null ? money(it.valor_estimado) : '—'],
+        ['Modalidade', it.modalidade || '—'],
+        ['UF / Município', [it.uf, it.municipio].filter(Boolean).join(' · ') || '—'],
+        ['CNPJ órgão', it.cnpj_orgao || '—'],
+        ['Número', it.numero || '—'],
+        ['Publicação', fmtData(it.data_publicacao)],
+        ['Abertura propostas', fmtData(it.data_abertura_proposta)],
+        ['Encerramento propostas', fmtData(it.data_encerramento_proposta)],
+        ['Link PNCP', it.link_pncp || '—', true],
+    ];
+
+    document.getElementById('detGrid').innerHTML = rows.map(([label, value, full]) => `
+        <div class="${full ? 'full' : ''}">
+            <div class="detail-label">${label}</div>
+            <div class="detail-value">${esc(value)}</div>
+        </div>
+    `).join('');
+
+    const a = document.getElementById('detLinkPncp');
+    if (it.link_pncp) {
+        a.href = it.link_pncp;
+        a.style.display = '';
+    } else {
+        a.href = 'https://pncp.gov.br';
+    }
+
+    document.getElementById('modalPncpDetalhe').classList.add('show');
+}
+
+function fecharDetalhePncp() {
+    document.getElementById('modalPncpDetalhe').classList.remove('show');
+}
+
+function usarLicitacaoSelecionada() {
+    if (!pncpSelecionado) return;
+    aplicarCabecalhoPncp(pncpSelecionado, true);
+    fecharDetalhePncp();
+    showToast('Cabeçalho preenchido com dados do PNCP. Revise e salve.', 'success');
+    document.getElementById('objeto')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function aplicarCabecalhoPncp(d, forcar) {
     if (!d) return;
     const set = (id, v) => {
         if (v == null || v === '') return;
@@ -515,31 +735,32 @@ function aplicarCabecalho(d, forcar) {
     };
     set('modalidade', d.modalidade);
     set('numero', d.numero);
-    set('processo', d.processo);
     set('orgao', d.orgao);
     set('cnpj_orgao', d.cnpj_orgao);
     set('uf', d.uf);
     set('objeto', d.objeto);
-    set('criterio_julgamento', d.criterio_julgamento);
-    set('modo_disputa', d.modo_disputa);
-    set('plataforma', d.plataforma || 'PNCP');
+    set('plataforma', 'PNCP');
     if (d.valor_estimado != null && d.valor_estimado !== '') {
         if (forcar || !document.getElementById('valor_estimado').value)
             document.getElementById('valor_estimado').value = d.valor_estimado;
     }
-    if (d.tipo_disputa === 'lote' || d.tipo_disputa === 'item')
-        document.getElementById('tipo_disputa').value = d.tipo_disputa;
-    if (d.data_sessao) preencherDataSessao(d.data_sessao);
+    const dataRef = d.data_abertura_proposta || d.data_publicacao;
+    if (dataRef) preencherDataSessao(dataRef);
+
+    if (d.link_pncp) {
+        document.getElementById('link_pncp').value = d.link_pncp;
+        const btn = document.getElementById('btnAbrirPncpForm');
+        btn.href = d.link_pncp;
+        btn.classList.remove('hidden');
+    }
 }
 
-/* ========== LlamaParse Extract → JSON ========== */
+/* ========== LlamaParse itens ========== */
 async function extrairItensPdf(event) {
     const file = event.target.files?.[0];
     if (!file) return;
     if (document.getElementById('viewForm').classList.contains('hidden')) novoEdital();
-
-    showToast('LlamaParse Extract (agentic)... aguarde 1–2 min', 'info');
-
+    showToast('LlamaParse Extract... aguarde', 'info');
     try {
         const base64 = await fileToBase64(file);
         const res = await apiFetch(FUNCTION_ITENS_PDF, {
@@ -547,22 +768,17 @@ async function extrairItensPdf(event) {
             body: JSON.stringify({ pdfBase64: base64, pdfNome: file.name })
         });
         const json = await res.json().catch(() => ({}));
-
         if (!res.ok || !json.success) {
             console.error(json);
             showToast(json.error || 'Falha Extract', 'error');
             event.target.value = '';
             return;
         }
-
         const d = json.dados || {};
-        // preenche vazios do cabeçalho com o que o TR trouxe
-        aplicarCabecalho(d, false);
-
+        aplicarCabecalhoPncp(d, false);
         const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
         const lista = Array.isArray(d.itens) ? d.itens : [];
         let importados = 0;
-
         lista.forEach((it) => {
             const descricao = String(it.descricao || '').trim();
             if (descricao.length < 2) return;
@@ -572,25 +788,19 @@ async function extrairItensPdf(event) {
                 descricao,
                 unidade: it.unidade || 'UN',
                 quantidade: it.quantidade != null ? Number(it.quantidade) : 1,
-                valor_referencia: it.valor_unitario_referencia != null
-                    ? Number(it.valor_unitario_referencia)
-                    : null,
-                preco_custo: 0,
-                margem_lucro: margem,
-                preco_unitario: 0,
-                participar: true,
-                ordem: itensLocais.length
+                valor_referencia: it.valor_unitario_referencia != null ? Number(it.valor_unitario_referencia) : null,
+                preco_custo: 0, margem_lucro: margem, preco_unitario: 0,
+                participar: true, ordem: itensLocais.length
             });
             importados++;
         });
-
         if (importados > 0) {
             if (lista.some(x => x.lote)) document.getElementById('tipo_disputa').value = 'lote';
             renderItens();
-            showToast(`✅ ${importados} item(ns) via LlamaParse Extract`, 'success');
+            showToast(`✅ ${importados} item(ns) via LlamaParse`, 'success');
         } else {
-            console.log('Extract resposta:', json);
-            showToast('Extract OK, itens vazios. Veja F12.', 'info');
+            console.log(json);
+            showToast('Extract OK, itens vazios', 'info');
         }
     } catch (e) {
         console.error(e);
@@ -598,7 +808,6 @@ async function extrairItensPdf(event) {
     }
     event.target.value = '';
 }
-
 function fileToBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -611,7 +820,7 @@ function fileToBase64(file) {
     });
 }
 
-/* ========== Lista / CRUD ========== */
+/* ========== CRUD editais (igual antes) ========== */
 async function carregarEditais() {
     try {
         const res = await fetch(`${CONFIG_URL}/rest/v1/editais?select=id,numero,orgao,uf,modalidade,status&order=created_at.desc`, {
@@ -774,7 +983,7 @@ async function excluirEdital(id) {
 function renderItens() {
     const tbody = document.getElementById('listaItens');
     if (!itensLocais.length) {
-        tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state">Nenhum produto. Use PDF TR, Excel ou + Produto.</div></td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12"><div class="empty-state">Nenhum produto</div></td></tr>';
         atualizarTotais();
         document.getElementById('resumoLotes').innerHTML = '';
         return;
@@ -806,7 +1015,6 @@ function renderItens() {
     renderResumoLotes();
     atualizarTotais();
 }
-
 function abrirDesc(i) {
     descEditIndex = i;
     document.getElementById('descArea').value = itensLocais[i].descricao || '';
@@ -822,7 +1030,6 @@ function aplicarDesc() {
     fecharDesc();
     renderItens();
 }
-
 function renderResumoLotes() {
     const box = document.getElementById('resumoLotes');
     if (!isPorLote()) { box.innerHTML = ''; return; }
@@ -833,21 +1040,13 @@ function renderResumoLotes() {
         const unit = parseFloat(it.preco_custo) > 0 ? calcUnitario(it) : (parseFloat(it.preco_unitario) || 0);
         mapa[lote] = (mapa[lote] || 0) + unit * (parseFloat(it.quantidade) || 0);
     });
-    const keys = Object.keys(mapa).sort((a, b) => {
-        const na = parseFloat(a), nb = parseFloat(b);
-        if (!isNaN(na) && !isNaN(nb)) return na - nb;
-        return String(a).localeCompare(String(b));
-    });
+    const keys = Object.keys(mapa).sort((a, b) => (parseFloat(a) || 0) - (parseFloat(b) || 0));
     if (!keys.length) { box.innerHTML = ''; return; }
     let html = '<div class="lote-box"><h3>Soma por lote</h3>', geral = 0;
-    keys.forEach(k => {
-        geral += mapa[k];
-        html += `<div class="lote-line"><span>Lote ${k}</span><span>${money(mapa[k])}</span></div>`;
-    });
+    keys.forEach(k => { geral += mapa[k]; html += `<div class="lote-line"><span>Lote ${k}</span><span>${money(mapa[k])}</span></div>`; });
     html += `<div class="lote-line"><span>Total</span><span>${money(geral)}</span></div></div>`;
     box.innerHTML = html;
 }
-
 function updItem(i, field, value) {
     if (field === 'participar') itensLocais[i][field] = value;
     else if (['quantidade','preco_custo','margem_lucro','impostos','frete_outros','preco_unitario','valor_referencia'].includes(field))
@@ -878,41 +1077,30 @@ function atualizarTotais() {
     document.getElementById('totalGeral').textContent = money(somaVenda);
     document.getElementById('totalLucro').textContent = money(somaVenda - somaCusto);
 }
-
 function adicionarItem() {
     const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
     const n = itensLocais.length + 1;
     itensLocais.push({
-        numero_lote: isPorLote() ? String(n) : '',
-        numero_item: String(n),
-        descricao: '', unidade: 'UN', quantidade: 1,
-        valor_referencia: null, preco_custo: 0, margem_lucro: margem,
-        preco_unitario: 0, participar: true, ordem: itensLocais.length
+        numero_lote: isPorLote() ? String(n) : '', numero_item: String(n),
+        descricao: '', unidade: 'UN', quantidade: 1, valor_referencia: null,
+        preco_custo: 0, margem_lucro: margem, preco_unitario: 0, participar: true, ordem: itensLocais.length
     });
     renderItens();
 }
-function removerItem(i) {
-    itensLocais.splice(i, 1);
-    renderItens();
-}
+function removerItem(i) { itensLocais.splice(i, 1); renderItens(); }
 function limparItens() {
     if (!itensLocais.length) return showToast('Tabela vazia', 'info');
     if (!confirm('Apagar todos os produtos?')) return;
     itensLocais = [];
     renderItens();
-    showToast('Itens removidos', 'success');
 }
-
 async function salvarItens() {
     if (!editalAtualId) return showToast('Salve o edital primeiro', 'error');
     try {
         await fetch(`${CONFIG_URL}/rest/v1/edital_itens?edital_id=eq.${editalAtualId}`, {
             method: 'DELETE', headers: { 'apikey': CONFIG_KEY, 'Authorization': `Bearer ${token}` }
         });
-        if (!itensLocais.length) {
-            showToast('Itens salvos (vazio)', 'success');
-            return;
-        }
+        if (!itensLocais.length) { showToast('Itens salvos (vazio)', 'success'); return; }
         const rows = itensLocais.map((it, i) => {
             const unit = parseFloat(it.preco_custo) > 0 ? calcUnitario(it) : (parseFloat(it.preco_unitario) || 0);
             const qtd = parseFloat(it.quantidade) || 0;
@@ -937,24 +1125,19 @@ async function salvarItens() {
             body: JSON.stringify(rows)
         });
         if (res.ok) showToast('✅ Itens salvos!', 'success');
-        else {
-            console.error(await res.json());
-            showToast('Erro ao salvar itens', 'error');
-        }
+        else { console.error(await res.json()); showToast('Erro ao salvar itens', 'error'); }
     } catch (e) {
         console.error(e);
         showToast('Erro de conexão', 'error');
     }
 }
-
 function abrirPaste() { document.getElementById('modalPaste').classList.add('show'); }
 function fecharPaste() { document.getElementById('modalPaste').classList.remove('show'); }
 function processarPaste() {
     const texto = document.getElementById('pasteArea').value.trim();
     if (!texto) return;
-    const linhas = texto.split(/\r?\n/).filter(l => l.trim());
     const margem = parseFloat(document.getElementById('margem_padrao').value) || 20;
-    linhas.forEach(linha => {
+    texto.split(/\r?\n/).filter(l => l.trim()).forEach(linha => {
         const cols = linha.split(/\t|;|\|/).map(c => c.trim());
         if (cols.length < 2) return;
         let numero_lote = '', descricao = '', unidade = 'UN', quantidade = 1, valor_referencia = null;
@@ -963,23 +1146,17 @@ function processarPaste() {
             quantidade = parseNum(cols[3]) || 1; valor_referencia = parseNum(cols[4]);
         } else if (cols.length >= 4) {
             numero_lote = cols[0]; descricao = cols[1]; unidade = cols[2] || 'UN'; quantidade = parseNum(cols[3]) || 1;
-        } else {
-            descricao = cols[0]; quantidade = parseNum(cols[1]) || 1;
-        }
+        } else { descricao = cols[0]; quantidade = parseNum(cols[1]) || 1; }
         itensLocais.push({
             numero_lote, numero_item: String(itensLocais.length + 1),
             descricao, unidade, quantidade, valor_referencia,
-            preco_custo: 0, margem_lucro: margem, preco_unitario: 0,
-            participar: true, ordem: itensLocais.length
+            preco_custo: 0, margem_lucro: margem, preco_unitario: 0, participar: true, ordem: itensLocais.length
         });
     });
-    if (itensLocais.some(i => i.numero_lote)) document.getElementById('tipo_disputa').value = 'lote';
     fecharPaste();
     document.getElementById('pasteArea').value = '';
     renderItens();
-    showToast('Linhas importadas', 'success');
 }
-
 function importarPlanilha(event) {
     const file = event.target.files[0];
     if (!file) return;
@@ -1027,13 +1204,11 @@ function importarPlanilha(event) {
                     descricao = String(cols[0] || '');
                     if (!descricao) continue;
                 }
-                if (!descricao || descricao.length < 2 || /^total$/i.test(descricao.trim())) continue;
+                if (!descricao || descricao.length < 2) continue;
                 itensLocais.push({
-                    numero_lote,
-                    numero_item: numero_item || String(itensLocais.length + 1),
+                    numero_lote, numero_item: numero_item || String(itensLocais.length + 1),
                     descricao, unidade, quantidade, valor_referencia,
-                    preco_custo: 0, margem_lucro: margem, preco_unitario: 0,
-                    participar: true, ordem: itensLocais.length
+                    preco_custo: 0, margem_lucro: margem, preco_unitario: 0, participar: true, ordem: itensLocais.length
                 });
                 importados++;
             }
